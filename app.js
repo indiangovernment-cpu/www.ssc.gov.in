@@ -137,9 +137,12 @@ t==='Answer Key'?'▤':'▮';
 }
 
 function nav(){
+
 return `
 <div class="topline">
+
 <div>${T('feedback')}</div>
+
 <div>
 ${T('skip')} |
 <button id="langBtn" style="border:0;background:transparent;color:#333">
@@ -147,95 +150,163 @@ ${lang==='en'?'हिन्दी':'English'}
 </button>
 | +A A -A
 </div>
+
 </div>
 
 <div class="brandrow">
+
 <div class="brand">
-<img src="${A}header-brand.jpg" alt="Government of India Staff Selection Commission">
+
+<img
+src="${A}header-brand.jpg"
+alt="Government of India Staff Selection Commission"
+>
+
 <span class="ashoka">♜</span>
+
 </div>
 
 <div class="head-actions">
+
 <div class="searchbox">
-<input id="searchInput" placeholder="Search">
-<button id="searchBtn" style="border:0;background:transparent">⌕</button>
+
+<input
+id="searchInput"
+placeholder="Search"
+>
+
+<button
+id="searchBtn"
+style="border:0;background:transparent"
+>
+⌕
+</button>
+
 </div>
 
-<button class="login-btn" id="loginBtn">${T('login')}</button>
+<button
+class="login-btn"
+id="loginBtn"
+>
+${T('login')}
+</button>
+
 </div>
+
 </div>
 
 <div class="nav">
+
 <div class="container nav-inner">
 
 ${['Home',"Chairman's Message",'For Candidates','Tender','RTI','About Us'].map((x,i)=>{
 
 if(menus[x]){
+
 return `
-<div class="nav-item" data-menu="${esc(x)}">
+<div
+class="nav-item"
+data-menu="${esc(x)}"
+>
+
 <button class="nav-btn">
+
 ${T(
 x==="Chairman's Message"?'chair':
 x==='For Candidates'?'cand':
 x==='About Us'?'about':
 x.toLowerCase()
 )}
+
 <span class="caret">▾</span>
+
 </button>
 
 <div class="dropdown">
+
 ${menus[x].map(y=>`
+
 <a
 class="drop-link"
 href="#"
 data-action="submenu"
 data-label="${esc(y)}"
->${esc(y)}</a>
+>
+${esc(y)}
+</a>
+
 `).join('')}
+
 </div>
+
 </div>
 `;
+
 }
 
 return `
 <div class="nav-item">
+
 <button
 class="nav-btn"
 data-page="${i===3?'tender':i===1?'chairman':'home'}"
 >
+
 ${T(
 x==='Home'?'home':
 x==='Tender'?'tender':
 x==='RTI'?'rti':
 x.toLowerCase()
 )}
+
 </button>
+
 </div>
 `;
 
 }).join('')}
 
 </div>
+
 </div>
 `;
 }
 
 function hero(){
+
 return `
 <div class="hero">
-<img id="heroImg" src="${A}hero-building-1.jpg" alt="SSC building">
 
-<button class="hero-prev" id="heroPrev">‹</button>
-<button class="hero-next" id="heroNext">›</button>
+<img
+id="heroImg"
+src="${A}hero-building-1.jpg"
+alt="SSC building"
+>
+
+<button
+class="hero-prev"
+id="heroPrev"
+>
+‹
+</button>
+
+<button
+class="hero-next"
+id="heroNext"
+>
+›
+</button>
 
 <div class="hero-dots">
 <span class="active"></span>
 <span></span>
 <span></span>
 </div>
+
 </div>
 
 <div class="notice-strip">
+
 <div class="ticker">
 
 <div class="ticker-row">
@@ -253,32 +324,58 @@ One Time Registration(OTR) for Scribe is live.
 Please click here to register.
 </div>
 
-<a class="join" href="#">Join Indian Navy</a>
+<a class="join" href="#">
+Join Indian Navy
+</a>
 
 </div>
+
 </div>
 `;
 }
 
 function noticeCard(){
+
 return `
 <section class="section container">
+
 <div class="card notice-card">
 
 <div class="section-head">
-<h2 class="section-title">${T('notice')}</h2>
-<a href="#" data-page="notices">${T('view')}</a>
+
+<h2 class="section-title">
+${T('notice')}
+</h2>
+
+<a
+href="#"
+data-page="notices"
+>
+${T('view')}
+</a>
+
 </div>
 
 <div class="notice-list">
 
 ${notices.map((n,i)=>`
+
 <div class="notice-row">
 
 <div class="datebox">
-<span class="month">${n[0]}</span>
-<span class="day">${n[1]}</span>
-<span class="year">${n[2]}</span>
+
+<span class="month">
+${n[0]}
+</span>
+
+<span class="day">
+${n[1]}
+</span>
+
+<span class="year">
+${n[2]}
+</span>
+
 </div>
 
 <div class="notice-title">
@@ -287,17 +384,26 @@ ${esc(n[3])}
 
 <div class="notice-meta">
 (${n[4]})
-<span class="pdf">PDF</span>
+<span class="pdf">
+PDF
+</span>
 </div>
 
-<button class="eye" data-notice="${i}">◉</button>
+<button
+class="eye"
+data-notice="${i}"
+>
+◉
+</button>
 
 </div>
+
 `).join('')}
 
 </div>
 
 <div class="pager">
+
 <button>‹</button>
 <button class="current">1</button>
 <button>2</button>
@@ -305,18 +411,23 @@ ${esc(n[3])}
 <button>…</button>
 <button>66</button>
 <button>›</button>
+
 </div>
 
 </div>
+
 </section>
 `;
 }
 
 function quick(){
+
 return `
 <section class="container section">
 
-<h2 class="section-title">${T('quick')}</h2>
+<h2 class="section-title">
+${T('quick')}
+</h2>
 
 <div class="quick-grid">
 
@@ -326,34 +437,54 @@ ${[
 [T('answer'),'Answer Key'],
 [T('result'),'Result']
 ].map(x=>`
+
 <a
 class="quick"
 href="#"
 data-quick="${x[1]}"
 >
-<span class="ico">${icon(x[1])}</span>
-<span>${x[0]}</span>
+
+<span class="ico">
+${icon(x[1])}
+</span>
+
+<span>
+${x[0]}
+</span>
+
 </a>
+
 `).join('')}
 
 </div>
+
 </section>
 `;
 }
 
 function calendarCard(){
+
 return `
 <section class="container section">
 
 <div class="card calendar-card">
 
 <div class="calendar-head">
-<h2 class="section-title">${T('calendar')}</h2>
+
+<h2 class="section-title">
+${T('calendar')}
+</h2>
 
 <div class="month-nav">
+
 <button>‹</button>
-<span>Aug, 2026</span>
+
+<span>
+Aug, 2026
+</span>
+
 <button>›</button>
+
 </div>
 
 </div>
@@ -361,11 +492,19 @@ return `
 <div class="cal-list">
 
 ${calendar.map(c=>`
+
 <div class="cal-row">
 
 <div class="cal-date">
-<strong>${c[0]}</strong>
-<small>${c[1]}</small>
+
+<strong>
+${c[0]}
+</strong>
+
+<small>
+${c[1]}
+</small>
+
 </div>
 
 <div class="cal-name">
@@ -373,26 +512,34 @@ ${esc(c[2])}
 </div>
 
 </div>
+
 `).join('')}
 
 </div>
 
-<a class="viewall" href="#" data-page="calendar">
+<a
+class="viewall"
+href="#"
+data-page="calendar"
+>
 ${T('view')}
 </a>
 
 </div>
+
 </section>
 `;
 }
 
 function examSection(){
+
 return `
 <section class="exams section">
 
 <div class="container exam-wrap">
 
 <div>
+
 <h2 class="exam-title">
 ${T('browse').replace(' by ','<br>')}
 </h2>
@@ -400,6 +547,7 @@ ${T('browse').replace(' by ','<br>')}
 <div class="exam-sub">
 Explore exam-related details and relevant resources.
 </div>
+
 </div>
 
 <div>
@@ -407,6 +555,7 @@ Explore exam-related details and relevant resources.
 <div class="exam-track">
 
 ${exams.map((e,i)=>`
+
 <a
 href="#"
 class="exam-card"
@@ -414,13 +563,23 @@ data-exam="${i}"
 >
 
 <div>
-<h3>${esc(e[0])}</h3>
-<p>${esc(e[1])}</p>
+
+<h3>
+${esc(e[0])}
+</h3>
+
+<p>
+${esc(e[1])}
+</p>
+
 </div>
 
-<span class="arrow">→</span>
+<span class="arrow">
+→
+</span>
 
 </a>
+
 `).join('')}
 
 </div>
@@ -431,12 +590,15 @@ data-exam="${i}"
 </div>
 
 </div>
+
 </div>
+
 </section>
 `;
 }
 
 function promos(){
+
 return `
 <section class="container">
 
@@ -455,11 +617,13 @@ return `
 </div>
 
 </div>
+
 </section>
 `;
 }
 
 function faqSection(){
+
 return `
 <section class="container section">
 
@@ -467,13 +631,18 @@ return `
 
 <div class="faq-copy">
 
-<h2>${T('faq')}</h2>
+<h2>
+${T('faq')}
+</h2>
 
 <p>
 List of common inquiries and their brief answers to provide quick information and assist users.
 </p>
 
-<button class="primary" data-page="faqs">
+<button
+class="primary"
+data-page="faqs"
+>
 View All
 </button>
 
@@ -486,11 +655,22 @@ MOST POPULAR FAQS
 </div>
 
 ${faqs.map((f,i)=>`
+
 <div class="faq-item">
 
-<button class="faq-q" data-faq="${i}">
-<span>${esc(f[0])}</span>
-<b>⊕</b>
+<button
+class="faq-q"
+data-faq="${i}"
+>
+
+<span>
+${esc(f[0])}
+</span>
+
+<b>
+⊕
+</b>
+
 </button>
 
 <div class="faq-a">
@@ -498,19 +678,25 @@ ${esc(f[1])}
 </div>
 
 </div>
+
 `).join('')}
 
 </div>
+
 </div>
+
 </section>
 `;
 }
 
 function initiatives(){
+
 return `
 <section class="container section initiatives">
 
-<h2 class="section-title">${T('other')}</h2>
+<h2 class="section-title">
+${T('other')}
+</h2>
 
 <div class="initiative-grid">
 
@@ -520,13 +706,20 @@ ${[
 ['initiative-data.jpg','data.gov.in'],
 ['initiative-digital.jpg','Digital India']
 ].map(x=>`
+
 <a
 class="initiative"
 href="#"
 data-action="initiative"
 >
-<img src="${A+x[0]}" alt="${x[1]}">
+
+<img
+src="${A+x[0]}"
+alt="${x[1]}"
+>
+
 </a>
+
 `).join('')}
 
 </div>
@@ -541,6 +734,7 @@ data-action="initiative"
 }
 
 function footer(){
+
 return `
 <footer class="footer">
 
@@ -549,11 +743,14 @@ return `
 <div>
 
 <div class="footer-brand">
+
 <img src="${A}ssc-footer.jpg">
+
 <span>
 Staff Selection<br>
 Commission
 </span>
+
 </div>
 
 <p>
@@ -568,7 +765,9 @@ List of Debarred Candidates in Examinations Conducted by the Staff Selection Com
 
 <div>
 
-<b>Useful links</b>
+<b>
+Useful links
+</b>
 
 <a href="#">DoPT</a>
 <a href="#">Archives</a>
@@ -582,7 +781,9 @@ List of Debarred Candidates in Examinations Conducted by the Staff Selection Com
 
 <div>
 
-<b>Contact Us</b>
+<b>
+Contact Us
+</b>
 
 <p>
 ⌖ Block No-12, CGO Complex, Lodhi Road<br>
@@ -595,9 +796,17 @@ New Delhi - 110003
 
 <div class="container footer-bottom">
 
-<span>© 2026 SSC. All Rights Reserved.</span>
-<span>Total Visitor Count: 474754905</span>
-<span>Last updated on Aug 12, 2026</span>
+<span>
+© 2026 SSC. All Rights Reserved.
+</span>
+
+<span>
+Total Visitor Count: 474754905
+</span>
+
+<span>
+Last updated on Aug 12, 2026
+</span>
 
 </div>
 
@@ -606,6 +815,7 @@ New Delhi - 110003
 }
 
 function home(){
+
 return nav()+
 hero()+
 noticeCard()+
@@ -616,10 +826,13 @@ promos()+
 faqSection()+
 initiatives()+
 footer();
+
 }
 
 function page(title,body){
+
 return nav()+
+
 `
 <main class="page container">
 
@@ -627,18 +840,23 @@ return nav()+
 Homepage &gt; ${esc(title)}
 </div>
 
-<h1>${esc(title)}</h1>
+<h1>
+${esc(title)}
+</h1>
 
 ${body}
 
 </main>
-`+
+`
+
++
 footer();
+
 }
 
 function tenderPage(){
 
-let rows=[
+const rows=[
 'Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for Technology and Operations Partner for SSC Examinations and Candidate Services',
 'Notice for Opening of Bids in respect of the RFP for Selection of Service Provider (SP) for Technology & Operations Partner for SSC Examinations and Candidate Services',
 'Corrigendum 4 - Corrigendum regarding Extension of Dates in respect of the RFP for Selection of Service Provider (SP) for Technology and Operations Partner for SSC Examinations and Candidate Services',
@@ -650,30 +868,50 @@ let rows=[
 
 return page(
 'Tender',
+
 `
 <p>
 Welcome to the SSC Tenders page, your gateway to explore the latest tender opportunities related to Staff Selection Commission.
 </p>
 
-<div class="searchbox" style="margin:20px 0;width:280px">
+<div
+class="searchbox"
+style="margin:20px 0;width:280px"
+>
+
 <input placeholder="Search">
-<span>⌕</span>
+
+<span>
+⌕
+</span>
+
 </div>
 
 ${rows.map((r,i)=>`
+
 <div class="tender-row">
 
 <div>
-${i+1}<br>
-<small>2026</small>
+${i+1}
+<br>
+<small>
+2026
+</small>
 </div>
 
 <div>
+
 ${esc(r)}
+
 <br>
-<a class="download" href="#">
+
+<a
+class="download"
+href="#"
+>
 PDF. ${(158+i*37).toFixed(2)} KB
 </a>
+
 </div>
 
 <div>
@@ -681,16 +919,19 @@ PDF. ${(158+i*37).toFixed(2)} KB
 </div>
 
 </div>
+
 `).join('')}
 
 `
 );
+
 }
 
 function calendarPage(){
 
 return page(
 'SSC Calendar',
+
 `
 <p>
 Staff Selection Commission Tentative Calendar of Examination for the Year 2026-2027
@@ -703,11 +944,19 @@ ${calendar.concat([
 ['16','MAR','JSA / LDC Grade Limited Departmental Competitive Examination, 2025 for DoPT only'],
 ['16','MAR','ASO Grade Limited Departmental Competitive Examination, 2025']
 ]).map(c=>`
+
 <div class="cal-row">
 
 <div class="cal-date">
-<strong>${c[0]}</strong>
-<small>${c[1]}</small>
+
+<strong>
+${c[0]}
+</strong>
+
+<small>
+${c[1]}
+</small>
+
 </div>
 
 <div class="cal-name">
@@ -715,26 +964,40 @@ ${esc(c[2])}
 </div>
 
 </div>
+
 `).join('')}
 
 </div>
 `
 );
+
 }
 
 function faqsPage(){
 
 return page(
 'FAQs',
+
 `
 <div class="faq-list">
 
 ${faqs.concat(faqs).map((f,i)=>`
+
 <div class="faq-item">
 
-<button class="faq-q" data-faq="${i%faqs.length}">
-<span>${esc(f[0])}</span>
-<b>⊕</b>
+<button
+class="faq-q"
+data-faq="${i%faqs.length}"
+>
+
+<span>
+${esc(f[0])}
+</span>
+
+<b>
+⊕
+</b>
+
 </button>
 
 <div class="faq-a">
@@ -742,21 +1005,26 @@ ${esc(f[1])}
 </div>
 
 </div>
+
 `).join('')}
 
 </div>
 `
 );
+
 }
 
 function examPage(i){
 
-let e=exams[i]||exams[0];
+const e=exams[i]||exams[0];
 
 return page(
 e[0],
+
 `
-<p>${esc(e[1])}</p>
+<p>
+${esc(e[1])}
+</p>
 
 <div class="admin-note">
 This examination section contains notices, syllabus, special instructions, previous year question papers, tentative vacancies and related resources.
@@ -783,6 +1051,7 @@ Result
 </div>
 `
 );
+
 }
 
 function modal(html,cls=''){
@@ -792,20 +1061,35 @@ const root=document.getElementById('modal-root');
 if(!root)return;
 
 root.innerHTML=`
-<div class="modal-backdrop" id="backdrop">
+<div
+class="modal-backdrop"
+id="backdrop"
+>
+
 <div class="modal ${cls}">
 ${html}
 </div>
+
 </div>
 `;
 
-document
-.getElementById('backdrop')
-.addEventListener('click',e=>{
+const backdrop=document.getElementById('backdrop');
+
+if(backdrop){
+
+backdrop.addEventListener(
+'click',
+e=>{
+
 if(e.target.id==='backdrop'){
 closeModal();
 }
-});
+
+}
+);
+
+}
+
 }
 
 function closeModal(){
@@ -815,16 +1099,23 @@ const root=document.getElementById('modal-root');
 if(root){
 root.innerHTML='';
 }
+
 }
 
 function resultModal(){
 
 modal(`
+
 <div class="modal-head">
 
-<h2>▮ Result</h2>
+<h2>
+▮ Result
+</h2>
 
-<button class="close" onclick="closeModal()">
+<button
+class="close"
+onclick="closeModal()"
+>
 ×
 </button>
 
@@ -837,9 +1128,11 @@ ${[
 'DEPARTMENTAL EXAMS','DPHCM','RHQ','DPCE','CGL','DPCD',
 'DPHCT','CEDP','MTS','STE'
 ].map((x,i)=>`
+
 <button class="tab ${i===0?'active':''}">
 ${x}
 </button>
+
 `).join('')}
 
 </div>
@@ -847,43 +1140,72 @@ ${x}
 <div class="modal-body">
 
 ${notices.slice(0,2).map(n=>`
+
 <div class="result-row">
 
 <div>
+
 ${esc(n[3])}
+
 <br>
-<small>03-08-2026</small>
+
+<small>
+03-08-2026
+</small>
+
 </div>
 
 <div class="result-actions">
+
 (${n[4]})
-<span class="pdf">PDF</span>
+<span class="pdf">
+PDF
+</span>
+
 <br>
-<a href="#">Write up</a>
-<a href="#">Result</a>
+
+<a href="#">
+Write up
+</a>
+
+<a href="#">
+Result
+</a>
+
 </div>
 
 </div>
+
 `).join('')}
 
 </div>
 
 <div class="modal-footer">
+
 <button class="primary">
 View All
 </button>
+
 </div>
+
 `);
+
 }
 
 function admitModal(){
 
 modal(`
+
 <div class="modal-head">
 
-<h2>▣ ${T('admit')}</h2>
+<h2>
+▣ ${T('admit')}
+</h2>
 
-<button class="close" onclick="closeModal()">
+<button
+class="close"
+onclick="closeModal()"
+>
 ×
 </button>
 
@@ -892,35 +1214,49 @@ modal(`
 <div class="modal-body">
 
 <div class="result-row">
+
 <div>
 Download E-Admit Card of Stenographer Grade 'C' and 'D' Examination, 2024,
 </div>
+
 </div>
 
 <div class="result-row">
+
 <div>
 Download E-Admit Card of Combined Hindi Translators Examination,
 </div>
+
 </div>
 
 </div>
 
 <div class="modal-footer">
+
 <button class="primary">
 Login
 </button>
+
 </div>
+
 `);
+
 }
 
 function applyModal(){
 
 modal(`
+
 <div class="modal-head">
 
-<h2>✎ ${T('apply')}</h2>
+<h2>
+✎ ${T('apply')}
+</h2>
 
-<button class="close" onclick="closeModal()">
+<button
+class="close"
+onclick="closeModal()"
+>
 ×
 </button>
 
@@ -928,9 +1264,13 @@ modal(`
 
 <div class="modal-body">
 
-<div style="text-align:center;padding:50px 10px">
+<div
+style="text-align:center;padding:50px 10px"
+>
 
-<div style="font-size:78px;color:#c48784">
+<div
+style="font-size:78px;color:#c48784"
+>
 📄
 </div>
 
@@ -941,17 +1281,25 @@ Application is not active !
 </div>
 
 </div>
+
 `);
+
 }
 
 function answerModal(){
 
 modal(`
+
 <div class="modal-head">
 
-<h2>▤ ${T('answer')}</h2>
+<h2>
+▤ ${T('answer')}
+</h2>
 
-<button class="close" onclick="closeModal()">
+<button
+class="close"
+onclick="closeModal()"
+>
 ×
 </button>
 
@@ -959,11 +1307,12 @@ modal(`
 
 <div class="tabs">
 
-${['CGL','CHSL','JE','MTS','STENO','OTHERS']
-.map((x,i)=>`
+${['CGL','CHSL','JE','MTS','STENO','OTHERS'].map((x,i)=>`
+
 <button class="tab ${i===0?'active':''}">
 ${x}
 </button>
+
 `).join('')}
 
 </div>
@@ -997,16 +1346,25 @@ PDF
 </div>
 
 <div class="modal-footer">
+
 <button class="primary">
 View All
 </button>
+
 </div>
+
 `);
+
 }
+
+/* ==========================================
+   LOGIN MODAL
+   ========================================== */
 
 function loginModal(){
 
 modal(`
+
 <div class="modal-head">
 </div>
 
@@ -1020,7 +1378,9 @@ Candidate
 </button>
 
 <button
+type="button"
 data-login-tab="admin"
+onclick="window.location.href='./admin.html'"
 >
 Admin
 </button>
@@ -1035,7 +1395,9 @@ Admin
 Username (Registration Number) <b>*</b>
 </label>
 
-<input placeholder="Registration Number">
+<input
+placeholder="Registration Number"
+>
 
 </div>
 
@@ -1053,9 +1415,14 @@ placeholder="Password"
 </div>
 
 <div style="text-align:right">
-<a class="link" href="#">
+
+<a
+class="link"
+href="#"
+>
 Forgot Password
 </a>
+
 </div>
 
 <div class="captcha">
@@ -1065,6 +1432,7 @@ LRaQV
 </div>
 
 <button
+type="button"
 class="close"
 style="font-size:14px"
 >
@@ -1079,22 +1447,30 @@ style="font-size:14px"
 Captcha *
 </label>
 
-<input placeholder="Captcha">
+<input
+placeholder="Captcha"
+>
 
 </div>
 
 <button
+type="button"
 class="primary"
 style="width:100%"
 >
 Login
 </button>
 
-<div style="text-align:center;padding-top:12px">
+<div
+style="text-align:center;padding-top:12px"
+>
 
 New User ? &nbsp;
 
-<a class="link" href="#">
+<a
+class="link"
+href="#"
+>
 Register Now
 </a>
 
@@ -1103,27 +1479,37 @@ Register Now
 </div>
 
 <button
+type="button"
 class="close"
 style="position:absolute;right:10px;top:8px"
 onclick="closeModal()"
 >
 ×
 </button>
+
 `,
 'small'
 );
+
 }
+
+/* ==========================================
+   NOTICE MODAL
+   ========================================== */
 
 function noticeModal(i){
 
-let n=notices[i];
+const n=notices[i];
 
 if(!n)return;
 
 modal(`
+
 <div class="modal-head">
 
-<h2>Notice</h2>
+<h2>
+Notice
+</h2>
 
 <button
 class="close"
@@ -1172,23 +1558,34 @@ Download PDF
 </button>
 
 </div>
+
 `);
+
 }
+
+/* ==========================================
+   SEARCH
+   ========================================== */
 
 function searchModal(q){
 
 const all=[
+
 ...notices.map(x=>x[3]),
 ...exams.map(x=>x[0]),
 ...faqs.map(x=>x[0])
+
 ].filter(
 x=>x.toLowerCase().includes(q.toLowerCase())
 );
 
 modal(`
+
 <div class="modal-head">
 
-<h2>Search</h2>
+<h2>
+Search
+</h2>
 
 <button
 class="close"
@@ -1203,85 +1600,31 @@ onclick="closeModal()"
 
 ${
 all.length
+
 ?
+
 all.map(x=>`
+
 <div class="search-item">
 ${esc(x)}
 </div>
+
 `).join('')
+
 :
+
 'No matching results found.'
 }
 
 </div>
+
 `);
-}
-
-/* =========================
-   ADMIN
-   ========================= */
-
-function openAdmin(){
-
-window.location.href='admin.html';
 
 }
 
-/* =========================
-   PAGE RENDER
-   ========================= */
-
-function render(){
-
-const root=document.getElementById('app');
-
-if(!root)return;
-
-const h=location.hash.slice(1);
-
-if(h.startsWith('page=')){
-
-const p=h.slice(5);
-
-root.innerHTML=
-p==='tender'
-?tenderPage()
-:p==='calendar'
-?calendarPage()
-:p==='faqs'
-?faqsPage()
-:p==='chairman'
-?page(
-"Chairman's Message",
-'<p>Welcome to the Chairman’s Message section of the Staff Selection Commission.</p>'
-)
-:p==='notices'
-?page('Notice Board',noticeCard())
-:home();
-
-}
-
-else if(h.startsWith('exam=')){
-
-root.innerHTML=examPage(
-Number(h.slice(5))
-);
-
-}
-
-else{
-
-root.innerHTML=home();
-
-}
-
-bind();
-
-}
-
-/* =========================
-   HERO IMAGE ROTATION
-   ========================= */
+/* ==========================================
+   HERO
+   ========================================== */
 
 function bindHero(){
 
@@ -1301,7 +1644,7 @@ const dots=[
 ...document.querySelectorAll('.hero-dots span')
 ];
 
-const go=d=>{
+function go(d){
 
 i=(i+d+imgs.length)%imgs.length;
 
@@ -1314,7 +1657,7 @@ n===i
 )
 );
 
-};
+}
 
 document
 .getElementById('heroPrev')
@@ -1337,15 +1680,38 @@ setInterval(
 
 }
 
-/* =========================
-   ALL EVENTS
-   ========================= */
+/* ==========================================
+   TOAST
+   ========================================== */
+
+function toast(msg){
+
+const t=document.getElementById('toast');
+
+if(!t)return;
+
+t.textContent=msg;
+
+t.classList.add('show');
+
+setTimeout(
+()=>{
+t.classList.remove('show');
+},
+1800
+);
+
+}
+
+/* ==========================================
+   BIND
+   ========================================== */
 
 function bind(){
 
 bindHero();
 
-/* Dropdown menus */
+/* MENU */
 
 document
 .querySelectorAll('[data-menu]')
@@ -1364,9 +1730,11 @@ e.stopPropagation();
 document
 .querySelectorAll('.nav-item.open')
 .forEach(x=>{
+
 if(x!==el){
 x.classList.remove('open');
 }
+
 });
 
 el.classList.toggle('open');
@@ -1376,21 +1744,7 @@ el.classList.toggle('open');
 
 });
 
-/* Close dropdown when clicking outside */
-
-document.addEventListener(
-'click',
-()=>{
-document
-.querySelectorAll('.nav-item.open')
-.forEach(x=>x.classList.remove('open'));
-},
-{
-once:true
-}
-);
-
-/* Pages */
+/* PAGE LINKS */
 
 document
 .querySelectorAll('[data-page]')
@@ -1409,7 +1763,7 @@ location.hash='page='+el.dataset.page;
 
 });
 
-/* Quick links */
+/* QUICK LINKS */
 
 document
 .querySelectorAll('[data-quick]')
@@ -1444,7 +1798,7 @@ answerModal();
 
 });
 
-/* Notices */
+/* NOTICE */
 
 document
 .querySelectorAll('[data-notice]')
@@ -1476,7 +1830,7 @@ el.parentElement.classList.toggle('open');
 
 });
 
-/* Exams */
+/* EXAMS */
 
 document
 .querySelectorAll('[data-exam]')
@@ -1495,7 +1849,7 @@ location.hash='exam='+el.dataset.exam;
 
 });
 
-/* Login */
+/* LOGIN */
 
 document
 .getElementById('loginBtn')
@@ -1504,7 +1858,7 @@ document
 loginModal
 );
 
-/* Search */
+/* SEARCH */
 
 document
 .getElementById('searchBtn')
@@ -1540,7 +1894,7 @@ document
 }
 );
 
-/* Language */
+/* LANGUAGE */
 
 document
 .getElementById('langBtn')
@@ -1559,7 +1913,7 @@ render();
 }
 );
 
-/* Submenus */
+/* SUBMENUS */
 
 document
 .querySelectorAll('[data-action="submenu"]')
@@ -1580,33 +1934,23 @@ el.dataset.label+' opened'
 
 });
 
-/* =========================
-   IMPORTANT ADMIN FIX
-   ========================= */
+/*
+IMPORTANT:
+Admin button has its own inline onclick
+inside loginModal(), so it does NOT depend
+on this JavaScript event listener.
+*/
 
 document
-.querySelectorAll('[data-login-tab]')
+.querySelectorAll('[data-login-tab="candidate"]')
 .forEach(el=>{
 
 el.addEventListener(
 'click',
-()=>{
+e=>{
 
-const tab=el.dataset.loginTab;
-
-if(tab==='admin'){
-
-/*
- Admin button now opens the actual
- admin.html page instead of only
- showing "Admin login selected".
-*/
-
-window.location.href='admin.html';
-
-return;
-
-}
+e.preventDefault();
+e.stopPropagation();
 
 toast('Candidate login selected');
 
@@ -1617,32 +1961,87 @@ toast('Candidate login selected');
 
 }
 
-/* =========================
-   TOAST
-   ========================= */
+/* ==========================================
+   RENDER
+   ========================================== */
 
-function toast(msg){
+function render(){
 
-const t=document.getElementById('toast');
+const root=document.getElementById('app');
 
-if(!t)return;
+if(!root)return;
 
-t.textContent=msg;
+const h=location.hash.slice(1);
 
-t.classList.add('show');
+if(h.startsWith('page=')){
 
-setTimeout(
-()=>{
-t.classList.remove('show');
-},
-1800
+const p=h.slice(5);
+
+if(p==='tender'){
+
+root.innerHTML=tenderPage();
+
+}
+
+else if(p==='calendar'){
+
+root.innerHTML=calendarPage();
+
+}
+
+else if(p==='faqs'){
+
+root.innerHTML=faqsPage();
+
+}
+
+else if(p==='chairman'){
+
+root.innerHTML=page(
+"Chairman's Message",
+'<p>Welcome to the Chairman’s Message section of the Staff Selection Commission.</p>'
 );
 
 }
 
-/* =========================
+else if(p==='notices'){
+
+root.innerHTML=page(
+'Notice Board',
+noticeCard()
+);
+
+}
+
+else{
+
+root.innerHTML=home();
+
+}
+
+}
+
+else if(h.startsWith('exam=')){
+
+root.innerHTML=examPage(
+Number(h.slice(5))
+);
+
+}
+
+else{
+
+root.innerHTML=home();
+
+}
+
+bind();
+
+}
+
+/* ==========================================
    GLOBAL FUNCTIONS
-   ========================= */
+   ========================================== */
 
 window.closeModal=closeModal;
 window.resultModal=resultModal;
@@ -1651,7 +2050,10 @@ window.applyModal=applyModal;
 window.answerModal=answerModal;
 window.loginModal=loginModal;
 window.noticeModal=noticeModal;
-window.openAdmin=openAdmin;
+
+/* ==========================================
+   START
+   ========================================== */
 
 window.addEventListener(
 'hashchange',
