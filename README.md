@@ -1,15 +1,16 @@
-# SSC Mobile Reference + Supabase Ready Build
+# SSC Final Reference Build
 
-This package keeps the compact SSC-style mobile layout and includes working navigation/modals, notice board, candidate services, exam resources, search, FAQ, calendar, login/register UI, and Supabase-backed shared notices/files.
+Mobile-first SSC-style website rebuilt against the supplied 50341/50396 video and screenshot references.
 
-## Supabase already configured
-`config.js` contains the supplied project URL and publishable/anon key. Do not replace it with a service_role/secret key.
+## Included
+- Video-reference header, hero, maroon information band, notice board, quick links, calendar, browse-by-examinations, promotional carousel, FAQ, initiatives carousel and footer.
+- English/Hindi switch.
+- Working navigation/dropdowns, search, notice pagination, notice PDF opening, calendar month controls, examination carousel, promotional/initiative rotation, FAQ accordion.
+- Result, Admit Card and Answer Key interactive modals.
+- Candidate login UI and Admin login link.
+- Supabase notice board and admin upload/publish/delete workflow.
 
-## One-time Supabase setup
-Run `supabase.sql` in the Supabase SQL Editor. Then create your admin user in Authentication > Users.
+## Supabase
+`config.js` is preconfigured with the supplied browser-safe publishable key. Run `supabase.sql` once in the Supabase SQL editor, create an admin user in Authentication, then open `admin.html`.
 
-## Admin
-Open `admin.html`, sign in with the Supabase admin user, upload a PDF/file, enter the notice details, and click **Save Notice**. The notice then appears on the public home page for all visitors.
-
-## Deployment
-Static hosting is enough. Publish the folder containing `index.html` at the repository root.
+The browser-side key is intended for client use. Never add a service-role/secret key to `config.js` or GitHub.
