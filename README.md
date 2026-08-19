@@ -1,22 +1,15 @@
-# SSC Final Reference Build
+# SSC Mobile Reference + Supabase Ready Build
 
-This is a static, mobile-first SSC portal recreation based on the supplied 49846.mp4 reference recording. It reproduces the visible structure and interaction patterns: header/nav dropdowns, hero building, notice board, quick links, calendar, Browse by Examinations, image/promo carousel area, FAQs, initiatives, footer, result modal, candidate/admin login modal, search, and dedicated calendar/tender/exam views.
+This package keeps the compact SSC-style mobile layout and includes working navigation/modals, notice board, candidate services, exam resources, search, FAQ, calendar, login/register UI, and Supabase-backed shared notices/files.
 
-## Upload to GitHub
-Keep this structure exactly:
-- index.html
-- site.css
-- app.js
-- admin.html
-- admin.css
-- admin.js
-- config.js
-- config.example.js
-- supabase.sql
-- assets/ (do not move the images)
+## Supabase already configured
+`config.js` contains the supplied project URL and publishable/anon key. Do not replace it with a service_role/secret key.
 
-## Render
-Use a Static Site. Build command can be empty. Publish directory is the repository root.
+## One-time Supabase setup
+Run `supabase.sql` in the Supabase SQL Editor. Then create your admin user in Authentication > Users.
 
-## Shared admin/file uploads
-A static website cannot make a browser-local upload visible to every visitor by itself. For shared publishing, create a Supabase project, put its URL + publishable/anon key in `config.js`, create the `ssc-files` Storage bucket, and run `supabase.sql`. The admin page is then the place to connect the authenticated upload workflow.
+## Admin
+Open `admin.html`, sign in with the Supabase admin user, upload a PDF/file, enter the notice details, and click **Save Notice**. The notice then appears on the public home page for all visitors.
+
+## Deployment
+Static hosting is enough. Publish the folder containing `index.html` at the repository root.

@@ -1,2 +1,6 @@
-/* Demo mode works without Supabase. Add your Supabase URL + publishable/anon key here when you want shared admin uploads. */
-window.SSC_CONFIG = { SUPABASE_URL: "", SUPABASE_ANON_KEY: "" };
+// Supabase client configuration for the SSC website.
+// This is the publishable/anon key, safe for browser-side use. Never put a service_role/secret key here.
+window.SSC_CONFIG = {
+  SUPABASE_URL: "https://zbkwyxkvsnwqwdbfqvxb.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_Ju4b41n0fISbobJNE_RbIw_5etEmAF4"
+};
