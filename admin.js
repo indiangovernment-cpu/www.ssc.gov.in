@@ -1,11 +1,11 @@
 const cfg = window.SSC_CONFIG || {};
 
 const hasSupabase =
-!!(
-cfg.SUPABASE_URL &&
-cfg.SUPABASE_ANON_KEY &&
-window.supabase
-);
+  !!(
+    cfg.SUPABASE_URL &&
+    cfg.SUPABASE_ANON_KEY &&
+    window.supabase
+  );
 
 let client = null;
 let user = null;
@@ -15,436 +15,482 @@ const status = $('status');
 
 if (hasSupabase) {
 
-client = supabase.createClient(
-cfg.SUPABASE_URL,
-cfg.SUPABASE_ANON_KEY
-);
+  client = supabase.createClient(
+    cfg.SUPABASE_URL,
+    cfg.SUPABASE_ANON_KEY
+  );
 
-status.textContent =
-'Supabase configured. Login as your admin user.';
+  status.textContent =
+    'Supabase configured. Login as your admin user.';
 
 } else {
 
-$('authPanel').querySelector('button').disabled = true;
+  const loginButton = $('authPanel')?.querySelector('button');
 
-status.textContent =
-'Demo mode: add Supabase URL + publishable/anon key in config.js.';
+  if (loginButton) {
+    loginButton.disabled = true;
+  }
+
+  status.textContent =
+    'Demo mode: add Supabase URL + publishable/anon key in config.js.';
 
 }
 
-/* ================================
-ADMIN LOGIN
-================================ */
+
+/* =========================================
+   ADMIN LOGIN
+========================================= */
 
 $('login').onclick = async () => {
 
-if (!client) return;
+  if (!client) return;
 
-const email = $('email').value.trim();
-const password = $('password').value;
+  const email = $('email').value.trim();
+  const password = $('password').value;
 
-if (!email || !password) {
+  if (!email || !password) {
 
-status.textContent =
-  'Enter admin email and password.';
+    status.textContent =
+      'Enter admin email and password.';
 
-return;
+    return;
+  }
 
-}
+  status.textContent = 'Logging in...';
 
-status.textContent = 'Logging in...';
+  const { data, error } =
+    await client.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
 
-const { data, error } =
-await client.auth.signInWithPassword({
-email,
-password
-});
+  if (error) {
 
-if (error) {
+    status.textContent =
+      error.message;
 
-status.textContent = error.message;
+    return;
+  }
 
-return;
+  user = data.user;
 
-}
+  openManager();
 
-user = data.user;
-
-openManager();
-
-await loadNotices();
-
+  await loadNotices();
 };
 
-/* ================================
-OPEN MANAGER
-================================ */
+
+/* =========================================
+   OPEN MANAGER
+========================================= */
 
 function openManager() {
 
-$('authPanel').hidden = true;
-$('manager').hidden = false;
-$('contentPanel').hidden = false;
+  $('authPanel').hidden = true;
 
-status.textContent =
-'Logged in. You can now upload files and publish notices.';
+  $('manager').hidden = false;
+
+  $('contentPanel').hidden = false;
+
+  status.textContent =
+    'Logged in. You can now upload files and publish notices.';
 }
 
-/* ================================
-UPLOAD FILE
-================================ */
+
+/* =========================================
+   UPLOAD FILE
+========================================= */
 
 $('upload').onclick = async () => {
 
-if (!client || !user) {
+  if (!client || !user) {
 
-$('uploadMsg').textContent =
-  'Please login first.';
+    $('uploadMsg').textContent =
+      'Please login first.';
 
-return;
+    return;
+  }
 
-}
+  const file =
+    $('file').files[0];
 
-const file = $('file').files[0];
+  const displayTitle =
+    $('title').value.trim();
 
-const displayTitle =
-$('title').value.trim();
+  if (!file) {
 
-if (!file) {
+    $('uploadMsg').textContent =
+      'Choose a file first.';
 
-$('uploadMsg').textContent =
-  'Choose a file first.';
+    return;
+  }
 
-return;
+  if (!displayTitle) {
 
-}
+    $('uploadMsg').textContent =
+      'Enter a display title.';
 
-if (!displayTitle) {
+    return;
+  }
 
-$('uploadMsg').textContent =
-  'Enter a display title.';
+  $('uploadMsg').textContent =
+    'Uploading...';
 
-return;
 
-}
+  const safeName =
+    file.name.replace(
+      /[^a-zA-Z0-9._-]/g,
+      '_'
+    );
 
-$('uploadMsg').textContent =
-'Uploading...';
 
-const safeName =
-file.name.replace(
-/[^a-zA-Z0-9.-]/g,
-''
-);
+  /* IMPORTANT:
+     Correct template string
+  */
 
-const path =
-"${user.id}/${Date.now()}-${safeName}";
+  const path =
+    `${user.id}/${Date.now()}-${safeName}`;
 
-const { error: uploadError } =
-await client
-.storage
-.from('ssc-files')
-.upload(
-path,
-file,
-{
-upsert: false
-}
-);
 
-if (uploadError) {
+  const {
+    error: uploadError
+  } =
+    await client
+      .storage
+      .from('ssc-files')
+      .upload(
+        path,
+        file,
+        {
+          upsert: false
+        }
+      );
 
-$('uploadMsg').textContent =
-  uploadError.message;
 
-return;
+  if (uploadError) {
 
-}
+    $('uploadMsg').textContent =
+      uploadError.message;
 
-const { data: publicData } =
-client
-.storage
-.from('ssc-files')
-.getPublicUrl(path);
+    return;
+  }
 
-const publicUrl =
-publicData.publicUrl;
 
-/*
-Save the latest uploaded file
-information temporarily so that
-Save Notice can attach this file.
-*/
+  const {
+    data: publicData
+  } =
+    client
+      .storage
+      .from('ssc-files')
+      .getPublicUrl(path);
 
-window.SSC_LAST_UPLOAD = {
-path: path,
-url: publicUrl,
-title: displayTitle,
-size: formatFileSize(file.size)
+
+  const publicUrl =
+    publicData.publicUrl;
+
+
+  window.SSC_LAST_UPLOAD = {
+
+    path: path,
+
+    url: publicUrl,
+
+    title: displayTitle,
+
+    size: formatFileSize(file.size)
+
+  };
+
+
+  if (!$('noticeSize').value.trim()) {
+
+    $('noticeSize').value =
+      formatFileSize(file.size);
+
+  }
+
+
+  if (!$('noticeTitle').value.trim()) {
+
+    $('noticeTitle').value =
+      displayTitle;
+
+  }
+
+
+  $('uploadMsg').textContent =
+    'Uploaded successfully. File is ready to publish as a Notice.';
 };
 
-/*
-Automatically put the detected
-file size into the Notice field
-if the field is empty.
-*/
 
-if (!$('noticeSize').value.trim()) {
-
-$('noticeSize').value =
-  formatFileSize(file.size);
-
-}
-
-/*
-Automatically use Display Title
-as Notice Title if empty.
-*/
-
-if (!$('noticeTitle').value.trim()) {
-
-$('noticeTitle').value =
-  displayTitle;
-
-}
-
-$('uploadMsg').textContent =
-'Uploaded successfully. File is ready to publish as a Notice.';
-
-};
-
-/* ================================
-FILE SIZE
-================================ */
+/* =========================================
+   FILE SIZE
+========================================= */
 
 function formatFileSize(bytes) {
 
-if (!bytes) return '0 KB';
+  if (!bytes) {
+    return '0 KB';
+  }
 
-const kb = bytes / 1024;
+  const kb =
+    bytes / 1024;
 
-if (kb < 1024) {
+  if (kb < 1024) {
 
-return kb.toFixed(2) + ' KB';
+    return kb.toFixed(2) + ' KB';
 
+  }
+
+  return (
+    kb / 1024
+  ).toFixed(2) + ' MB';
 }
 
-return (
-kb / 1024
-).toFixed(2) + ' MB';
 
-}
-
-/* ================================
-SAVE NOTICE
-================================ */
+/* =========================================
+   SAVE NOTICE
+========================================= */
 
 $('saveNotice').onclick = async () => {
 
-if (!client || !user) {
+  if (!client || !user) {
 
-status.textContent =
-  'Please login first.';
+    status.textContent =
+      'Please login first.';
 
-return;
+    return;
+  }
 
-}
 
-const noticeTitle =
-$('noticeTitle').value.trim();
+  const noticeTitle =
+    $('noticeTitle').value.trim();
 
-const noticeDate =
-$('noticeDate').value;
+  const noticeDate =
+    $('noticeDate').value;
 
-const noticeSize =
-$('noticeSize').value.trim();
+  const noticeSize =
+    $('noticeSize').value.trim();
 
-const uploaded =
-window.SSC_LAST_UPLOAD;
+  const uploaded =
+    window.SSC_LAST_UPLOAD;
 
-if (!noticeTitle) {
 
-status.textContent =
-  'Enter a notice title.';
+  if (!noticeTitle) {
 
-return;
+    status.textContent =
+      'Enter a notice title.';
 
-}
+    return;
+  }
 
-if (!uploaded) {
 
-status.textContent =
-  'Please upload a file first.';
+  if (!uploaded) {
 
-return;
+    status.textContent =
+      'Please upload a file first.';
 
-}
+    return;
+  }
 
-status.textContent =
-'Publishing notice...';
 
-const { error } =
-await client
-.from('ssc_notices')
-.insert({
+  status.textContent =
+    'Publishing notice...';
 
-    title: noticeTitle,
 
-    notice_date:
-      noticeDate || null,
+  const {
+    error
+  } =
+    await client
+      .from('ssc_notices')
+      .insert({
 
-    file_path:
-      uploaded.url,
+        title:
+          noticeTitle,
 
-    file_size:
-      noticeSize ||
-      uploaded.size
+        notice_date:
+          noticeDate || null,
 
-  });
+        file_path:
+          uploaded.url,
 
-if (error) {
+        file_size:
+          noticeSize ||
+          uploaded.size
 
-status.textContent =
-  error.message;
+      });
 
-return;
 
-}
+  if (error) {
 
-status.textContent =
-'Notice published successfully.';
+    status.textContent =
+      error.message;
 
-/*
-Clear form
-*/
+    return;
+  }
 
-$('file').value = '';
-$('title').value = '';
-$('noticeTitle').value = '';
-$('noticeDate').value = '';
-$('noticeSize').value = '';
 
-$('uploadMsg').textContent =
-'';
+  status.textContent =
+    'Notice published successfully.';
 
-/*
-Clear last uploaded reference
-*/
 
-window.SSC_LAST_UPLOAD = null;
+  $('file').value = '';
 
-await loadNotices();
+  $('title').value = '';
 
+  $('noticeTitle').value = '';
+
+  $('noticeDate').value = '';
+
+  $('noticeSize').value = '';
+
+  $('uploadMsg').textContent = '';
+
+
+  window.SSC_LAST_UPLOAD = null;
+
+
+  await loadNotices();
 };
 
-/* ================================
-LOAD PUBLISHED NOTICES
-================================ */
+
+/* =========================================
+   LOAD PUBLISHED NOTICES
+========================================= */
 
 async function loadNotices() {
 
-if (!client) return;
+  if (!client) return;
 
-const {
-data,
-error
-} = await client
-.from('ssc_notices')
-.select('*')
-.order(
-'created_at',
-{
-ascending: false
-}
-);
 
-if (error) {
+  const {
+    data,
+    error
+  } =
+    await client
+      .from('ssc_notices')
+      .select('*')
+      .order(
+        'created_at',
+        {
+          ascending: false
+        }
+      );
 
-$('noticeList').innerHTML =
-  `
-  <div class="muted">
-    ${escapeHtml(error.message)}
-  </div>
-  `;
 
-return;
+  if (error) {
 
-}
+    $('noticeList').innerHTML = `
+      <div class="muted">
+        ${escapeHtml(error.message)}
+      </div>
+    `;
 
-if (!data || data.length === 0) {
+    return;
+  }
 
-$('noticeList').innerHTML =
-  `
-  <div class="muted">
-    No notices yet.
-  </div>
-  `;
 
-return;
+  if (!data || data.length === 0) {
 
-}
+    $('noticeList').innerHTML = `
+      <div class="muted">
+        No notices yet.
+      </div>
+    `;
 
-$('noticeList').innerHTML =
-data.map(n => `
+    return;
+  }
 
-  <div class="notice">
 
-    <b>
-      ${escapeHtml(n.title || 'Untitled Notice')}
-    </b>
+  $('noticeList').innerHTML =
+    data.map(n => `
 
-    <div class="muted">
+      <div class="notice">
 
-      ${escapeHtml(n.notice_date || '')}
+        <b>
+          ${escapeHtml(
+            n.title ||
+            'Untitled Notice'
+          )}
+        </b>
 
-      ·
+        <div class="muted">
 
-      ${escapeHtml(n.file_size || '')}
+          ${escapeHtml(
+            n.notice_date ||
+            ''
+          )}
 
-    </div>
+          ·
 
-    ${
-      n.file_path
-      ?
-      `
-      <div style="margin-top:8px">
+          ${escapeHtml(
+            n.file_size ||
+            ''
+          )}
 
-        <a
-          href="${escapeHtml(n.file_path)}"
-          target="_blank"
-          rel="noopener"
-        >
-          Open PDF
-        </a>
+        </div>
+
+        ${
+          n.file_path
+          ?
+          `
+            <div style="margin-top:8px">
+
+              <a
+                href="${escapeAttribute(n.file_path)}"
+                target="_blank"
+                rel="noopener"
+              >
+                Open / Download File
+              </a>
+
+            </div>
+          `
+          :
+          ''
+        }
 
       </div>
-      `
-      :
-      ''
-    }
 
-  </div>
-
-`).join('');
-
+    `).join('');
 }
 
-/* ================================
-ESCAPE HTML
-================================ */
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
 
 function escapeHtml(value) {
 
-return String(value || '')
-.replace(
-/[&<>"']/g,
-m => ({
-'&': '&',
-'<': '<',
-'>': '>',
-'"': '"',
-"'": '''
-}[m])
-);
+  return String(value || '')
+    .replace(
+      /[&<>"']/g,
+      m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m])
+    );
+}
 
+
+/* =========================================
+   ESCAPE ATTRIBUTE
+========================================= */
+
+function escapeAttribute(value) {
+
+  return String(value || '')
+    .replace(
+      /[&<>"']/g,
+      m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m])
+    );
 }
