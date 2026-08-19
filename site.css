@@ -86,150 +86,57 @@ button:hover{transform:translateY(-1px)}
 .brand-reference{width:205px!important;height:43px!important;object-fit:cover!important;object-position:left center!important;display:block}.brand{gap:0}.hero-overlay{display:none!important}.hero-image{background:#edf7fb}.hero-image .reference-hero{object-fit:cover;object-position:center center}
 @media(max-width:700px){.brand-reference{width:205px!important;height:43px!important}.brand{max-width:205px}.hero{height:105px}.hero-image .reference-hero{height:105px;object-fit:cover}}
 
-/* FINAL MOBILE SCREEN-FIT: keep the existing design/content, only match the supplied 707px mobile flow */
+/* MOBILE REFERENCE LOCK — only sizing/spacing; desktop + functionality unchanged */
 @media (max-width:760px){
   html,body{width:100%;max-width:100%;overflow-x:hidden}
   body{font-size:12px}
-  .container{width:calc(100% - 16px);max-width:none;margin:0 auto}
-
-  /* top area */
-  .gov-strip{height:27px;font-size:8px}
-  .gov-strip .container{height:27px;white-space:nowrap;overflow:hidden}
-  .header-main{height:52px;min-height:52px;padding:0;gap:5px}
-  .brand-reference{width:205px!important;height:40px!important;object-fit:cover!important;object-position:left center!important}
-  .brand{max-width:205px;overflow:hidden;flex:0 0 auto}
-  .header-actions{gap:5px;min-width:0}
-  .lang-btn{display:none}
-  .searchbox{width:92px;height:30px;padding:0 7px}
-  .searchbox input{font-size:8px}
-  .login-btn{height:30px;padding:0 7px;font-size:8px;white-space:nowrap}
-
-  .nav{height:34px;min-height:34px}
-  .nav-inner{height:34px;min-height:34px;overflow:hidden;white-space:nowrap;gap:0}
-  .nav-btn{height:34px;padding:8px 7px;font-size:8px}
-  .nav-btn:after{left:7px;right:7px}
-
-  /* first screen: hero + notice + quick links + start of calendar */
-  .hero{height:187px}
-  .hero-image{height:187px}
-  .hero-image .reference-hero{height:187px!important;width:100%;object-fit:cover;object-position:center center}
-  .notice-banner{height:97px;min-height:97px;font-size:8px}
-  .notice-banner .container{height:97px;padding:8px 10px;line-height:1.65;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-
-  .section{padding:0}
-  .notice-section{height:510px;padding:27px 0 8px}
-  .notice-section .section-head{height:24px;margin:0 0 7px;padding:0 1px}
-  .section-head h2,.small-title{font-size:14px;line-height:1;margin:0}
-  .text-link,.viewall{font-size:9px}
-  .notice-card{height:444px;min-height:0;padding:6px;border-radius:8px;overflow:hidden}
-  .notice-list{height:384px;overflow:hidden;border-top:1px solid #eee}
-  .notice-row{grid-template-columns:34px minmax(0,1fr) 62px 34px;gap:5px;min-height:54px;height:54px;padding:5px 2px;font-size:8px}
-  .datebox{border-right:2px solid #7f3338}
-  .datebox .month{font-size:7px}.datebox .day{font-size:12px}.datebox .year{font-size:6px}
-  .notice-title{font-size:8px;line-height:1.25;min-width:0}
-  .notice-meta{font-size:7px;white-space:nowrap}
-  .notice-actions{gap:3px}.pdf{width:16px;height:16px;font-size:6px}.eye{font-size:10px}
-  .pager{height:40px;padding:7px 0 0;gap:5px}
-  .pager button{width:24px;height:24px;font-size:8px}
-
-  .section.compact{padding:0}
-  .notice-section + .section.compact{height:150px;padding:10px 0 8px}
-  .notice-section + .section.compact .small-title{height:20px;line-height:20px}
-  .quick-grid{height:108px;grid-template-columns:1fr 1fr;gap:7px}
-  .quick{height:50px;min-height:50px;padding:8px;border-radius:8px;font-size:9px;gap:6px}
-  .quick .ico{font-size:13px}
-
-  .notice-section + .section.compact + .section.compact{height:230px;padding:0 0 8px}
-  .calendar-card{height:222px;padding:7px;border-radius:8px;overflow:hidden}
-  .calendar-head{height:22px;padding:0 2px 5px}
-  .calendar-head .small-title{font-size:14px}
-  .month-nav{font-size:9px;gap:4px}
-  .cal-list{height:163px;max-height:none;overflow:hidden;margin-top:0;border-top:1px solid #eee}
-  .cal-row{height:54px;min-height:54px;grid-template-columns:46px 1fr;font-size:8px}
-  .cal-date b{font-size:12px}.cal-date small{font-size:6px}
-  .cal-row>span{padding:18px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .calendar-card .viewall{height:22px;padding-top:7px;font-size:9px}
-
-  /* second screen starts naturally after the calendar */
-  .exam-band{padding:29px 0 36px}
-  .exam-layout{grid-template-columns:145px 1fr;gap:8px;align-items:center}
-  .exam-intro h2{font-size:15px;line-height:1.05;margin:0 0 5px}
-  .exam-intro p{font-size:8px;line-height:1.35;margin:0 0 7px}
-  .light-btn{font-size:8px;padding:5px 9px}
-  .exam-grid{grid-template-columns:1fr 1fr;gap:5px}
-  .exam-card{min-height:76px;height:76px;padding:7px;border-radius:8px;font-size:8px}
-  .exam-card b{font-size:8px;line-height:1.2}.exam-card small{font-size:6px;line-height:1.2;margin-top:3px}.exam-card strong{font-size:13px}
-  .carousel-dots{padding-top:8px}
-  .carousel-dots button{width:6px;height:6px}
-
-  .exam-band + .section.compact{height:auto;padding:10px 0}
-  .promo-grid{grid-template-columns:repeat(3,1fr);gap:6px;padding:0}
-  .promo img{height:175px;object-fit:cover}
-  .promo-body{padding:5px;font-size:7px}.promo-body p{font-size:6px}
-  .faq-section{padding:12px 0}
-  .faq-layout{grid-template-columns:1fr 1.55fr;gap:10px}
-  .faq-copy h2{font-size:14px}.faq-copy p{font-size:8px;line-height:1.35}.primary{font-size:8px;padding:6px 11px}
-  .faq-list{padding:5px}.faq-q{font-size:8px;padding:8px 0}.faq-a{font-size:8px}
-  .initiatives{padding:10px 0}.initiative-row{gap:6px}.initiative{min-width:150px;height:95px;border-radius:8px}.initiative img{width:100%;height:100%;object-fit:contain}
-  .footer{padding:28px 0 8px}.footer-grid{grid-template-columns:1.4fr 1fr 1fr;gap:12px}.footer-brand{font-size:9px}.footer p,.footer a{font-size:6px;line-height:1.45}.footer h3{font-size:8px}.footer-bottom{font-size:5px;margin-top:12px;padding-top:7px}
-}
-
-/* ===== MOBILE REFERENCE SIZE LOCK =====
-   Only adjusts sizing/spacing so the first viewport matches the supplied
-   707px SSC reference. Existing colors, components, data and interactions
-   remain unchanged. The lower scroll content keeps its existing layout. */
-@media (max-width:760px){
-  html,body{width:100%;max-width:100%;overflow-x:hidden}
   .container{width:calc(100% - 16px);max-width:none}
-
-  /* header / hero */
-  .gov-strip{height:27px;font-size:9px}
-  .header-main{height:61px;min-height:61px;padding:0}
-  .brand-reference{width:205px!important;height:43px!important}
-  .header-actions{gap:6px;flex-wrap:nowrap}
-  .searchbox{width:92px;height:32px}
-  .login-btn{height:32px;padding:0 9px;font-size:9px;white-space:nowrap}
-  .nav-inner{min-height:34px;height:34px;overflow:hidden}
-  .nav-btn{padding:8px 8px;font-size:9px}
-  .hero{height:186px}
-  .hero-image,.hero-image .reference-hero{height:186px}
-  .hero-image .reference-hero{width:100%;object-fit:cover;object-position:center center}
-
-  /* notice strip */
-  .notice-banner{font-size:9px;min-height:97px}
-  .notice-banner .container{padding:7px 8px;line-height:1.65}
-
-  /* first viewport: notice board */
-  .notice-section{padding:30px 0 8px}
-  .notice-section .section-head{margin-bottom:7px;padding:0 2px}
-  .notice-section .section-head h2{font-size:18px}
-  .notice-section .notice-card{padding:6px;border-radius:9px}
-  .notice-section .notice-row{grid-template-columns:38px minmax(0,1fr) 58px 36px;gap:5px;min-height:60px;padding:6px 3px;font-size:9px}
-  .notice-section .notice-title{font-size:9px;line-height:1.35}
-  .notice-section .notice-meta{font-size:7px}
-  .notice-section .datebox b{font-size:13px}
-  .notice-section .datebox span{font-size:7px}
-  .notice-section .datebox small{font-size:6px}
-  .notice-section .pdf{width:16px;height:16px;font-size:6px}
-  .notice-section .eye{font-size:10px}
-  .notice-section .pager{padding:9px 0 7px}
-
-  /* quick links */
-  .section.compact{padding:8px 0}
-  .quick-grid{grid-template-columns:1fr 1fr;gap:8px}
-  .quick{min-height:58px;padding:11px 10px;font-size:10px;border-radius:8px}
-  .quick .ico{font-size:14px}
-
-  /* calendar starts in the first viewport, with the same compact rows */
-  .calendar-card{padding:7px;border-radius:8px}
-  .calendar-head{padding:2px 2px 6px}
-  .calendar-head .small-title{font-size:17px}
-  .month-nav{font-size:9px}
-  .cal-row{grid-template-columns:46px minmax(0,1fr);min-height:58px;font-size:9px}
-  .cal-date b{font-size:13px}
-  .cal-date small{font-size:7px}
-  .cal-row>span{padding:19px 8px}
-
-  /* Do not redesign the scroll-down sections; only keep them full-width. */
-  .exam-band,.promo-grid,.faq-section,.initiatives,.footer{width:100%;max-width:100%;overflow:hidden}
+  .topline{height:24px;font-size:8px}
+  .brandrow{height:60px;min-height:60px;padding:6px 0;gap:6px}
+  .brand img,.brand-reference{width:205px!important;height:40px!important;object-fit:cover!important;object-position:left center!important}
+  .brand{max-width:205px;gap:0;overflow:hidden}
+  .head-actions{gap:5px}
+  .searchbox{width:92px;height:32px;padding:0 8px}
+  .searchbox input{font-size:9px}
+  .login-btn{height:32px;padding:0 8px;font-size:9px}
+  .ashoka{font-size:22px}
+  .nav-inner{min-height:36px;height:36px;overflow:hidden;gap:0}
+  .nav-btn{padding:9px 7px;font-size:9px}
+  .nav-btn:after{left:7px;right:7px}
+  .hero{height:190px}
+  .hero img,.hero-image,.hero-image .reference-hero{height:190px!important;object-fit:cover!important;object-position:center center!important}
+  .notice-strip{min-height:97px;height:auto;font-size:9px}
+  .ticker{font-size:9px;line-height:1.55;padding:5px 0}
+  .section{padding:17px 0}
+  .section.compact{padding:9px 0}
+  .section-head{margin-bottom:7px}
+  .section-head h2,.small-title{font-size:14px}
+  .notice-card{padding:6px;border-radius:9px}
+  .notice-list{height:365px}
+  .notice-row{grid-template-columns:34px minmax(0,1fr) 58px 30px;gap:5px;min-height:54px;padding:6px 2px;font-size:8px}
+  .notice-title{font-size:8px;line-height:1.3}
+  .notice-meta{font-size:7px}
+  .datebox{padding:4px 2px}
+  .datebox .month{font-size:7px}.datebox .day{font-size:13px}.datebox .year{font-size:6px}
+  .pdf{width:16px;height:16px;font-size:6px}.eye{font-size:10px}
+  .pager{padding:7px;gap:5px}.pager button{width:20px;height:20px;font-size:8px}
+  .quick-grid{gap:6px}
+  .quick{min-height:52px;padding:10px;font-size:9px}
+  .quick .ico{font-size:13px}
+  .calendar-card{padding:6px}
+  .cal-list{max-height:210px}
+  .cal-row{grid-template-columns:45px 1fr;min-height:54px;font-size:8px}
+  .cal-date b{font-size:12px}.cal-date small{font-size:6px}.cal-row>span{padding:18px 8px}
+  .exam-band{padding:18px 0}
+  .exam-layout{grid-template-columns:1fr 1.7fr;gap:8px}
+  .exam-intro h2{font-size:15px}.exam-intro p{font-size:8px}
+  .exam-grid{grid-template-columns:1fr 1fr;gap:5px}
+  .exam-card{min-height:52px;padding:7px;font-size:8px}.exam-card b{font-size:8px}.exam-card small{font-size:6px}
+  .promo-grid{grid-template-columns:repeat(3,1fr);gap:5px;padding:9px 0}
+  .promo img{height:86px!important}
+  .promo-body{padding:6px;font-size:8px}
+  .faq-layout{grid-template-columns:1fr 1.55fr;gap:10px}
+  .faq-copy h2{font-size:14px}.faq-copy p{font-size:8px}.faq-q{font-size:8px;padding:8px 0}
+  .initiative-row{gap:5px;overflow:hidden}.initiative{min-width:116px;height:57px}
+  .footer{padding:22px 0 8px}.footer-grid{grid-template-columns:1.4fr 1fr 1fr;gap:12px}.footer-brand{font-size:10px}.footer p,.footer a{font-size:7px}.footer-bottom{font-size:6px}
 }
