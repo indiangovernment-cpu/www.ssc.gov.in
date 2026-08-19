@@ -1,7 +1,79 @@
-const c=window.SSC_CONFIG||{};const db=(c.SUPABASE_URL&&c.SUPABASE_ANON_KEY&&window.supabase)?supabase.createClient(c.SUPABASE_URL,c.SUPABASE_ANON_KEY):null;let user=null,uploadedPath='';const $=id=>document.getElementById(id);const status=m=>$('status').textContent=m;
-if(!db){status('Supabase URL / publishable key is not configured.');$('login').disabled=true}else status('Supabase configured. Login with your admin account.');
-$('login').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||!password)return status('Enter email and password.');status('Logging in…');const {data,error}=await db.auth.signInWithPassword({email,password});if(error)return status(error.message);user=data.user;$('auth').hidden=true;$('manager').hidden=false;status('Logged in.');load()};
-$('upload').onclick=async()=>{if(!user)return status('Login first.');const f=$('file').files[0];if(!f)return $('uploadMsg').textContent='Choose a file.';const safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_');uploadedPath=`${user.id}/${Date.now()}-${safe}`;$('uploadMsg').textContent='Uploading…';const {error}=await db.storage.from('ssc-files').upload(uploadedPath,f,{upsert:false,contentType:f.type||undefined});if(error){$('uploadMsg').textContent=error.message;uploadedPath='';return}const size=f.size<1048576?(f.size/1024).toFixed(2)+' KB':(f.size/1048576).toFixed(2)+' MB';$('noticePath').value=uploadedPath;$('noticeSize').value=size;$('fileTitle').value=$('fileTitle').value||f.name;$('noticeTitle').value=$('noticeTitle').value||$('fileTitle').value;$('uploadMsg').textContent='Upload successful.'};
-$('publish').onclick=async()=>{if(!user)return status('Login first.');const title=$('noticeTitle').value.trim();if(!title)return status('Enter notice title.');const {error}=await db.from('ssc_notices').insert({title,notice_date:$('noticeDate').value||null,file_path:uploadedPath||null,file_size:$('noticeSize').value||null});if(error)return status(error.message);status('Notice published successfully.');['noticeTitle','noticeDate','noticeSize','noticePath','fileTitle'].forEach(id=>$(id).value='');uploadedPath='';$('file').value='';load()};
-async function load(){const {data,error}=await db.from('ssc_notices').select('*').order('created_at',{ascending:false});if(error){$('noticeList').innerHTML='<p>'+esc(error.message)+'</p>';return}$('noticeList').innerHTML=(data||[]).map(n=>`<article><span><b>${esc(n.title)}</b><br><span class="muted">${esc(n.notice_date||'')} · ${esc(n.file_size||'')}</span></span><a href="${n.file_path?esc(db.storage.from('ssc-files').getPublicUrl(n.file_path).data.publicUrl):'#'}" target="_blank">Open PDF</a><button data-del="${esc(n.id)}">Delete</button></article>`).join('')||'<p class="muted">No notices.</p>';document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this notice?'))return;const id=b.dataset.del;const {error}=await db.from('ssc_notices').delete().eq('id',id);if(error)return status(error.message);load()})}
-$('refresh').onclick=load;$('logout').onclick=async()=>{await db.auth.signOut();location.reload()};function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]) )}
+
+const cfg=window.SSC_CONFIG||{};
+const has=!!(cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&window.supabase);
+const db=has?window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY):null;
+let user=null, uploadedPath='', uploadedSize='';
+
+const $=id=>document.getElementById(id);
+const status=m=>{$('status').textContent=m};
+
+if(!has){status('Supabase is not configured.');$('login').disabled=true}
+
+$('login').onclick=async()=>{
+ if(!db)return;
+ const email=$('email').value.trim(), password=$('password').value;
+ if(!email||!password){status('Enter email and password.');return}
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+ if(error){status(error.message);return}
+ user=data.user; $('auth').hidden=true; $('manager').hidden=false;
+ status('Logged in. Upload a PDF/file, then publish it as a notice.');
+ await loadNotices();
+};
+
+$('upload').onclick=async()=>{
+ if(!db||!user)return;
+ const file=$('file').files[0];
+ if(!file){$('uploadMsg').textContent='Choose a file first.';return}
+ const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+ const path=`${user.id}/${Date.now()}-${safe}`;
+ const {error}=await db.storage.from('ssc-files').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+ if(error){$('uploadMsg').textContent=error.message;return}
+ uploadedPath=path; uploadedSize=(file.size/1024).toFixed(2)+' KB';
+ $('noticePath').value=path;
+ $('noticeSize').value=uploadedSize;
+ $('fileTitle').value=file.name;
+ $('uploadMsg').textContent='Uploaded successfully. You can now publish this file as a notice.';
+};
+
+$('publish').onclick=async()=>{
+ if(!db||!user)return;
+ const title=$('noticeTitle').value.trim();
+ if(!title){status('Enter notice title.');return}
+ const payload={
+   title,
+   notice_date:$('noticeDate').value||null,
+   file_path:uploadedPath||$('noticePath').value||'',
+   file_size:$('noticeSize').value.trim()||uploadedSize||''
+ };
+ const {error}=await db.from('ssc_notices').insert(payload);
+ if(error){status(error.message);return}
+ status('Notice published successfully. It will appear on the website.');
+ $('noticeTitle').value='';$('noticeDate').value='';$('noticePath').value='';
+ $('noticeSize').value='';$('uploadMsg').textContent='';$('file').value='';uploadedPath='';uploadedSize='';
+ await loadNotices();
+};
+
+$('refresh').onclick=loadNotices;
+$('logout').onclick=async()=>{if(db)await db.auth.signOut();location.reload()};
+
+async function loadNotices(){
+ if(!db)return;
+ const {data,error}=await db.from('ssc_notices').select('*').order('created_at',{ascending:false});
+ if(error){$('noticeList').innerHTML=`<div class="muted">${escapeHtml(error.message)}</div>`;return}
+ $('noticeList').innerHTML=(data||[]).map(n=>{
+   const url=n.file_path?db.storage.from('ssc-files').getPublicUrl(n.file_path).data.publicUrl:'#';
+   return `<article><div><b>${escapeHtml(n.title)}</b><div class="muted">${escapeHtml(n.notice_date||'')} · ${escapeHtml(n.file_size||'')}</div></div><a href="${escapeHtml(url)}" target="_blank">PDF</a><button data-delete="${escapeHtml(n.id)}">Delete</button></article>`;
+ }).join('')||'<div class="muted">No notices published.</div>';
+ document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteNotice(b.dataset.delete));
+}
+async function deleteNotice(id){
+ if(!db||!confirm('Delete this notice?'))return;
+ const {data,error}=await db.from('ssc_notices').select('file_path').eq('id',id).single();
+ if(error){status(error.message);return}
+ const del=await db.from('ssc_notices').delete().eq('id',id);
+ if(del.error){status(del.error.message);return}
+ if(data?.file_path) await db.storage.from('ssc-files').remove([data.file_path]);
+ status('Notice deleted.');
+ await loadNotices();
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}

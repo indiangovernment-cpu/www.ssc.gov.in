@@ -1,53 +1,304 @@
-const cfg=window.SSC_CONFIG||{};
-const db=(cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&window.supabase)?supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY):null;
-const A='assets/';
-const state={lang:localStorage.sscLang||'en',notices:[],page:1,month:7,year:2026,examPage:0,promoPage:0,initiativePage:0};
-const EXAMS=['Selection Posts Examination','Junior Engineer (Civil, Mechanical & Electrical) Examination','Combined Graduate Level Examination, 2024','Combined Higher Secondary Level (10+2) Examination','Stenographer Grade C and D Examination, 2024','Constable (GD) in Central Armed Police Forces (CAPFs), SSF, Rifleman (GD) in Assam Rifles and Sepoy in NCB Examination','Combined Hindi Translators Examination','Sub-Inspector in Delhi Police and Central Armed Police Forces Examination','Multi-Tasking (Non-Technical) Staff Examination','Junior Secretariat Assistant / Lower Division Clerk Examination'];
-const CANDIDATES=['Apply Online','Admit Card','Answer Key','Result','Candidate Login','One Time Registration (OTR)','Correction Window','Exam City / Intimation','Option-cum-Preference'];
-const ABOUT=['Background of Commission','Setup of Commission','Organization Structure','Function of Commission','Vision, Mission & Objectives of SSC','Regional Network','Annual Report',"Citizen's Charter",'Contact List','Resolution','PIDPI','Right To Information','Committee on Sexual Harassment'];
-const TENDER=['Current Tenders','Tender Archive','Corrigenda'];
-const RTI=['RTI Online','RTI Disclosure','RTI Officers'];
-const examResources=['Notice','Calendar','Scheme of Examination','Syllabus','Special Instructions','Previous Year Question Papers','Format of Certificates','Tentative Vacancy','Normalization Method','Mock Test'];
-const fallback=[
+
+const cfg = window.SSC_CONFIG || {};
+const db = (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY) : null;
+
+const A = 'assets/';
+const state = {
+  lang: localStorage.getItem('sscLang') || 'en',
+  notices: [],
+  page: 1,
+  month: 7,
+  year: 2026,
+  examPage: 0,
+  promoPage: 0,
+  initiativePage: 0
+};
+
+const EXAMS = [
+ 'Selection Posts Examination',
+ 'Junior Engineer (Civil, Mechanical & Electrical) Examination',
+ 'Combined Graduate Level Examination, 2024',
+ 'Combined Higher Secondary Level (10+2) Examination',
+ "Stenographer Grade 'C' and 'D' Examination, 2024",
+ 'Constable (GD) in Central Armed Police Forces (CAPFs), SSF, Rifleman (GD) in Assam Rifles and Sepoy in NCB Examination',
+ 'Combined Hindi Translators Examination',
+ 'Sub-Inspector in Delhi Police and Central Armed Police Forces Examination',
+ 'Multi-Tasking (Non-Technical) Staff Examination',
+ 'Junior Secretariat Assistant / Lower Division Clerk Examination',
+ 'Departmental Examination'
+];
+
+const CANDIDATES = [
+ 'Apply Online','Admit Card','Answer Key','Result','Candidate Login',
+ 'One Time Registration (OTR)','Correction Window','Exam City / Intimation',
+ 'Option-cum-Preference'
+];
+
+const ABOUT = [
+ 'Background of Commission','Setup of Commission','Organisation Structure',
+ 'Function of Commission','Vision, Mission & Objectives of SSC','Regional Network',
+ 'Annual Report',"Citizen's Charter",'Contact List','Resolution','PIDPI',
+ 'Right To Information','Committee on Sexual Harassment'
+];
+
+const TENDER = ['Current Tenders','Tender Archive','Corrigenda'];
+const RTI = ['RTI Online','RTI Disclosure','RTI Officers'];
+const EXAM_RESOURCES = [
+ 'Notice','Calendar','Scheme of Examination','Syllabus','Special Instructions',
+ 'Previous Year Question Papers','Format of Certificates','Tentative Vacancy',
+ 'Normalization Method','Mock Test'
+];
+
+const FALLBACK_NOTICES = [
  {id:'f1',notice_date:'2026-08-18',title:'Important Notice',file_size:'184.92 KB',file_path:''},
  {id:'f2',notice_date:'2026-08-18',title:'Identity Verification (IV) for the candidates shortlisted in FRTA of Combined Higher Secondary (10+2) Level Examination (CHSLE), 2025 - reg',file_size:'83.41 KB',file_path:''},
- {id:'f3',notice_date:'2026-08-17',title:'Combined Higher Secondary (10+2) Level Examination, 2025: Declaration of First Round of Tentative Allocation (FRTA)',file_size:'811.22 KB',file_path:''},
+ {id:'f3',notice_date:'2026-08-17',title:'Combined Higher Secondary (10+2) Level Examination, 2025 - Declaration of First Round of Tentative Allocation (FRTA)',file_size:'811.22 KB',file_path:''},
  {id:'f4',notice_date:'2026-08-17',title:'Important Notice for Departmental examinations, 2025 to be held on 23.08.2026 at Delhi',file_size:'247.52 KB',file_path:''},
  {id:'f5',notice_date:'2026-08-12',title:'Important Notice - Schedule of Examinations',file_size:'364.75 KB',file_path:''}
 ];
-const cal=[['2026-08-14','Indian Navy Entrance Test (INET) - (Agiveer (MR as SSR) and SSR (Medical))'],['2026-08-16','JSA / LDC Grade Limited Departmental Competitive Examination, 2025 (for DoPT only)'],['2026-08-16','ASO Grade Limited Departmental Competitive Examination, 2025'],['2026-08-16','SSA / UDC Grade Limited Departmental Competitive Examination, 2025']];
-const promos=[['promo-1.jpg','75 Years of Azadi Ka Amrit Mahotsav'],['promo-2.jpg','Mann Ki Baat / Government Outreach'],['promo-3.jpg','International Yoga Day']];
-const initiatives=[['initiative-incredible.jpg','Incredible India'],['initiative-data.jpg','data.gov.in'],['initiative-digital.jpg','Digital India'],['initiative-india.jpg','india.gov.in'],['initiative-mygov.jpg','MyGov']];
-const faq=[['Is Registration mandatory for applying to the examinations of the Commission?','Registration is required before applying for examinations where the Commission specifies it.'],['I did not receive registration number and password on the email.','Use the Candidate Login recovery option or contact the Commission help services.'],['When is the notice/advertisement of an Examination issued?','Notices are published on the Commission website when the examination schedule is approved.'],['What are the posts for which the SSC conducts exams and what are the required qualifications?','Open Browse by Examinations to see the examination-specific notice, scheme and eligibility information.'],['When does the Commission upload its Annual Calendar of Examinations?','The Annual Calendar is published as per the Commission schedule and is available through SSC Calendar.']];
-const t={en:{feedback:'Feedback | SSC Old Website',skip:'Skip to Main Content',home:'Home',chair:"Chairman's Message",cand:'For Candidates',tender:'Tender',rti:'RTI',about:'About Us',search:'Search',login:'Login or Register',notice:'Notice Board',quick:'Quick Links',calendar:'SSC Calendar',browse:'Browse by Examinations',faq:'FAQs',popular:'MOST POPULAR FAQS',initiatives:'Other Initiatives',view:'View All'},hi:{feedback:'प्रतिक्रिया | कर्मचारी चयन आयोग',skip:'मुख्य विषय पर जाएं',home:'होम',chair:'अध्यक्ष का संदेश',cand:'अभ्यर्थियों के लिए',tender:'निविदा',rti:'आरटीआई',about:'हमारे बारे में',search:'खोजें',login:'लॉगिन या रजिस्टर',notice:'नोटिस बोर्ड',quick:'त्वरित लिंक',calendar:'एसएससी कैलेंडर',browse:'परीक्षाओं के अनुसार',faq:'अक्सर पूछे जाने वाले प्रश्न',popular:'लोकप्रिय प्रश्न',initiatives:'अन्य पहल',view:'सभी देखें'}};
-const tr=k=>t[state.lang][k]||t.en[k]||k; const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); const slug=x=>x.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-function dateParts(s){const d=new Date(s+'T00:00:00');return {day:String(d.getDate()).padStart(2,'0'),mon:d.toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short'}).toUpperCase(),year:d.getFullYear()}}
+
+const CALENDAR = [
+ ['2026-08-14','Indian Navy Entrance Test (INET) - [Agniveer (MR as SSR) and SSR (Medical)]'],
+ ['2026-08-16','JSA / LDC Grade Limited Departmental Competitive Examination, 2025 (for DoPT only)'],
+ ['2026-08-16','ASO Grade Limited Departmental Competitive Examination, 2025'],
+ ['2026-08-16','SSA / UDC Grade Limited Departmental Competitive Examination, 2025 (for DoPT only)'],
+ ['2026-08-30','Combined Higher Secondary Level (10+2) Examination, 2026'],
+ ['2026-08-30','Stenographer Grade C and D Examination, 2026'],
+ ['2026-08-30','Combined Hindi Translators Examination, 2026'],
+ ['2026-09-30','Multi Tasking (Non-Technical) Staff Examination, 2026']
+];
+
+const PROMOS = [
+ ['promo-reference-1.jpg','International Day of Yoga'],
+ ['promo-reference-2.jpg','Mahatma Gandhi Quote / National Outreach'],
+ ['promo-reference-3.jpg','National Career Service']
+];
+
+const INITIATIVES = [
+ ['initiative-reference-1.jpg','India Empower'],
+ ['initiative-reference-2.jpg','india.gov.in'],
+ ['initiative-reference-3.jpg','Make in India'],
+ ['initiative-reference-4.jpg','Incredible India'],
+ ['initiative-reference-5.jpg','data.gov.in']
+];
+
+const FAQ = [
+ ['Is Registration mandatory for applying to the examinations of the Commission?','Registration is required before applying for examinations where the Commission specifies it.'],
+ ['I did not receive registration number and password on the email.','Use the Candidate Login recovery option or contact the Commission help services.'],
+ ['When is the notice/advertisement of an Examination issued?','The notice is published when the Commission approves and schedules the examination.'],
+ ['What are the posts for which the SSC conducts exams and what are the required qualifications?','Open the relevant examination to see eligibility, syllabus and qualifications.'],
+ ['When does the Commission upload its Annual Calendar of Examinations?','The Annual Calendar is published according to the Commission schedule.']
+];
+
+const I18N = {
+ en:{feedback:'Feedback | SSC Old Website',skip:'Skip to Main Content',home:'Home',chair:"Chairman's Message",cand:'For Candidates',tender:'Tender',rti:'RTI',about:'About Us',search:'Search',login:'Login or Register',notice:'Notice Board',quick:'Quick Links',calendar:'SSC Calendar',browse:'Browse by Examinations',faq:'FAQs',popular:'MOST POPULAR FAQS',initiatives:'Other Initiatives',view:'View All',apply:'Apply',admit:'Admit Card',answer:'Answer Key',result:'Result'},
+ hi:{feedback:'प्रतिक्रिया | एसएससी पुरानी वेबसाइट',skip:'मुख्य विषय पर जाएं',home:'होम',chair:'अध्यक्ष का संदेश',cand:'अभ्यर्थियों के लिए',tender:'निविदा',rti:'आरटीआई',about:'हमारे बारे में',search:'खोजें',login:'लॉगिन या रजिस्टर',notice:'नोटिस बोर्ड',quick:'त्वरित लिंक',calendar:'एसएससी कैलेंडर',browse:'परीक्षाओं के अनुसार',faq:'अक्सर पूछे जाने वाले प्रश्न',popular:'लोकप्रिय प्रश्न',initiatives:'अन्य पहल',view:'सभी देखें',apply:'आवेदन करें',admit:'प्रवेश पत्र',answer:'उत्तर कुंजी',result:'परिणाम'}
+};
+
+const tr = k => (I18N[state.lang] && I18N[state.lang][k]) || I18N.en[k] || k;
+const esc = v => String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const slug = x => String(x).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const fileUrl = path => db ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl : '#';
+
+function dateParts(s){
+  const d = new Date((s || '2026-08-18')+'T00:00:00');
+  return {day:String(d.getDate()).padStart(2,'0'), mon:d.toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short'}).toUpperCase(), year:d.getFullYear()};
+}
+
 function header(active='home'){
- return `<div class="topbar"><div class="wrap"><span>${tr('feedback')}</span><span>${tr('skip')} | <button id="langToggle" class="toplink">${state.lang==='en'?'हिन्दी':'English'}</button> | A- | A | A+</span></div></div>
- <header><div class="wrap head"><a class="brand" data-route="home"><img src="${A}brand.jpg"></a><div class="head-right"><div class="search"><input id="search" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button id="loginBtn" class="login">${tr('login')}</button><span class="emblem">☸</span></div></div></header>
- <nav><div class="wrap navrow">${nav('home',tr('home'),active)}${nav('chair',tr('chair'),active)}${menu('cand',tr('cand'),CANDIDATES,active)}${menu('tender',tr('tender'),TENDER,active)}${menu('rti',tr('rti'),RTI,active)}${menu('about',tr('about'),ABOUT,active)}</div></nav>`;
+ return `<div class="topline"><div class="wrap topflex"><span>${tr('feedback')}</span><span>${tr('skip')} | <button id="langToggle" class="plain">${state.lang==='en'?'हिन्दी':'English'}</button> | A- | A | A+</span></div></div>
+ <header class="sitehead"><div class="wrap headrow">
+   <button class="brandbtn" data-route="home"><img src="${A}brand-reference.jpg" alt="Staff Selection Commission"></button>
+   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><span class="emblem">♜</span></div>
+ </div></header>
+ <nav class="mainnav"><div class="wrap navrow">
+   ${nav('home',tr('home'),active)}${nav('chair',tr('chair'),active)}
+   ${menu('cand',tr('cand'),CANDIDATES,active)}${menu('tender',tr('tender'),TENDER,active)}
+   ${menu('rti',tr('rti'),RTI,active)}${menu('about',tr('about'),ABOUT,active)}
+ </div></nav>`;
 }
 function nav(id,label,active){return `<button class="navbtn ${active===id?'active':''}" data-route="${id}">${label}</button>`}
-function menu(id,label,items,active){return `<div class="navmenu"><button class="navbtn ${active===id?'active':''}" data-menu="${id}">${label} <span>⌄</span></button><div class="dropdown">${items.map(x=>`<button data-route="${slug(x)}" class="dropitem">${esc(x)}</button>`).join('')}</div></div>`}
-function footer(){return `<footer><div class="wrap footgrid"><div><div class="footbrand"><span class="footlogo">☸</span><b>Staff Selection<br>Commission</b></div><p>Public Disclosure of Scores and Other Details of Non-Recommended Willing Candidates</p><p>List of Debarred Candidates in Examinations Conducted by the Staff Selection Commission</p></div><div><h4>Useful Links</h4><a>DoPT</a><a>Archives</a><a>Disclaimer</a><a>Sitemap</a><a>Help</a><a>Website Policies</a><a>Web Information Manager</a></div><div><h4>Contact Us</h4><p>⌖ Block No-12, CGO Complex, Lodhi Road<br>New Delhi - 110003</p></div></div><div class="wrap footbottom"><span>© 2026 SSC. All Rights Reserved.</span><span>Total Visitor Count: 475188860</span><span>Last updated on Aug 18, 2026</span></div></footer>`}
-function home(){return `${header('home')}<main><section class="hero"><img src="${A}hero.jpg"></section><section class="noticeband"><div>For inquiries or support, candidates can email: <u>helpdesk-ssc@ssc.nic.in</u></div><div>Follow the Staff Selection Commission on X (formerly Twitter): <u>@SSC_GoI</u></div><div>One Time Registration(OTR) for Scribe is live. Please click here to register.</div><a>Join Indian Navy</a></section><section class="section"><div class="wrap"><div class="sectionhead"><h2>${tr('notice')}</h2><button data-route="notices">${tr('view')}</button></div><div class="noticecard"><div id="noticeList"></div><div id="pager" class="pager"></div></div></div></section><section class="quicksec"><div class="wrap"><h2>${tr('quick')}</h2><div class="quickgrid"><button data-route="apply-online">🖉 Apply</button><button data-route="admit-card">▣ Admit Card</button><button data-route="answer-key">▤ Answer Key</button><button data-route="result">🟢 Result</button></div></div></section><section class="section"><div class="wrap"><div class="calendar"><div class="sectionhead"><h2>${tr('calendar')}</h2><div><button id="prevMonth">‹</button> <b id="monthLabel">Aug, 2026</b> <button id="nextMonth">›</button></div></div><div id="calendarList"></div><button class="viewall" data-route="calendar">${tr('view')}</button></div></div></section><section class="examBand"><div class="wrap examwrap"><div><h2>${tr('browse')}</h2><p>Explore exam-related details and relevant resources.</p><button class="pill light" data-route="browse">View All</button></div><div><div id="examGrid" class="examgrid"></div><div id="examDots" class="dots"></div></div></div></section><section class="section promoSection"><div class="wrap"><div id="promoGrid" class="promogrid"></div><div id="promoDots" class="dots dark"></div></div></section><section class="section faqsec"><div class="wrap faqwrap"><div><h2>${tr('faq')}</h2><p>List of common inquiries and their brief answers to provide quick information and assistance users.</p><button class="pill" data-route="faq">${tr('view')}</button></div><div><h5>${tr('popular')}</h5><div id="faqList" class="faqlist"></div></div></div></section><section class="section initiativeSec"><div class="wrap"><h2>${tr('initiatives')}</h2><div id="initiativeGrid" class="initiativegrid"></div><div id="initiativeDots" class="dots dark"></div></div></section></main>${footer()}`}
-function renderNotices(){const el=document.getElementById('noticeList');if(!el)return;const per=5;const start=(state.page-1)*per;const arr=state.notices.slice(start,start+per);el.innerHTML=arr.map(n=>{const d=dateParts(n.notice_date||'2026-08-18');return `<div class="noticeRow"><div class="datebox"><span>New</span><small>${d.mon}</small><b>${d.day}</b><small>${d.year}</small></div><button class="noticetitle" data-route="notice:${esc(n.id)}">${esc(n.title)}</button><div class="meta">(${esc(n.file_size||'')} )</div><div class="actions">${n.file_path?`<a href="${esc(fileUrl(n.file_path))}" target="_blank" class="pdf">PDF</a><a href="${esc(fileUrl(n.file_path))}" target="_blank" class="eye">◉</a>`:`<span class="pdf muted">PDF</span><span class="eye">◉</span>`}</div></div>`}).join('');const pages=Math.max(1,Math.ceil(state.notices.length/per));document.getElementById('pager').innerHTML=`<button data-page="${Math.max(1,state.page-1)}">‹</button>${[1,2,3].filter(x=>x<=pages).map(x=>`<button class="${x===state.page?'cur':''}" data-page="${x}">${x}</button>`).join('')}<span>…</span><button data-page="${pages}">${pages}</button><button data-page="${Math.min(pages,state.page+1)}">›</button>`;document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.page=+b.dataset.page;renderNotices()})}
-function fileUrl(p){return /^https?:/.test(p)?p:db?db.storage.from('ssc-files').getPublicUrl(p).data.publicUrl:p}
-async function loadNotices(){if(!db){state.notices=fallback;renderNotices();return}const {data,error}=await db.from('ssc_notices').select('*').order('created_at',{ascending:false});state.notices=error||!data||!data.length?fallback:data;renderNotices()}
-function renderCalendar(){const el=document.getElementById('calendarList');if(!el)return;document.getElementById('monthLabel').textContent='Aug, 2026';el.innerHTML=cal.map(x=>{const d=dateParts(x[0]);return `<button class="calrow"><span class="caldate"><b>${d.day}</b><small>${d.mon}</small></span><span>${esc(x[1])}</span></button>`}).join('')}
-function renderExams(){const pages=[[0,1,2,3,4,5],[6,7,8,9,0,1]];const arr=pages[state.examPage%pages.length].map(i=>EXAMS[i]);document.getElementById('examGrid').innerHTML=arr.map(x=>`<button class="examcard" data-route="exam:${encodeURIComponent(x)}"><span><b>${esc(x)}</b><small>${esc(x)} related details and resources.</small></span><strong>→</strong></button>`).join('');document.getElementById('examDots').innerHTML=pages.map((_,i)=>`<button class="${i===state.examPage?'on':''}" data-exampage="${i}"></button>`).join('');document.querySelectorAll('[data-exampage]').forEach(b=>b.onclick=()=>{state.examPage=+b.dataset.exampage;renderExams()})}
-function renderPromos(){const sets=[[0,1,2],[1,2,0],[2,0,1]];const arr=sets[state.promoPage%3].map(i=>promos[i]);document.getElementById('promoGrid').innerHTML=arr.map(x=>`<article class="promo"><img src="${A+x[0]}"></article>`).join('');document.getElementById('promoDots').innerHTML=sets.map((_,i)=>`<button class="${i===state.promoPage?'on':''}" data-promopage="${i}"></button>`).join('');document.querySelectorAll('[data-promopage]').forEach(b=>b.onclick=()=>{state.promoPage=+b.dataset.promopage;renderPromos()})}
-function renderInitiatives(){const sets=[[0,1,2,3],[1,2,3,4],[2,3,4,0]];const arr=sets[state.initiativePage%3].map(i=>initiatives[i]);document.getElementById('initiativeGrid').innerHTML=arr.map(x=>`<a class="initiative" href="#" onclick="return false"><img src="${A+x[0]}" alt="${esc(x[1])}"></a>`).join('');document.getElementById('initiativeDots').innerHTML=sets.map((_,i)=>`<button class="${i===state.initiativePage?'on':''}" data-initpage="${i}"></button>`).join('');document.querySelectorAll('[data-initpage]').forEach(b=>b.onclick=()=>{state.initiativePage=+b.dataset.initpage;renderInitiatives()})}
-function renderFaq(){document.getElementById('faqList').innerHTML=faq.map(x=>`<div class="faqitem"><button>${esc(x[0])}<span>⊕</span></button><p>${esc(x[1])}</p></div>`).join('');document.querySelectorAll('.faqitem>button').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'))}
-function bindCommon(){document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.parentElement;document.querySelectorAll('.navmenu').forEach(x=>x!==p&&x.classList.remove('open'));p.classList.toggle('open')});document.addEventListener('click',e=>{if(!e.target.closest('.navmenu'))document.querySelectorAll('.navmenu').forEach(x=>x.classList.remove('open'))},{once:true});document.querySelectorAll('[data-route]').forEach(x=>x.onclick=()=>route(x.dataset.route));document.getElementById('langToggle')?.addEventListener('click',()=>{state.lang=state.lang==='en'?'hi':'en';localStorage.sscLang=state.lang;renderRoute(location.hash.slice(1)||'home')});document.getElementById('loginBtn')?.addEventListener('click',()=>route('login'));document.getElementById('searchBtn')?.addEventListener('click',()=>doSearch());document.getElementById('search')?.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});document.getElementById('prevMonth')?.addEventListener('click',()=>toast('Previous month'));document.getElementById('nextMonth')?.addEventListener('click',()=>toast('Next month'))}
-function doSearch(){const q=document.getElementById('search')?.value.trim();if(!q)return;const hits=[...EXAMS,...CANDIDATES,...ABOUT,...TENDER,...RTI,...state.notices.map(n=>n.title)].filter(x=>x.toLowerCase().includes(q.toLowerCase()));modal(`<div class="modal"><div class="modalhead"><h3>Search</h3><button class="close">×</button></div><div class="modalbody">${hits.length?hits.map(x=>`<button class="searchitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join(''):'<p>No matching results found.</p>'}</div></div>`) }
-function loginPage(){return `${header('login')}<main class="page"><div class="wrap loginpage"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><input id="loginPass" type="password" placeholder="Password"><div class="captcha"><b>69yXs</b><span>↻ Refresh</span></div><label>Captcha <i>*</i></label><input placeholder="Captcha"><button id="candidateLogin" class="loginfull">Login</button><div class="loginlinks"><a>Forgot Password</a><span>New User? <a>Register Now</a></span></div></div></div></main>${footer()}`}
-function chairman(){return `${header('chair')}<main class="page"><div class="wrap"><div class="crumb">← Homepage &gt; Chairman's Message</div><h2>Chairman's Message</h2><div class="chairman"><img src="${A}chairman.jpg" onerror="this.style.display='none'" alt="Chairman"><h5>Shri S. Gopalakrishnan<br>Chairman</h5><p>Staff Selection Commission has evolved as one of the most trusted recruiting agency in India. It follows processes to ensure fair, just and impartial selection of candidates for the User Departments.</p><p>A number of significant developments are taking place in the methods of recruitment, including use of technology and information systems. This has brought new challenges for the recruiting bodies.</p><div class="fileline">Message From Chairman <span>PDF, 82.32 KB　↓　◉</span></div></div></div></main>${footer()}`}
-function tender(){return `${header('tender')}<main class="page"><div class="wrap"><div class="crumb">← Homepage &gt; Tender</div><h2>SSC Tender</h2><p>Welcome to the SSC Tenders page, your gateway to explore and engage with the latest tender opportunities related to Staff Selection Commission.</p><div class="searchline"><input placeholder="Search"><button>⌕</button></div><div class="tenders">${Array.from({length:10},(_,i)=>`<div class="tenderrow"><span class="datebox"><small>MAR</small><b>${25-i}</b><small>2026</small></span><span>Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for Technology and Operations Partner for SSC Examinations and Candidate Services</span><span>PDF · ${(158+i*17)}.89 KB</span><span>↓ ◉</span></div>`).join('')}</div></div></main>${footer()}`}
-function genericPage(title,body){return `${header('') }<main class="page"><div class="wrap"><div class="crumb">← Homepage &gt; ${esc(title)}</div><h2>${esc(title)}</h2>${body}</div></main>${footer()}`}
-function resultModal(){const cats=['ALL','CHSL','JEN','CAPF','CTGD','CHT','OTHERS','DEPARTMENTAL EXAMS','DPHM','RHQ','DPCE','CGL','DPCD','DPHCT','CEDP','MTS','STENOGRAPHER'];modal(`<div class="modal resultmodal"><div class="modalhead"><h3>🟢 Result</h3><button class="close">×</button></div><div class="tabs">${cats.map((x,i)=>`<button class="tab ${i===0?'active':''}">${x}</button>`).join('')}</div><div class="modalbody" id="resultBody"><div class="resultrow"><span>Junior Secretariat Assistant / Lower Division Clerk Grade Limited Departmental Competitive Examination, 2023-24: Declaration of final result for the year 2024 of AFHQ Grade-II</span><span>1143.76 KB PDF　 <u>Write-up</u>　<u>Result</u></span></div><div class="resultrow"><span>Combined Graduate Level Examination (CGLE), 2025: List of Candidates in Roll Number Order provisionally shortlisted</span><span>894.00 KB PDF　 <u>Write-up</u>　<u>Result</u></span></div><button class="pill">View All</button></div></div>`)}
-function admitModal(){modal(`<div class="modal small"><div class="modalhead"><h3>▣ Admit Card</h3><button class="close">×</button></div><div class="modalbody"><div class="resultrow">Download E-Admit Card of Unknown Exam.</div><div class="resultrow">Download E-Admit Card of Unknown Exam.</div><div class="center"><button class="pill" data-route="login">Login</button></div></div></div>`)}
-function answerModal(){modal(`<div class="modal"><div class="modalhead"><h3>🟨 Answer Key</h3><button class="close">×</button></div><div class="modalbody">${['Grade C Stenographers Limited Departmental Competitive Examination, 2025: Uploading of Tentative Answer Keys along with Candidates Response Sheets.','Constable (Executive) Male and Female in Delhi Police Examination, 2025: Uploading of Final Answer Keys along with Question Papers cum Response Sheets.','Head Constable (Ministerial) in Delhi Police Examination, 2025: Uploading of Final Answer Keys along with Question Papers cum Response Sheet.'].map(x=>`<div class="resultrow"><span>${x}</span><span>191.93 KB　PDF　◉</span></div>`).join('')}<div class="center"><button class="pill">View All</button></div></div></div>`)}
-function route(r){location.hash=r;document.querySelectorAll('.navmenu').forEach(x=>x.classList.remove('open'));if(r==='home'||!r){renderRoute('home');return}if(r==='result'){resultModal();return}if(r==='admit-card'){admitModal();return}if(r==='answer-key'){answerModal();return}if(r==='login'||r==='candidate-login'){document.getElementById('app').innerHTML=loginPage();bindCommon();document.getElementById('candidateLogin')?.addEventListener('click',()=>toast('Candidate login requires a configured candidate authentication service.'));return}if(r==='chair'){document.getElementById('app').innerHTML=chairman();bindCommon();return}if(r==='tender'||r==='current-tenders'){document.getElementById('app').innerHTML=tender();bindCommon();return}if(r.startsWith('notice:')){const n=state.notices.find(x=>String(x.id)===r.split(':')[1]);if(n)modal(`<div class="modal"><div class="modalhead"><h3>Notice</h3><button class="close">×</button></div><div class="modalbody"><h4>${esc(n.title)}</h4><p>Date: ${esc(n.notice_date||'')}</p><p>File size: ${esc(n.file_size||'')}</p>${n.file_path?`<a class="pill" href="${esc(fileUrl(n.file_path))}" target="_blank">Open PDF</a>`:''}</div></div>`);return}if(r.startsWith('exam:')){const name=decodeURIComponent(r.slice(5));modal(`<div class="modal"><div class="modalhead"><h3>${esc(name)}</h3><button class="close">×</button></div><div class="tabs">${examResources.map(x=>`<button class="tab" data-examtab="${slug(x)}">${x}</button>`).join('')}</div><div class="modalbody" id="examBody"><h4>Candidate resources</h4><p>Select a tab to open ${esc(name)} information.</p></div></div>`);document.querySelectorAll('[data-examtab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-examtab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('examBody').innerHTML=`<h4>${esc(b.textContent)}</h4><p>${esc(name)} — this section is ready for notices, PDFs and examination resources managed through the site.</p>`});return}if(r==='browse'){modal(`<div class="modal"><div class="modalhead"><h3>Browse by Examinations</h3><button class="close">×</button></div><div class="modalbody exammenu">${EXAMS.map(x=>`<button data-route="exam:${encodeURIComponent(x)}">${esc(x)} <b>→</b></button>`).join('')}</div></div>`);return}if(r==='apply-online'){genericPage('Apply Online','<div class="servicecard"><h3>Apply Online</h3><p>Start or continue an online application. Examination-specific applications open from the published notice.</p><button class="pill">Start Application</button></div>');bindCommon();return}if(r==='calendar'){genericPage('SSC Calendar','<div class="servicecard">'+cal.map(x=>`<div class="resultrow"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join('')+'</div>');bindCommon();return}if(r==='faq'){genericPage('Frequently Asked Questions',faq.map(x=>`<div class="faqfull"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join(''));bindCommon();return}if(r==='notices'){genericPage('Notice Board','<div class="servicecard" id="allNotices"></div>');bindCommon();document.getElementById('allNotices').innerHTML=state.notices.map(n=>`<div class="resultrow"><span>${esc(n.title)}</span><a href="${n.file_path?esc(fileUrl(n.file_path)):'#'}" target="_blank">PDF　◉</a></div>`).join('');return}if(r==='admin-login'){location.href='admin.html';return}if(r==='rti'){document.getElementById('app').innerHTML=genericPage('RTI','<p>RTI Online, disclosures and designated officers information.</p>');bindCommon();return}if(r==='about'||ABOUT.map(slug).includes(r)){document.getElementById('app').innerHTML=genericPage('About Us','<p>Information about the Staff Selection Commission, its structure, functions, regional network, annual report, citizen charter, RTI and contact information.</p>');bindCommon();return}document.getElementById('app').innerHTML=genericPage(r.replace(/-/g,' '),'<p>This section is ready for content and documents managed by the administrator.</p>');bindCommon()}
-function renderRoute(r){document.getElementById('app').innerHTML=home();bindCommon();loadNotices();renderCalendar();renderExams();renderPromos();renderInitiatives();renderFaq();clearInterval(window.sscTimer);window.sscTimer=setInterval(()=>{state.promoPage=(state.promoPage+1)%3;state.initiativePage=(state.initiativePage+1)%3;renderPromos();renderInitiatives()},4500)}
-window.addEventListener('hashchange',()=>renderRoute(location.hash.slice(1)||'home'));renderRoute(location.hash.slice(1)||'home');
+function menu(id,label,items,active){
+ return `<div class="navmenu"><button class="navbtn ${active===id?'active':''}" data-menu="${id}">${label}<span class="chev">⌄</span></button><div class="dropdown">${items.map(x=>`<button class="dropitem" data-route="${slug(x)}">${esc(x)}</button>`).join('')}</div></div>`;
+}
+
+function footer(){
+ return `<footer class="footer"><div class="wrap footgrid">
+  <div><div class="footbrand"><img src="${A}brand-reference.jpg" alt=""><span>Staff Selection<br>Commission</span></div>
+   <p>Public Disclosure of Scores and Other Details of Non-Recommended Willing Candidates</p>
+   <p>List of Debarred Candidates in Examinations Conducted by the Staff Selection Commission</p>
+  </div>
+  <div><h4>Useful Links</h4><a>DoPT</a><a>Archives</a><a>Disclaimer</a><a>Sitemap</a><a>Help</a><a>Website Policies</a><a>Web Information Manager</a></div>
+  <div><h4>Contact Us</h4><p>⌖ Block No-12, CGO Complex, Lodhi Road<br>New Delhi - 110003</p></div>
+ </div><div class="wrap footbottom"><span>© 2026 SSC. All Rights Reserved.</span><span>Total Visitor Count: 475188660</span><span>Last updated on Aug 18, 2026</span></div></footer>`;
+}
+
+function home(){
+ return `${header('home')}<main>
+ <section class="hero"><img src="${A}hero-reference.jpg" alt="SSC building"></section>
+ <section class="noticeband"><div>For inquiries or support, candidates can email: <u>helpdesk-ssc@ssc.nic.in</u></div><div>Follow the Staff Selection Commission on X (formerly Twitter): <u>@SSC_GoI</u></div><div>One Time Registration(OTR) for Scribe is live. Please click here to register.</div><a href="#" onclick="return false">Join Indian Navy</a></section>
+ <section class="section"><div class="wrap"><div class="sectionhead"><h2>${tr('notice')}</h2><button data-route="notices">${tr('view')}</button></div><div class="noticecard"><div id="noticeList"></div><div id="pager" class="pager"></div></div></div></section>
+ <section class="quicksec"><div class="wrap"><h2>${tr('quick')}</h2><div class="quickgrid">
+  <button data-route="apply-online"><span>🖉</span>${tr('apply')}</button><button data-route="admit-card"><span>▣</span>${tr('admit')}</button>
+  <button data-route="answer-key"><span>▤</span>${tr('answer')}</button><button data-route="result"><span>▥</span>${tr('result')}</button>
+ </div></div></section>
+ <section class="section"><div class="wrap"><div class="calendar card"><div class="sectionhead"><h2>${tr('calendar')}</h2><div class="monthnav"><button id="prevMonth">‹</button><b id="monthLabel"></b><button id="nextMonth">›</button></div></div><div id="calendarList"></div><button class="viewall" data-route="calendar">${tr('view')}</button></div></div></section>
+ <section class="examBand"><div class="wrap examwrap"><div class="examintro"><h2>${tr('browse')}</h2><p>Explore exam-related details and relevant resources</p><button class="pill light" data-route="browse">${tr('view')}</button></div><div class="examarea"><div id="examGrid" class="examgrid"></div><div id="examDots" class="dots"></div></div></div></section>
+ <section class="section promoSection"><div class="wrap"><div id="promoGrid" class="promogrid"></div><div id="promoDots" class="dots dark"></div></div></section>
+ <section class="section faqsec"><div class="wrap faqwrap"><div><h2>${tr('faq')}</h2><p>List of common inquiries and their brief answers to provide quick information and assist users.</p><button class="pill" data-route="faq">${tr('view')}</button></div><div><h5>${tr('popular')}</h5><div id="faqList" class="faqlist"></div></div></div></section>
+ <section class="section initiativeSec"><div class="wrap"><h2>${tr('initiatives')}</h2><div id="initiativeGrid" class="initiativegrid"></div><div id="initiativeDots" class="dots dark"></div></div></section>
+ </main>${footer()}`;
+}
+
+function renderNotices(){
+ const list = state.notices.length ? state.notices : FALLBACK_NOTICES;
+ const pageSize=5, total=Math.max(1,Math.ceil(list.length/pageSize)), page=Math.min(state.page,total);
+ const start=(page-1)*pageSize;
+ document.getElementById('noticeList').innerHTML=list.slice(start,start+pageSize).map(n=>{
+   const d=dateParts(n.notice_date);
+   return `<article class="noticeRow"><div class="datebox"><small>${d.mon}</small><b>${d.day}</b><small>${d.year}</small></div><div class="noticeTitle">${esc(n.title)}</div><div class="noticeMeta">(${esc(n.file_size||'')} )</div><div class="noticeActions"><button title="PDF" data-notice="${esc(n.id)}">PDF</button><button title="View" data-notice="${esc(n.id)}">◉</button></div></article>`;
+ }).join('');
+ document.getElementById('pager').innerHTML=`<button data-page="${Math.max(1,page-1)}">‹</button>${[1,2,3].map(i=>`<button class="${page===i?'active':''}" data-page="${i}">${i}</button>`).join('')}<span>…</span><button data-page="${total}">${total}</button><button data-page="${Math.min(total,page+1)}">›</button>`;
+ document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.page=+b.dataset.page;renderNotices()});
+ document.querySelectorAll('[data-notice]').forEach(b=>b.onclick=()=>openNotice(b.dataset.notice));
+}
+async function loadNotices(){
+ if(!db){state.notices=FALLBACK_NOTICES;renderNotices();return}
+ const {data,error}=await db.from('ssc_notices').select('*').order('notice_date',{ascending:false}).order('created_at',{ascending:false});
+ state.notices=(!error && data && data.length)?data:FALLBACK_NOTICES;
+ renderNotices();
+}
+
+function renderCalendar(){
+ const m=state.month;
+ const items=CALENDAR.filter(x=>new Date(x[0]).getMonth()===m);
+ document.getElementById('monthLabel').textContent=new Date(state.year,m,1).toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short',year:'numeric'});
+ document.getElementById('calendarList').innerHTML=(items.length?items:CALENDAR.slice(0,4)).map(x=>{
+   const d=dateParts(x[0]);return `<div class="calrow"><div class="caldate"><b>${d.day}</b><small>${d.mon}</small></div><div>${esc(x[1])}</div></div>`;
+ }).join('');
+}
+function renderExams(){
+ const start=state.examPage*6;
+ const items=EXAMS.slice(start,start+6);
+ document.getElementById('examGrid').innerHTML=items.map(x=>`<button class="examcard" data-route="exam:${encodeURIComponent(x)}"><strong>${esc(x)}</strong><span>${esc(x)} is a competitive examination conducted by the Staff Selection Commission...</span><b>→</b></button>`).join('');
+ document.getElementById('examDots').innerHTML=[0,1].map(i=>`<button class="${i===state.examPage?'on':''}" data-exampage="${i}"></button>`).join('');
+ document.querySelectorAll('[data-exampage]').forEach(b=>b.onclick=()=>{state.examPage=+b.dataset.exampage;renderExams()});
+}
+function renderPromos(){
+ const items=[0,1,2].map(i=>PROMOS[(state.promoPage+i)%PROMOS.length]);
+ document.getElementById('promoGrid').innerHTML=items.map(p=>`<button class="promoCard" data-promo="${esc(p[1])}"><img src="${A+p[0]}" alt=""><span>${esc(p[1])}</span></button>`).join('');
+ document.getElementById('promoDots').innerHTML=[0,1,2].map(i=>`<button class="${i===state.promoPage?'on':''}" data-promopage="${i}"></button>`).join('');
+ document.querySelectorAll('[data-promopage]').forEach(b=>b.onclick=()=>{state.promoPage=+b.dataset.promopage;renderPromos()});
+}
+function renderInitiatives(){
+ const start=state.initiativePage;
+ const items=[0,1,2,3,4].map(i=>INITIATIVES[(start+i)%INITIATIVES.length]);
+ document.getElementById('initiativeGrid').innerHTML=items.map(p=>`<button class="initiativeCard"><img src="${A+p[0]}" alt="${esc(p[1])}"></button>`).join('');
+ document.getElementById('initiativeDots').innerHTML=[0,1].map(i=>`<button class="${i===state.initiativePage%2?'on':''}"></button>`).join('');
+}
+function renderFaq(){
+ document.getElementById('faqList').innerHTML=FAQ.map((x,i)=>`<div class="faqitem"><button data-faq="${i}"><span>${esc(x[0])}</span><b>⊕</b></button><div class="faqanswer">${esc(x[1])}</div></div>`).join('');
+ document.querySelectorAll('[data-faq]').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'));
+}
+
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.classList.remove('show'),2200)}
+function modal(html){document.getElementById('modal-root').innerHTML=`<div class="modalback">${html}</div>`;document.querySelector('.modalback').addEventListener('click',e=>{if(e.target.classList.contains('modalback'))closeModal()});document.querySelectorAll('.close').forEach(b=>b.onclick=closeModal)}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+function resultModal(){
+ const cats=['ALL','CHSL','JEN','CAPF','CTGD','CHT','OTHERS','DEPARTMENTAL EXAMS','DPHM','RHQ','DPCE','CGL','DPCD','DPHCT','CEDP','MTS','STENOGRAPHER'];
+ modal(`<div class="modal resultmodal"><div class="modalhead"><h3>🟢 Result</h3><button class="close">×</button></div><div class="tabs">${cats.map((x,i)=>`<button class="tab ${i===0?'active':''}" data-resultcat="${x}">${x}</button>`).join('')}</div><div class="modalbody" id="resultBody"></div><div class="modalfoot"><button class="pill">View All</button></div></div>`);
+ renderResult('ALL');
+ document.querySelectorAll('[data-resultcat]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-resultcat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderResult(b.dataset.resultcat)});
+}
+function renderResult(cat){
+ const rows=[
+  'Junior Secretariat Assistant / Lower Division Clerk Grade Limited Departmental Competitive Examination, 2023-24: Declaration of final result for the year 2024 of AFHQ Grade-II',
+  'Combined Graduate Level Examination (CGLE), 2025: List of Candidates in Roll Number Order provisionally shortlisted',
+  'Head Constable (Assistant Wireless Operator/Tele-Printer Operator) in Delhi Police Examination, 2025 — Additional Female Candidates qualified'
+ ];
+ document.getElementById('resultBody').innerHTML=rows.map(x=>`<div class="resultrow"><span>${esc(x)}</span><span>416.08 KB <i class="pdf">PDF</i> <u>Write up</u> <u>Result</u></span></div>`).join('');
+}
+function admitModal(){
+ modal(`<div class="modal small"><div class="modalhead"><h3>▣ Admit Card</h3><button class="close">×</button></div><div class="modalbody">${['Download E-Admit Card of Stenographer Grade C and D Examination, 2024','Download E-Admit Card of Combined Hindi Translators Examination','Download E-Admit Card of Combined Higher Secondary Level Examination'].map(x=>`<div class="resultrow"><span>${x}</span></div>`).join('')}<div class="center"><button class="pill" data-route="login">Login</button></div></div></div>`);
+ bindModalRoutes();
+}
+function answerModal(){
+ modal(`<div class="modal"><div class="modalhead"><h3>▤ Answer Key</h3><button class="close">×</button></div><div class="modalbody">${['Grade C Stenographers Limited Departmental Competitive Examination, 2025: Uploading of Tentative Answer Keys along with Candidates Response Sheets.','Constable (Executive) Male and Female in Delhi Police Examination, 2025: Uploading of Final Answer Keys.','Head Constable (Ministerial) in Delhi Police Examination, 2025: Uploading of Final Answer Keys along with Question Papers cum Response Sheet.'].map(x=>`<div class="resultrow"><span>${x}</span><span>191.93 KB <i class="pdf">PDF</i> ◉</span></div>`).join('')}<div class="center"><button class="pill">View All</button></div></div></div>`);
+}
+function applyPage(){return genericPage('Apply Online',`<div class="servicecard"><h3>Apply Online</h3><p>Select an examination to continue your application.</p>${EXAMS.slice(0,6).map(x=>`<button class="serviceitem" data-route="exam:${encodeURIComponent(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`)}
+function loginPage(){
+ return `${header('login')}<main class="page loginPage"><div class="wrap"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><div class="passrow"><input id="loginPass" type="password" placeholder="Password"><button>◉</button></div><a class="forgot">Forgot Password</a><div class="captcha"><b>69vXs</b><button>↻ Refresh</button></div><label>Captcha <i>*</i></label><input placeholder="Captcha"><button id="candidateLogin" class="loginfull">Login</button><div class="loginlinks">New User? <a>Register Now</a></div></div></div></main>${footer()}`;
+}
+function chairmanPage(){return genericPage("Chairman's Message",`<div class="chaircard"><h3>Chairman's Message</h3><p>Staff Selection Commission has evolved as one of the trusted recruiting agencies in India. The Commission uses technology and transparent processes to conduct fair recruitment.</p><p>For the full message and downloadable documents, use the links provided by the administrator.</p></div>`)}
+function tenderPage(){return genericPage('SSC Tender',`<p>Welcome to the SSC Tenders page, your gateway to tender announcements.</p><div class="servicecard">${Array.from({length:9},(_,i)=>`<div class="tenderrow"><span class="datebox"><small>APR</small><b>${8-i%7}</b><small>2026</small></span><span>Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for SSC Examinations and Candidate Services</span><span>PDF · ${(158+i*17)}.89 KB</span><span>↓ ◉</span></div>`).join('')}</div>`)}
+function genericPage(title,body){return `${header('')}<main class="page"><div class="wrap"><div class="crumb">← Homepage &gt; ${esc(title)}</div><h2>${esc(title)}</h2>${body}</div></main>${footer()}`}
+
+function openNotice(id){
+ const n=state.notices.find(x=>String(x.id)===String(id)); if(!n)return;
+ const link=n.file_path?fileUrl(n.file_path):'#';
+ modal(`<div class="modal"><div class="modalhead"><h3>Notice</h3><button class="close">×</button></div><div class="modalbody"><h3>${esc(n.title)}</h3><p>${esc(n.notice_date||'')}</p><p>${esc(n.file_size||'')}</p>${n.file_path?`<a class="pill" href="${esc(link)}" target="_blank">Open PDF</a>`:'<p class="muted">No PDF attached.</p>'}</div></div>`);
+}
+
+function examModal(name){
+ modal(`<div class="modal exammodal"><div class="modalhead"><h3>${esc(name)}</h3><button class="close">×</button></div><div class="tabs">${EXAM_RESOURCES.map((x,i)=>`<button class="tab ${i===0?'active':''}" data-examtab="${slug(x)}">${esc(x)}</button>`).join('')}</div><div class="modalbody" id="examBody"><h4>Notice</h4><p>Examination-specific content can be managed from the administrator panel.</p></div></div>`);
+ document.querySelectorAll('[data-examtab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-examtab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('examBody').innerHTML=`<h4>${esc(b.textContent)}</h4><p>${esc(name)} — ${esc(b.textContent)} documents and links can be published by the administrator.</p>`});
+}
+
+function bindModalRoutes(){document.querySelectorAll('#modal-root [data-route]').forEach(b=>b.onclick=()=>route(b.dataset.route))}
+function doSearch(){
+ const q=(document.getElementById('searchInput')?.value||'').trim().toLowerCase();
+ if(!q){toast('Enter a search term');return}
+ const all=[...EXAMS,...CANDIDATES,...ABOUT,...TENDER,...RTI,...state.notices.map(n=>n.title)];
+ const hits=all.filter(x=>x.toLowerCase().includes(q));
+ modal(`<div class="modal"><div class="modalhead"><h3>Search</h3><button class="close">×</button></div><div class="modalbody">${hits.length?hits.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join(''):'<p>No matching results found.</p>'}</div></div>`);
+ bindModalRoutes();
+}
+
+function route(r){
+ if(!r)return;
+ location.hash=r;
+ document.querySelectorAll('.navmenu.open').forEach(x=>x.classList.remove('open'));
+ closeModal();
+ if(r==='home'){renderHome();return}
+ if(r==='login'||r==='candidate-login'){document.getElementById('app').innerHTML=loginPage();bindCommon();return}
+ if(r==='admin-login'){location.href='admin.html';return}
+ if(r==='result'){resultModal();return}
+ if(r==='admit-card'){admitModal();return}
+ if(r==='answer-key'){answerModal();return}
+ if(r==='apply-online'){document.getElementById('app').innerHTML=applyPage();bindCommon();return}
+ if(r==='chair'){document.getElementById('app').innerHTML=chairmanPage();bindCommon();return}
+ if(r==='tender'||r==='current-tenders'||r==='tender-archive'||r==='corrigenda'){document.getElementById('app').innerHTML=tenderPage();bindCommon();return}
+ if(r==='browse'){modal(`<div class="modal"><div class="modalhead"><h3>Browse by Examinations</h3><button class="close">×</button></div><div class="modalbody exammenu">${EXAMS.map(x=>`<button data-route="exam:${encodeURIComponent(x)}">${esc(x)} <b>→</b></button>`).join('')}</div></div>`);bindModalRoutes();return}
+ if(r.startsWith('exam:')){examModal(decodeURIComponent(r.slice(5)));return}
+ if(r.startsWith('notice:')){openNotice(r.slice(7));return}
+ if(r==='notices'){document.getElementById('app').innerHTML=genericPage('Notice Board','<div class="servicecard" id="allNotices"></div>');bindCommon();document.getElementById('allNotices').innerHTML=state.notices.map(n=>`<div class="resultrow"><span>${esc(n.title)}</span><span><a href="${n.file_path?esc(fileUrl(n.file_path)):'#'}" target="_blank">PDF</a> <button data-notice="${esc(n.id)}">◉</button></span></div>`).join('');document.querySelectorAll('[data-notice]').forEach(b=>b.onclick=()=>openNotice(b.dataset.notice));return}
+ if(r==='calendar'){document.getElementById('app').innerHTML=genericPage('SSC Calendar',CALENDAR.map(x=>`<div class="resultrow"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join(''));bindCommon();return}
+ if(r==='faq'){document.getElementById('app').innerHTML=genericPage('Frequently Asked Questions',FAQ.map(x=>`<div class="faqfull"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join(''));bindCommon();return}
+ if(r==='rti'||r.startsWith('rti-')){document.getElementById('app').innerHTML=genericPage('RTI',`<div class="servicecard">${RTI.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`);bindCommon();return}
+ if(r==='about'||ABOUT.map(slug).includes(r)){document.getElementById('app').innerHTML=genericPage('About Us',`<div class="servicecard">${ABOUT.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`);bindCommon();return}
+ document.getElementById('app').innerHTML=genericPage(r.replace(/-/g,' '),'<div class="servicecard"><p>This option is active and ready for administrator-managed content and documents.</p></div>');bindCommon();
+}
+
+function bindCommon(){
+ document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>route(b.dataset.route));
+ document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.parentElement;document.querySelectorAll('.navmenu.open').forEach(x=>{if(x!==p)x.classList.remove('open')});p.classList.toggle('open')});
+ document.addEventListener('click',closeMenus,{once:true});
+ document.getElementById('langToggle')?.addEventListener('click',()=>{state.lang=state.lang==='en'?'hi':'en';localStorage.setItem('sscLang',state.lang);renderHome()});
+ document.getElementById('searchBtn')?.addEventListener('click',doSearch);
+ document.getElementById('searchInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
+ document.getElementById('prevMonth')?.addEventListener('click',()=>{state.month=(state.month+11)%12;renderCalendar()});
+ document.getElementById('nextMonth')?.addEventListener('click',()=>{state.month=(state.month+1)%12;renderCalendar()});
+ document.getElementById('candidateLogin')?.addEventListener('click',()=>toast('Candidate login form is ready; connect your candidate authentication service to validate credentials.'));
+}
+function closeMenus(){document.querySelectorAll('.navmenu.open').forEach(x=>x.classList.remove('open'))}
+
+function renderHome(){
+ document.getElementById('app').innerHTML=home();
+ bindCommon(); loadNotices(); renderCalendar(); renderExams(); renderPromos(); renderInitiatives(); renderFaq();
+ clearInterval(window.sscTimer);
+ window.sscTimer=setInterval(()=>{state.promoPage=(state.promoPage+1)%3;state.initiativePage=(state.initiativePage+1)%2;renderPromos();renderInitiatives()},5000);
+}
+
+window.addEventListener('hashchange',()=>{const r=location.hash.slice(1)||'home'; if(r==='home')renderHome(); else route(r)});
+renderHome();
