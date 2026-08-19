@@ -1,5 +1,14 @@
-IMPORTANT
-This is the second, closer SSC-style replacement. The previous package was only an approximation and should NOT be treated as the final design.
-Keep your existing assets folder and images.
-Replace root index.html, app.js, site.css and config.js with these files. Keep your working admin.html/admin.js if already working.
-The public layout/interactions now follow the current SSC home structure: header, dropdown navigation, rotating hero, notice board, quick links, calendar, browse-by-examination, FAQs, initiatives, footer, Results, Admit Card, Answer Key and Apply pages.
+SSC website replacement package
+
+Reference structure: official SSC homepage (ssc.gov.in).
+
+Upload all files to the GitHub repository root. Keep your existing assets folder beside app.js/site.css if you already have the SSC images.
+
+Files:
+index.html, app.js, site.css, config.js, admin.html, admin.js, admin.css, supabase_policies.sql
+
+Important:
+1. Keep your existing assets folder and images.
+2. If admin upload says "row-level security policy" run supabase_policies.sql in Supabase SQL Editor.
+3. Create bucket named ssc-files and make it public for public PDF opening/download.
+4. Admin account must exist in Supabase Authentication.
