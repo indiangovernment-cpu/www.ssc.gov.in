@@ -170,8 +170,7 @@ function renderNotices(){
    return `<article class="noticeRow"><div class="datebox"><small>${d.mon}</small><b>${d.day}</b><small>${d.year}</small></div><div class="noticeTitle">${esc(n.title)}</div><div class="noticeMeta">(${esc(n.file_size||'')} )</div><div class="noticeActions"><button title="PDF" data-notice-action="pdf" data-notice="${esc(n.id)}"><span class="pdficon">PDF</span></button><button title="View" data-notice-action="view" data-notice="${esc(n.id)}"><span class="eyeicon">${eyeIcon()}</span></button></div></article>`;
  }).join('');
  const pager=document.getElementById('pager');
- if(total<=1){ pager.innerHTML=''; pager.style.display='none'; }
- else {
+ if(list.length<=pageSize || total<=1){ pager.innerHTML=''; pager.style.display='none'; } else {
    pager.style.display='flex';
    const nums=[...new Set([1,page-1,page,page+1,total].filter(i=>i>=1&&i<=total))];
    let html=`<button data-page="${Math.max(1,page-1)}" aria-label="Previous page">‹</button>`;
