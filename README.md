@@ -1,15 +1,17 @@
-# SSC Mobile Reference + Supabase Ready Build
+# SSC Final Ready – Working Reference Build
 
-This package keeps the compact SSC-style mobile layout and includes working navigation/modals, notice board, candidate services, exam resources, search, FAQ, calendar, login/register UI, and Supabase-backed shared notices/files.
+This build preserves the working SSC website interactions and uses the reference-matched mobile layout/assets.
 
-## Supabase already configured
-`config.js` contains the supplied project URL and publishable/anon key. Do not replace it with a service_role/secret key.
+Included:
+- Working navigation/dropdowns
+- Working notice PDF/view actions
+- Working notice pagination
+- Working Quick Links
+- Working SSC Calendar month controls
+- Working examination cards and resource tabs
+- Working FAQ expand/collapse
+- Working promo/initiative sliders
+- Mobile two-screen responsive layout
+- Admin panel files and Supabase setup files
 
-## One-time Supabase setup
-Run `supabase.sql` in the Supabase SQL Editor. Then create your admin user in Authentication > Users.
-
-## Admin
-Open `admin.html`, sign in with the Supabase admin user, upload a PDF/file, enter the notice details, and click **Save Notice**. The notice then appears on the public home page for all visitors.
-
-## Deployment
-Static hosting is enough. Publish the folder containing `index.html` at the repository root.
+Open `index.html` to view the site. Configure `config.js` for Supabase-backed uploads/authentication when needed.
