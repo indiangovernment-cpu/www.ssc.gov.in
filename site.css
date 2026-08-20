@@ -117,3 +117,101 @@ button:hover{transform:translateY(-1px)}
   .faq-copy h2{font-size:15px}.faq-q{font-size:9px}
   .initiative{min-width:116px;height:62px}
 }
+
+/* FINAL SSC REFERENCE MATCH — visual corrections only; existing structure/functionality preserved. */
+@media (max-width:760px){
+  html,body{overflow-x:hidden}
+  body{font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:400;color:#2f2b2b}
+  .container{width:calc(100% - 16px);max-width:none}
+
+  /* Header + navigation */
+  .gov-strip{height:27px;font-size:9px}
+  .header-main{height:72px}
+  .brand-reference{width:205px!important;height:43px!important;object-fit:cover!important;object-position:left center!important}
+  .header-actions{gap:6px}
+  .searchbox{width:105px;height:32px}
+  .searchbox input{font-size:10px}
+  .login-btn{height:32px;padding:0 9px;font-size:9px;font-weight:400}
+  .nav-inner{height:34px;min-height:34px;overflow:hidden}
+  .nav-btn{padding:8px 8px;font-size:9px;font-weight:400}
+
+  /* Hero + maroon information strip */
+  .hero{height:185px}
+  .hero-image,.hero-image .reference-hero,.hero img{height:185px!important;object-fit:cover!important;object-position:center center!important}
+  .notice-banner{font-size:9px;font-weight:400}
+  .notice-banner .container{padding:7px 8px;line-height:1.6;text-align:center}
+  .notice-banner a{font-weight:400}
+
+  /* Notice board — same compact five-row feel as reference */
+  .section{padding:13px 0}
+  .notice-section{padding-top:17px}
+  .section-head{margin-bottom:7px}
+  .section-head h2,.small-title{font-size:15px;line-height:1.2;font-weight:500}
+  .text-link{font-size:9px;font-weight:400}
+  .notice-card{padding:7px;border-radius:10px}
+  .notice-list{height:385px;overflow:auto}
+  .notice-row{grid-template-columns:36px minmax(0,1fr) 62px 36px;gap:6px;min-height:68px;padding:7px 2px;font-size:9px;font-weight:400}
+  .notice-title{font-size:9px;line-height:1.35;font-weight:400}
+  .notice-meta{font-size:8px;font-weight:400}
+  .datebox{padding:3px 2px}
+  .datebox .month{font-size:7px;font-weight:600}
+  .datebox .day{font-size:13px;font-weight:700}
+  .datebox .year{font-size:6px;font-weight:400}
+  .pdf{width:17px;height:17px;font-size:6px;font-weight:700}
+  .eye{font-size:11px}
+  .pager{padding:8px;gap:6px}
+  .pager button{width:22px;height:22px;font-size:8px}
+
+  /* Quick links */
+  .section.compact{padding:8px 0}
+  .quick-grid{gap:7px}
+  .quick{min-height:58px;padding:10px;font-size:10px;font-weight:400}
+  .quick .ico{font-size:14px;font-weight:400}
+
+  /* Calendar */
+  .calendar-card{padding:8px}
+  .calendar-head{padding:2px 2px 6px}
+  .month-nav{font-size:9px}
+  .cal-list{max-height:210px;overflow:auto}
+  .cal-row{grid-template-columns:45px 1fr;min-height:62px;font-size:9px;font-weight:400}
+  .cal-date b{font-size:12px;font-weight:700}
+  .cal-date small{font-size:6px;font-weight:400}
+  .cal-row>span{padding:18px 8px}
+  .viewall{padding-top:8px;font-size:9px;font-weight:400}
+
+  /* Browse by Examinations */
+  .exam-band{padding:18px 0}
+  .exam-layout{grid-template-columns:1fr 1.7fr;gap:8px}
+  .exam-intro h2{font-size:15px;font-weight:700}
+  .exam-intro p{font-size:8px;font-weight:400}
+  .exam-card{min-height:58px;padding:8px;font-size:8px;font-weight:400;border-radius:8px}
+  .exam-card b{font-size:8px;font-weight:700;line-height:1.2}
+  .exam-card small{font-size:6px;font-weight:400;line-height:1.25}
+  .exam-card strong{font-size:14px;font-weight:400}
+
+  /* Reference promo images: image-first cards, not oversized text blocks */
+  .promo-grid{grid-template-columns:repeat(3,1fr);gap:7px;padding:10px 0}
+  .promo{border-radius:8px}
+  .promo img{width:100%;height:170px!important;object-fit:cover;display:block}
+  .promo-body{display:none!important}
+
+  /* FAQs */
+  .faq-layout{grid-template-columns:1fr 1.55fr;gap:10px}
+  .faq-copy h2{font-size:15px;font-weight:500}
+  .faq-copy p{font-size:8px;line-height:1.4;font-weight:400}
+  .faq-q{font-size:9px;padding:9px 0;font-weight:400}
+  .faq-a{font-size:8px;font-weight:400}
+
+  /* Other initiatives */
+  .initiative-row{gap:7px;overflow-x:auto}
+  .initiative{min-width:150px;height:88px;border-radius:8px}
+  .initiative img{width:100%;height:100%;object-fit:contain}
+
+  /* Footer */
+  .footer{padding:25px 0 9px}
+  .footer-grid{grid-template-columns:1.4fr 1fr 1fr;gap:12px}
+  .footer-brand{font-size:10px;font-weight:700}
+  .footer p,.footer a{font-size:7px;line-height:1.5;font-weight:400}
+  .footer h3{font-size:9px;font-weight:700}
+  .footer-bottom{font-size:6px;font-weight:400}
+}
