@@ -100,6 +100,16 @@ const tr = k => (I18N[state.lang] && I18N[state.lang][k]) || I18N.en[k] || k;
 const esc = v => String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const slug = x => String(x).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const fileUrl = path => db ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl : '#';
+function icon(type){
+ const paths={
+  apply:'<path d="M5 19l4.2-1 9.1-9.1a2 2 0 0 0-2.8-2.8L6.4 15.2 5 19Z"/><path d="m14.5 7.5 2 2"/>',
+  admit:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4M7 12h4M15 9h3M15 12h3M7 16h11"/>',
+  answer:'<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3M8.5 11h7M8.5 14h7M8.5 17h5"/>',
+  result:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 16v-3M12 16V9M16 16v-6"/>'
+ };
+ return `<svg viewBox="0 0 24 24" focusable="false">${paths[type]||''}</svg>`;
+}
+function eyeIcon(){return '<svg viewBox="0 0 24 24" focusable="false"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg>'}
 
 function dateParts(s){
   const d = new Date((s || '2026-08-18')+'T00:00:00');
@@ -140,8 +150,8 @@ function home(){
  <section class="noticeband"><div>For inquiries or support, candidates can email: <u>helpdesk-ssc@ssc.nic.in</u></div><div>Follow the Staff Selection Commission on X (formerly Twitter): <u>@SSC_GoI</u></div><div>One Time Registration(OTR) for Scribe is live. Please click here to register.</div><a href="#" onclick="return false">Join Indian Navy</a></section>
  <section class="section"><div class="wrap"><div class="sectionhead"><h2>${tr('notice')}</h2><button data-route="notices">${tr('view')}</button></div><div class="noticecard"><div id="noticeList"></div><div id="pager" class="pager"></div></div></div></section>
  <section class="quicksec"><div class="wrap"><h2>${tr('quick')}</h2><div class="quickgrid">
-  <button data-route="apply-online"><span>🖉</span>${tr('apply')}</button><button data-route="admit-card"><span>▣</span>${tr('admit')}</button>
-  <button data-route="answer-key"><span>▤</span>${tr('answer')}</button><button data-route="result"><span>▥</span>${tr('result')}</button>
+  <button data-route="apply-online"><span class="quickicon applyicon">${icon('apply')}</span>${tr('apply')}</button><button data-route="admit-card"><span class="quickicon admiticon">${icon('admit')}</span>${tr('admit')}</button>
+  <button data-route="answer-key"><span class="quickicon answericon">${icon('answer')}</span>${tr('answer')}</button><button data-route="result"><span class="quickicon resulticon">${icon('result')}</span>${tr('result')}</button>
  </div></div></section>
  <section class="section"><div class="wrap"><div class="calendar card"><div class="sectionhead"><h2>${tr('calendar')}</h2><div class="monthnav"><button id="prevMonth">‹</button><b id="monthLabel"></b><button id="nextMonth">›</button></div></div><div id="calendarList"></div><button class="viewall" data-route="calendar">${tr('view')}</button></div></div></section>
  <section class="examBand"><div class="wrap examwrap"><div class="examintro"><h2>${tr('browse')}</h2><p>Explore exam-related details and relevant resources</p><button class="pill light" data-route="browse">${tr('view')}</button></div><div class="examarea"><div id="examGrid" class="examgrid"></div><div id="examDots" class="dots"></div></div></div></section>
@@ -157,11 +167,23 @@ function renderNotices(){
  const start=(page-1)*pageSize;
  document.getElementById('noticeList').innerHTML=list.slice(start,start+pageSize).map(n=>{
    const d=dateParts(n.notice_date);
-   return `<article class="noticeRow"><div class="datebox"><small>${d.mon}</small><b>${d.day}</b><small>${d.year}</small></div><div class="noticeTitle">${esc(n.title)}</div><div class="noticeMeta">(${esc(n.file_size||'')} )</div><div class="noticeActions"><button title="PDF" data-notice="${esc(n.id)}">PDF</button><button title="View" data-notice="${esc(n.id)}">◉</button></div></article>`;
+   return `<article class="noticeRow"><div class="datebox"><small>${d.mon}</small><b>${d.day}</b><small>${d.year}</small></div><div class="noticeTitle">${esc(n.title)}</div><div class="noticeMeta">(${esc(n.file_size||'')} )</div><div class="noticeActions"><button title="PDF" data-notice-action="pdf" data-notice="${esc(n.id)}"><span class="pdficon">PDF</span></button><button title="View" data-notice-action="view" data-notice="${esc(n.id)}"><span class="eyeicon">${eyeIcon()}</span></button></div></article>`;
  }).join('');
- document.getElementById('pager').innerHTML=`<button data-page="${Math.max(1,page-1)}">‹</button>${[1,2,3].map(i=>`<button class="${page===i?'active':''}" data-page="${i}">${i}</button>`).join('')}<span>…</span><button data-page="${total}">${total}</button><button data-page="${Math.min(total,page+1)}">›</button>`;
+ const pager=document.getElementById('pager');
+ if(total<=1){ pager.innerHTML=''; pager.style.display='none'; }
+ else {
+   pager.style.display='flex';
+   const nums=[...new Set([1,page-1,page,page+1,total].filter(i=>i>=1&&i<=total))];
+   let html=`<button data-page="${Math.max(1,page-1)}" aria-label="Previous page">‹</button>`;
+   nums.forEach((n,i)=>{ if(i && n>nums[i-1]+1) html+='<span>…</span>'; html+=`<button class="${page===n?'active':''}" data-page="${n}">${n}</button>`; });
+   html+=`<button data-page="${Math.min(total,page+1)}" aria-label="Next page">›</button>`;
+   pager.innerHTML=html;
+ }
  document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.page=+b.dataset.page;renderNotices()});
- document.querySelectorAll('[data-notice]').forEach(b=>b.onclick=()=>openNotice(b.dataset.notice));
+ document.querySelectorAll('[data-notice]').forEach(b=>b.onclick=()=>{
+   const n=state.notices.find(x=>String(x.id)===String(b.dataset.notice)) || FALLBACK_NOTICES.find(x=>String(x.id)===String(b.dataset.notice));
+   if(b.dataset.noticeAction==='pdf' && n?.file_path){ window.open(fileUrl(n.file_path),'_blank','noopener'); } else openNotice(b.dataset.notice);
+ });
 }
 async function loadNotices(){
  if(!db){state.notices=FALLBACK_NOTICES;renderNotices();return}
@@ -230,7 +252,7 @@ function applyPage(){return genericPage('Apply Online',`<div class="servicecard"
 function loginPage(){
  return `${header('login')}<main class="page loginPage"><div class="wrap"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><div class="passrow"><input id="loginPass" type="password" placeholder="Password"><button>◉</button></div><a class="forgot">Forgot Password</a><div class="captcha"><b>69vXs</b><button>↻ Refresh</button></div><label>Captcha <i>*</i></label><input placeholder="Captcha"><button id="candidateLogin" class="loginfull">Login</button><div class="loginlinks">New User? <a>Register Now</a></div></div></div></main>${footer()}`;
 }
-function chairmanPage(){return genericPage("Chairman's Message",`<div class="chaircard"><h3>Chairman's Message</h3><p>Staff Selection Commission has evolved as one of the trusted recruiting agencies in India. The Commission uses technology and transparent processes to conduct fair recruitment.</p><p>For the full message and downloadable documents, use the links provided by the administrator.</p></div>`)}
+function chairmanPage(){return genericPage("Chairman's Message",`<div class="chaircard"><div class="chairhero"><img src="${A}chairman.jpg" alt="Chairman"><div><h3>Chairman's Message</h3><p>Staff Selection Commission has evolved as one of the trusted recruiting agencies in India. The Commission uses technology and transparent processes to conduct fair recruitment.</p><p>For the full message and downloadable documents, use the links provided by the administrator.</p></div></div></div>`)}
 function tenderPage(){return genericPage('SSC Tender',`<p>Welcome to the SSC Tenders page, your gateway to tender announcements.</p><div class="servicecard">${Array.from({length:9},(_,i)=>`<div class="tenderrow"><span class="datebox"><small>APR</small><b>${8-i%7}</b><small>2026</small></span><span>Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for SSC Examinations and Candidate Services</span><span>PDF · ${(158+i*17)}.89 KB</span><span>↓ ◉</span></div>`).join('')}</div>`)}
 function genericPage(title,body){return `${header('')}<main class="page"><div class="wrap"><div class="crumb">← Homepage &gt; ${esc(title)}</div><h2>${esc(title)}</h2>${body}</div></main>${footer()}`}
 
