@@ -120,7 +120,7 @@ function header(active='home'){
  return `<div class="topline"><div class="wrap topflex"><span>${tr('feedback')}</span><span>${tr('skip')} | <button id="langToggle" class="plain">${state.lang==='en'?'हिन्दी':'English'}</button> | A- | A | A+</span></div></div>
  <header class="sitehead"><div class="wrap headrow">
    <button class="brandbtn" data-route="home"><img src="${A}brand-reference.jpg" alt="Staff Selection Commission"></button>
-   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><span class="emblem">♜</span></div>
+   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}emblem-header.jpg" alt="Government of India Emblem"></div>
  </div></header>
  <nav class="mainnav"><div class="wrap navrow">
    ${nav('home',tr('home'),active)}${nav('chair',tr('chair'),active)}
