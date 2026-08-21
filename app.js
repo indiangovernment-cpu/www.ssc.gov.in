@@ -3,6 +3,7 @@ const db = (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY) : null;
 
 const A = 'assets/';
+
 const state = {
   lang: localStorage.getItem('sscLang') || 'en',
   notices: [],
@@ -69,18 +70,22 @@ const CALENDAR = [
  ['2026-09-30','Multi Tasking (Non-Technical) Staff Examination, 2026']
 ];
 
+/* =========================
+   ACTUAL ASSET FILE NAMES
+========================= */
+
 const PROMOS = [
- ['promo-reference-1.jpg','International Day of Yoga'],
- ['promo-reference-2.jpg','Mahatma Gandhi Quote / National Outreach'],
- ['promo-reference-3.jpg','National Career Service']
+ ['promo-1.jpg','Mahatma Gandhi Quote / National Outreach'],
+ ['promo-2.jpg','National Career Service'],
+ ['promo-3.jpg','International Day of Yoga']
 ];
 
 const INITIATIVES = [
- ['initiative-reference-1.jpg','India Empower'],
- ['initiative-reference-2.jpg','india.gov.in'],
- ['initiative-reference-3.jpg','Make in India'],
- ['initiative-reference-4.jpg','Incredible India'],
- ['initiative-reference-5.jpg','data.gov.in']
+ ['initiative-india-gov.jpg','india.gov.in'],
+ ['initiative-digital-india-make-in-india-azadi.jpg','Make in India'],
+ ['initiative-incredible-india.jpg','Incredible India'],
+ ['initiative-data.jpg','data.gov.in'],
+ ['initiative-azadi-ka-amrit-mahotsav.jpg','Azadi Ka Amrit Mahotsav']
 ];
 
 const FAQ = [
@@ -143,108 +148,142 @@ const I18N = {
 };
 
 const tr = k =>
-  (I18N[state.lang] && I18N[state.lang][k]) ||
-  I18N.en[k] ||
-  k;
+ (I18N[state.lang] && I18N[state.lang][k]) ||
+ I18N.en[k] ||
+ k;
 
 const esc = v =>
-  String(v ?? '').replace(
-    /[&<>"']/g,
-    m => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#39;'
-    }[m])
-  );
+ String(v ?? '').replace(/[&<>"']/g,m=>({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+ }[m]));
 
 const slug = x =>
-  String(x)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g,'-')
-    .replace(/^-|-$/g,'');
+ String(x)
+ .toLowerCase()
+ .replace(/[^a-z0-9]+/g,'-')
+ .replace(/^-|-$/g,'');
 
 const fileUrl = path =>
-  db
-    ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl
-    : '#';
+ db
+ ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl
+ : '#';
+
+/* =========================
+   ICONS
+========================= */
 
 function icon(type){
- const paths={
-  apply:'<path d="M5 19l4.2-1 9.1-9.1a2 2 0 0 0-2.8-2.8L6.4 15.2 5 19Z"/><path d="m14.5 7.5 2 2"/>',
-  admit:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4M7 12h4M15 9h3M15 12h3M7 16h11"/>',
-  answer:'<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3M8.5 11h7M8.5 14h7M8.5 17h5"/>',
-  result:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 16v-3M12 16V9M16 16v-6"/>'
+ const paths = {
+  apply:
+   '<path d="M5 19l4.2-1 9.1-9.1a2 2 0 0 0-2.8-2.8L6.4 15.2 5 19Z"/><path d="m14.5 7.5 2 2"/>',
+
+  admit:
+   '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4M7 12h4M15 9h3M15 12h3M7 16h11"/>',
+
+  answer:
+   '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3M8.5 11h7M8.5 14h7M8.5 17h5"/>',
+
+  result:
+   '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 16v-3M12 16V9M16 16v-6"/>'
  };
+
  return `<svg viewBox="0 0 24 24" focusable="false">${paths[type]||''}</svg>`;
 }
 
 function eyeIcon(){
- return '<svg viewBox="0 0 24 24" focusable="false"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/><circle cx="12" cy="12" r="2.5"/></svg>';
+ return `
+ <svg viewBox="0 0 24 24" focusable="false">
+   <path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"/>
+   <circle cx="12" cy="12" r="2.5"/>
+ </svg>`;
 }
 
+/* =========================
+   DATE
+========================= */
+
 function dateParts(s){
-  const d = new Date((s || '2026-08-18')+'T00:00:00');
-  return {
-    day:String(d.getDate()).padStart(2,'0'),
-    mon:d.toLocaleString(
-      state.lang==='hi'?'hi-IN':'en-IN',
-      {month:'short'}
-    ).toUpperCase(),
-    year:d.getFullYear()
-  };
+ const d = new Date((s || '2026-08-18')+'T00:00:00');
+
+ return {
+  day:String(d.getDate()).padStart(2,'0'),
+  mon:d.toLocaleString(
+   state.lang==='hi'?'hi-IN':'en-IN',
+   {month:'short'}
+  ).toUpperCase(),
+  year:d.getFullYear()
+ };
 }
+
+/* =========================
+   HEADER
+========================= */
 
 function header(active='home'){
  return `
  <div class="topline">
-   <div class="wrap topflex">
-     <span>${tr('feedback')}</span>
-     <span>
-       ${tr('skip')} |
-       <button id="langToggle" class="plain">
-         ${state.lang==='en'?'हिन्दी':'English'}
-       </button> |
-       A- | A | A+
-     </span>
-   </div>
+  <div class="wrap topflex">
+   <span>${tr('feedback')}</span>
+
+   <span>
+    ${tr('skip')} |
+    <button id="langToggle" class="plain">
+     ${state.lang==='en'?'हिन्दी':'English'}
+    </button>
+    | A- | A | A+
+   </span>
+  </div>
  </div>
 
  <header class="sitehead">
   <div class="wrap headrow">
 
    <button class="brandbtn" data-route="home">
-     <img
-       src="${A}government-of-india.jpg"
-       alt="Government of India"
-     >
+    <img
+      src="${A}brand.jpg"
+      alt="Government of India Staff Selection Commission"
+    >
    </button>
 
    <div class="headtools">
+
     <div class="searchbox">
-      <input id="searchInput" placeholder="${tr('search')}">
-      <button id="searchBtn">⌕</button>
+     <input
+       id="searchInput"
+       placeholder="${tr('search')}"
+     >
+     <button id="searchBtn">⌕</button>
     </div>
 
     <button class="loginBtn" data-route="login">
-      ${tr('login')}
+     ${tr('login')}
     </button>
 
-    <span class="emblem">♜</span>
-   </div>
+    <img
+      class="emblem"
+      src="${A}government-of-india-emblem.png.jpg"
+      alt="Government of India"
+    >
 
+   </div>
   </div>
  </header>
 
  <nav class="mainnav">
   <div class="wrap navrow">
+
    ${nav('home',tr('home'),active)}
    ${nav('chair',tr('chair'),active)}
+
    ${menu('cand',tr('cand'),CANDIDATES,active)}
    ${menu('tender',tr('tender'),TENDER,active)}
    ${menu('rti',tr('rti'),RTI,active)}
    ${menu('about',tr('about'),ABOUT,active)}
+
   </div>
  </nav>`;
 }
@@ -255,13 +294,14 @@ function nav(id,label,active){
    class="navbtn ${active===id?'active':''}"
    data-route="${id}"
  >
-   ${label}
+  ${label}
  </button>`;
 }
 
 function menu(id,label,items,active){
  return `
  <div class="navmenu">
+
   <button
     class="navbtn ${active===id?'active':''}"
     data-menu="${id}"
@@ -280,37 +320,52 @@ function menu(id,label,items,active){
     </button>
    `).join('')}
   </div>
+
  </div>`;
 }
+
+/* =========================
+   FOOTER
+========================= */
 
 function footer(){
  return `
  <footer class="footer">
+
   <div class="wrap footgrid">
 
    <div>
+
     <div class="footbrand">
-      <img
-        src="${A}government-of-india.jpg"
-        alt="Government of India"
-      >
-      <span>
-        Staff Selection<br>
-        Commission
-      </span>
+
+     <img
+       src="${A}government-of-india-emblem.png.jpg"
+       alt="Government of India"
+     >
+
+     <span>
+      Staff Selection<br>
+      Commission
+     </span>
+
     </div>
 
     <p>
-      Public Disclosure of Scores and Other Details of Non-Recommended Willing Candidates
+     Public Disclosure of Scores and Other Details of
+     Non-Recommended Willing Candidates
     </p>
 
     <p>
-      List of Debarred Candidates in Examinations Conducted by the Staff Selection Commission
+     List of Debarred Candidates in Examinations Conducted
+     by the Staff Selection Commission
     </p>
+
    </div>
 
    <div>
+
     <h4>Useful Links</h4>
+
     <a>DoPT</a>
     <a>Archives</a>
     <a>Disclaimer</a>
@@ -318,25 +373,38 @@ function footer(){
     <a>Help</a>
     <a>Website Policies</a>
     <a>Web Information Manager</a>
+
    </div>
 
    <div>
+
     <h4>Contact Us</h4>
+
     <p>
-      ⌖ Block No-12, CGO Complex, Lodhi Road<br>
-      New Delhi - 110003
+     ⌖ Block No-12, CGO Complex, Lodhi Road<br>
+     New Delhi - 110003
     </p>
+
    </div>
 
   </div>
 
   <div class="wrap footbottom">
+
    <span>© 2026 SSC. All Rights Reserved.</span>
+
    <span>Total Visitor Count: 475188660</span>
+
    <span>Last updated on Aug 18, 2026</span>
+
   </div>
+
  </footer>`;
 }
+
+/* =========================
+   HOME
+========================= */
 
 function home(){
  return `
@@ -345,10 +413,14 @@ function home(){
  <main>
 
   <section class="hero">
-   <img src="${A}hero-reference.jpg" alt="SSC building">
+   <img
+     src="${A}hero.jpg"
+     alt="SSC building"
+   >
   </section>
 
   <section class="noticeband">
+
    <div>
     For inquiries or support, candidates can email:
     <u>helpdesk-ssc@ssc.nic.in</u>
@@ -356,7 +428,8 @@ function home(){
 
    <div>
     Follow the Staff Selection Commission on X
-    (formerly Twitter): <u>@SSC_GoI</u>
+    (formerly Twitter):
+    <u>@SSC_GoI</u>
    </div>
 
    <div>
@@ -367,9 +440,11 @@ function home(){
    <a href="#" onclick="return false">
     Join Indian Navy
    </a>
+
   </section>
 
   <section class="section">
+
    <div class="wrap">
 
     <div class="sectionhead">
@@ -383,9 +458,11 @@ function home(){
     </div>
 
    </div>
+
   </section>
 
   <section class="quicksec">
+
    <div class="wrap">
 
     <h2>${tr('quick')}</h2>
@@ -421,15 +498,19 @@ function home(){
      </button>
 
     </div>
+
    </div>
+
   </section>
 
   <section class="section">
+
    <div class="wrap">
 
     <div class="calendar card">
 
      <div class="sectionhead">
+
       <h2>${tr('calendar')}</h2>
 
       <div class="monthnav">
@@ -437,6 +518,7 @@ function home(){
        <b id="monthLabel"></b>
        <button id="nextMonth">›</button>
       </div>
+
      </div>
 
      <div id="calendarList"></div>
@@ -445,71 +527,111 @@ function home(){
        class="viewall"
        data-route="calendar"
      >
-       ${tr('view')}
+      ${tr('view')}
      </button>
 
     </div>
+
    </div>
+
   </section>
 
   <section class="examBand">
+
    <div class="wrap examwrap">
 
     <div class="examintro">
+
      <h2>${tr('browse')}</h2>
+
      <p>
       Explore exam-related details and relevant resources
      </p>
+
      <button
        class="pill light"
        data-route="browse"
      >
-       ${tr('view')}
+      ${tr('view')}
      </button>
+
     </div>
 
     <div class="examarea">
-     <div id="examGrid" class="examgrid"></div>
-     <div id="examDots" class="dots"></div>
+
+     <div
+       id="examGrid"
+       class="examgrid"
+     ></div>
+
+     <div
+       id="examDots"
+       class="dots"
+     ></div>
+
     </div>
 
    </div>
+
   </section>
 
   <section class="section promoSection">
+
    <div class="wrap">
-    <div id="promoGrid" class="promogrid"></div>
-    <div id="promoDots" class="dots dark"></div>
+
+    <div
+      id="promoGrid"
+      class="promogrid"
+    ></div>
+
+    <div
+      id="promoDots"
+      class="dots dark"
+    ></div>
+
    </div>
+
   </section>
 
   <section class="section faqsec">
+
    <div class="wrap faqwrap">
 
     <div>
+
      <h2>${tr('faq')}</h2>
+
      <p>
-      List of common inquiries and their brief answers to provide
-      quick information and assist users.
+      List of common inquiries and their brief answers
+      to provide quick information and assist users.
      </p>
 
      <button
        class="pill"
        data-route="faq"
      >
-       ${tr('view')}
+      ${tr('view')}
      </button>
+
     </div>
 
     <div>
+
      <h5>${tr('popular')}</h5>
-     <div id="faqList" class="faqlist"></div>
+
+     <div
+       id="faqList"
+       class="faqlist"
+     ></div>
+
     </div>
 
    </div>
+
   </section>
 
   <section class="section initiativeSec">
+
    <div class="wrap">
 
     <h2>${tr('initiatives')}</h2>
@@ -525,6 +647,7 @@ function home(){
     ></div>
 
    </div>
+
   </section>
 
  </main>
@@ -533,395 +656,617 @@ function home(){
  `;
 }
 
+/* =========================
+   NOTICES
+========================= */
+
 function renderNotices(){
- const list = state.notices.length
+
+ const list =
+  state.notices.length
    ? state.notices
    : FALLBACK_NOTICES;
 
- const pageSize=5;
- const total=Math.max(
+ const pageSize = 5;
+
+ const total =
+  Math.max(
    1,
    Math.ceil(list.length/pageSize)
- );
+  );
 
- const page=Math.min(
-   state.page,
-   total
- );
+ const page =
+  Math.min(state.page,total);
 
- const start=(page-1)*pageSize;
+ const start =
+  (page-1)*pageSize;
 
- document.getElementById('noticeList').innerHTML =
- list.slice(start,start+pageSize)
- .map(n=>{
+ const target =
+  document.getElementById('noticeList');
 
-   const d=dateParts(n.notice_date);
+ if(!target)return;
 
-   return `
-   <article class="noticeRow">
+ target.innerHTML =
+  list
+   .slice(start,start+pageSize)
+   .map(n=>{
 
-    <div class="datebox">
-     <small>${d.mon}</small>
-     <b>${d.day}</b>
-     <small>${d.year}</small>
-    </div>
+    const d =
+     dateParts(n.notice_date);
 
-    <div class="noticeTitle">
-     ${esc(n.title)}
-    </div>
+    return `
+    <article class="noticeRow">
 
-    <div class="noticeMeta">
-     (${esc(n.file_size||'')} )
-    </div>
+     <div class="datebox">
+      <small>${d.mon}</small>
+      <b>${d.day}</b>
+      <small>${d.year}</small>
+     </div>
 
-    <div class="noticeActions">
+     <div class="noticeTitle">
+      ${esc(n.title)}
+     </div>
 
-     <button
+     <div class="noticeMeta">
+      (${esc(n.file_size || '')})
+     </div>
+
+     <div class="noticeActions">
+
+      <button
        title="PDF"
        data-notice-action="pdf"
        data-notice="${esc(n.id)}"
-     >
-      <span class="pdficon">PDF</span>
-     </button>
+      >
+       <span class="pdficon">PDF</span>
+      </button>
 
-     <button
+      <button
        title="View"
        data-notice-action="view"
        data-notice="${esc(n.id)}"
-     >
-      <span class="eyeicon">
-       ${eyeIcon()}
-      </span>
-     </button>
+      >
+       <span class="eyeicon">
+        ${eyeIcon()}
+       </span>
+      </button>
 
-    </div>
+     </div>
 
-   </article>`;
- })
- .join('');
+    </article>`;
+   })
+   .join('');
 
- const pager=document.getElementById('pager');
+ const pager =
+  document.getElementById('pager');
+
+ if(!pager)return;
 
  if(list.length<=pageSize || total<=1){
-   pager.innerHTML='';
-   pager.style.display='none';
+
+  pager.innerHTML='';
+  pager.style.display='none';
+
  }else{
 
-   pager.style.display='flex';
+  pager.style.display='flex';
 
-   const nums=[
-    ...new Set(
-      [1,page-1,page,page+1,total]
-      .filter(i=>i>=1&&i<=total)
-    )
-   ];
+  const nums =
+   [...new Set([
+    1,
+    page-1,
+    page,
+    page+1,
+    total
+   ].filter(
+    i=>i>=1 && i<=total
+   ))];
 
-   let html=`
-    <button
-      data-page="${Math.max(1,page-1)}"
-      aria-label="Previous page"
-    >‹</button>`;
+  let html =
+   `<button data-page="${Math.max(1,page-1)}">‹</button>`;
 
-   nums.forEach((n,i)=>{
+  nums.forEach((n,i)=>{
 
-     if(i && n>nums[i-1]+1){
-       html+='<span>…</span>';
-     }
-
-     html+=`
-      <button
-        class="${page===n?'active':''}"
-        data-page="${n}"
-      >
-       ${n}
-      </button>`;
-   });
+   if(
+    i &&
+    n>nums[i-1]+1
+   ){
+    html+='<span>…</span>';
+   }
 
    html+=`
     <button
-      data-page="${Math.min(total,page+1)}"
-      aria-label="Next page"
-    >›</button>`;
+      class="${page===n?'active':''}"
+      data-page="${n}"
+    >
+     ${n}
+    </button>`;
+  });
 
-   pager.innerHTML=html;
+  html+=`
+   <button
+     data-page="${Math.min(total,page+1)}"
+   >
+    ›
+   </button>`;
+
+  pager.innerHTML=html;
  }
 
- document.querySelectorAll('[data-page]')
- .forEach(b=>b.onclick=()=>{
-   state.page=+b.dataset.page;
-   renderNotices();
- });
+ document
+  .querySelectorAll('[data-page]')
+  .forEach(b=>{
 
- document.querySelectorAll('[data-notice]')
- .forEach(b=>b.onclick=()=>{
+   b.onclick=()=>{
+    state.page=+b.dataset.page;
+    renderNotices();
+   };
 
-   const n=
+  });
+
+ document
+  .querySelectorAll('[data-notice]')
+  .forEach(b=>{
+
+   b.onclick=()=>{
+
+    const n =
      state.notices.find(
-       x=>String(x.id)===String(b.dataset.notice)
+      x=>String(x.id)===String(b.dataset.notice)
      ) ||
      FALLBACK_NOTICES.find(
-       x=>String(x.id)===String(b.dataset.notice)
+      x=>String(x.id)===String(b.dataset.notice)
      );
 
-   if(
+    if(
      b.dataset.noticeAction==='pdf' &&
      n?.file_path
-   ){
-     window.open(
-       fileUrl(n.file_path),
-       '_blank',
-       'noopener'
-     );
-   }else{
-     openNotice(b.dataset.notice);
-   }
+    ){
 
- });
+     window.open(
+      fileUrl(n.file_path),
+      '_blank',
+      'noopener'
+     );
+
+    }else{
+
+     openNotice(b.dataset.notice);
+
+    }
+   };
+
+  });
 }
 
 async function loadNotices(){
 
  if(!db){
-   state.notices=FALLBACK_NOTICES;
-   renderNotices();
-   return;
+
+  state.notices=FALLBACK_NOTICES;
+  renderNotices();
+  return;
+
  }
 
- const {data,error}=
-   await db
+ const {data,error} =
+  await db
    .from('ssc_notices')
    .select('*')
-   .order('notice_date',{ascending:false})
-   .order('created_at',{ascending:false});
+   .order(
+    'notice_date',
+    {ascending:false}
+   )
+   .order(
+    'created_at',
+    {ascending:false}
+   );
 
- state.notices=
-   (!error && data && data.length)
+ state.notices =
+  (!error && data && data.length)
    ? data
    : FALLBACK_NOTICES;
 
  renderNotices();
 }
 
+/* =========================
+   CALENDAR
+========================= */
+
 function renderCalendar(){
 
  const m=state.month;
 
- const items=
-   CALENDAR.filter(
-     x=>new Date(x[0]).getMonth()===m
+ const items =
+  CALENDAR.filter(
+   x=>new Date(x[0]).getMonth()===m
+  );
+
+ const label =
+  document.getElementById('monthLabel');
+
+ if(label){
+
+  label.textContent =
+   new Date(
+    state.year,
+    m,
+    1
+   ).toLocaleString(
+    state.lang==='hi'
+     ? 'hi-IN'
+     : 'en-IN',
+    {
+     month:'short',
+     year:'numeric'
+    }
    );
+ }
 
- document.getElementById('monthLabel').textContent=
-   new Date(state.year,m,1)
-   .toLocaleString(
-     state.lang==='hi'?'hi-IN':'en-IN',
-     {
-       month:'short',
-       year:'numeric'
-     }
-   );
+ const list =
+  document.getElementById('calendarList');
 
- document.getElementById('calendarList').innerHTML=
-   (items.length?items:CALENDAR.slice(0,4))
-   .map(x=>{
+ if(!list)return;
 
-     const d=dateParts(x[0]);
+ list.innerHTML =
+  (items.length
+   ? items
+   : CALENDAR.slice(0,4)
+  )
+  .map(x=>{
 
-     return `
-     <div class="calrow">
+   const d=dateParts(x[0]);
 
-      <div class="caldate">
-       <b>${d.day}</b>
-       <small>${d.mon}</small>
-      </div>
+   return `
+   <div class="calrow">
 
-      <div>
-       ${esc(x[1])}
-      </div>
+    <div class="caldate">
+     <b>${d.day}</b>
+     <small>${d.mon}</small>
+    </div>
 
-     </div>`;
-   })
-   .join('');
+    <div>
+     ${esc(x[1])}
+    </div>
+
+   </div>`;
+  })
+  .join('');
 }
+
+/* =========================
+   EXAMS
+========================= */
 
 function renderExams(){
 
- const start=state.examPage*6;
- const items=EXAMS.slice(start,start+6);
+ const start =
+  state.examPage*6;
 
- document.getElementById('examGrid').innerHTML=
-   items.map(x=>`
-    <button
-      class="examcard"
-      data-route="exam:${encodeURIComponent(x)}"
-    >
-     <strong>${esc(x)}</strong>
+ const items =
+  EXAMS.slice(
+   start,
+   start+6
+  );
 
-     <span>
-      ${esc(x)}
-      is a competitive examination conducted by
-      the Staff Selection Commission...
-     </span>
+ const grid =
+  document.getElementById('examGrid');
 
-     <b>→</b>
-    </button>
-   `).join('');
+ if(!grid)return;
 
- document.getElementById('examDots').innerHTML=
+ grid.innerHTML =
+  items
+   .map(x=>`
+
+   <button
+     class="examcard"
+     data-route="exam:${encodeURIComponent(x)}"
+   >
+
+    <strong>
+     ${esc(x)}
+    </strong>
+
+    <span>
+     ${esc(x)} is a competitive examination
+     conducted by the Staff Selection Commission...
+    </span>
+
+    <b>→</b>
+
+   </button>
+
+  `)
+  .join('');
+
+ const dots =
+  document.getElementById('examDots');
+
+ if(dots){
+
+  dots.innerHTML =
    [0,1]
-   .map(i=>`
-    <button
-      class="${i===state.examPage?'on':''}"
-      data-exampage="${i}"
-    ></button>
-   `)
-   .join('');
+    .map(i=>`
+     <button
+       class="${i===state.examPage?'on':''}"
+       data-exampage="${i}"
+     ></button>
+    `)
+    .join('');
+ }
 
- document.querySelectorAll('[data-exampage]')
- .forEach(b=>b.onclick=()=>{
-   state.examPage=+b.dataset.exampage;
-   renderExams();
- });
+ document
+  .querySelectorAll('[data-exampage]')
+  .forEach(b=>{
+
+   b.onclick=()=>{
+    state.examPage=+b.dataset.exampage;
+    renderExams();
+   };
+
+  });
 }
+
+/* =========================
+   PROMOS
+========================= */
 
 function renderPromos(){
 
- const items=[0,1,2]
-   .map(i=>PROMOS[
-     (state.promoPage+i)%PROMOS.length
-   ]);
+ const items =
+  [0,1,2].map(
+   i=>PROMOS[
+    (state.promoPage+i) %
+    PROMOS.length
+   ]
+  );
 
- document.getElementById('promoGrid').innerHTML=
-   items.map(p=>`
-    <button
-      class="promoCard"
-      data-promo="${esc(p[1])}"
+ const grid =
+  document.getElementById('promoGrid');
+
+ if(!grid)return;
+
+ grid.innerHTML =
+  items
+   .map(p=>`
+
+   <button
+     class="promoCard"
+     data-promo="${esc(p[1])}"
+   >
+
+    <img
+      src="${A+p[0]}"
+      alt="${esc(p[1])}"
     >
-     <img src="${A+p[0]}" alt="">
-     <span>${esc(p[1])}</span>
-    </button>
-   `)
-   .join('');
 
- document.getElementById('promoDots').innerHTML=
+    <span>
+     ${esc(p[1])}
+    </span>
+
+   </button>
+
+  `)
+  .join('');
+
+ const dots =
+  document.getElementById('promoDots');
+
+ if(dots){
+
+  dots.innerHTML =
    [0,1,2]
-   .map(i=>`
-    <button
-      class="${i===state.promoPage?'on':''}"
-      data-promopage="${i}"
-    ></button>
-   `)
-   .join('');
+    .map(i=>`
+     <button
+       class="${i===state.promoPage?'on':''}"
+       data-promopage="${i}"
+     ></button>
+    `)
+    .join('');
+ }
 
- document.querySelectorAll('[data-promopage]')
- .forEach(b=>b.onclick=()=>{
-   state.promoPage=+b.dataset.promopage;
-   renderPromos();
- });
+ document
+  .querySelectorAll('[data-promopage]')
+  .forEach(b=>{
+
+   b.onclick=()=>{
+    state.promoPage=
+     +b.dataset.promopage;
+
+    renderPromos();
+   };
+
+  });
 }
+
+/* =========================
+   INITIATIVES
+========================= */
 
 function renderInitiatives(){
 
- const start=state.initiativePage;
+ const start =
+  state.initiativePage;
 
- const items=[0,1,2,3,4]
-   .map(i=>INITIATIVES[
-     (start+i)%INITIATIVES.length
-   ]);
+ const items =
+  [0,1,2,3,4].map(
+   i=>INITIATIVES[
+    (start+i) %
+    INITIATIVES.length
+   ]
+  );
 
- document.getElementById('initiativeGrid').innerHTML=
-   items.map(p=>`
-    <button class="initiativeCard">
-     <img
-       src="${A+p[0]}"
-       alt="${esc(p[1])}"
-     >
-    </button>
-   `)
-   .join('');
+ const grid =
+  document.getElementById('initiativeGrid');
 
- document.getElementById('initiativeDots').innerHTML=
+ if(!grid)return;
+
+ grid.innerHTML =
+  items
+   .map(p=>`
+
+   <button class="initiativeCard">
+
+    <img
+      src="${A+p[0]}"
+      alt="${esc(p[1])}"
+    >
+
+   </button>
+
+  `)
+  .join('');
+
+ const dots =
+  document.getElementById('initiativeDots');
+
+ if(dots){
+
+  dots.innerHTML =
    [0,1]
-   .map(i=>`
-    <button
-      class="${i===state.initiativePage%2?'on':''}"
-    ></button>
-   `)
-   .join('');
+    .map(i=>`
+     <button
+       class="${i===state.initiativePage%2?'on':''}"
+     ></button>
+    `)
+    .join('');
+ }
 }
+
+/* =========================
+   FAQ
+========================= */
 
 function renderFaq(){
 
- document.getElementById('faqList').innerHTML=
-   FAQ.map((x,i)=>`
-    <div class="faqitem">
+ const el =
+  document.getElementById('faqList');
 
-     <button data-faq="${i}">
-      <span>${esc(x[0])}</span>
-      <b>⊕</b>
-     </button>
+ if(!el)return;
 
-     <div class="faqanswer">
-      ${esc(x[1])}
-     </div>
+ el.innerHTML =
+  FAQ
+   .map((x,i)=>`
 
+   <div class="faqitem">
+
+    <button data-faq="${i}">
+
+     <span>
+      ${esc(x[0])}
+     </span>
+
+     <b>⊕</b>
+
+    </button>
+
+    <div class="faqanswer">
+     ${esc(x[1])}
     </div>
-   `)
-   .join('');
 
- document.querySelectorAll('[data-faq]')
- .forEach(b=>b.onclick=()=>{
-   b.parentElement.classList.toggle('open');
- });
+   </div>
+
+  `)
+  .join('');
+
+ document
+  .querySelectorAll('[data-faq]')
+  .forEach(b=>{
+
+   b.onclick=()=>{
+    b.parentElement.classList.toggle('open');
+   };
+
+  });
 }
+
+/* =========================
+   MODALS
+========================= */
 
 function toast(msg){
 
- const el=document.getElementById('toast');
+ const el =
+  document.getElementById('toast');
+
+ if(!el)return;
 
  el.textContent=msg;
+
  el.classList.add('show');
 
  clearTimeout(window.__toast);
 
- window.__toast=
-   setTimeout(
-     ()=>el.classList.remove('show'),
-     2200
-   );
+ window.__toast =
+  setTimeout(
+   ()=>el.classList.remove('show'),
+   2200
+  );
 }
 
 function modal(html){
 
- document.getElementById('modal-root').innerHTML=
-   `<div class="modalback">${html}</div>`;
+ const root =
+  document.getElementById('modal-root');
+
+ if(!root)return;
+
+ root.innerHTML =
+  `<div class="modalback">${html}</div>`;
+
+ const back =
+  document.querySelector('.modalback');
+
+ if(back){
+
+  back.addEventListener(
+   'click',
+   e=>{
+    if(
+     e.target.classList.contains(
+      'modalback'
+     )
+    ){
+     closeModal();
+    }
+   }
+  );
+
+ }
 
  document
-   .querySelector('.modalback')
-   .addEventListener('click',e=>{
-     if(e.target.classList.contains('modalback')){
-       closeModal();
-     }
-   });
-
- document.querySelectorAll('.close')
- .forEach(b=>b.onclick=closeModal);
+  .querySelectorAll('.close')
+  .forEach(
+   b=>b.onclick=closeModal
+  );
 }
 
 function closeModal(){
- document.getElementById('modal-root').innerHTML='';
+
+ const root =
+  document.getElementById('modal-root');
+
+ if(root){
+  root.innerHTML='';
+ }
 }
+
+/* =========================
+   RESULT
+========================= */
 
 function resultModal(){
 
  const cats=[
-  'ALL','CHSL','JEN','CAPF','CTGD','CHT',
-  'OTHERS','DEPARTMENTAL EXAMS','DPHM','RHQ',
-  'DPCE','CGL','DPCD','DPHCT','CEDP','MTS',
-  'STENOGRAPHER'
+  'ALL','CHSL','JEN','CAPF','CTGD',
+  'CHT','OTHERS','DEPARTMENTAL EXAMS',
+  'DPHM','RHQ','DPCE','CGL','DPCD',
+  'DPHCT','CEDP','MTS','STENOGRAPHER'
  ];
 
  modal(`
+
  <div class="modal resultmodal">
 
   <div class="modalhead">
@@ -930,14 +1275,18 @@ function resultModal(){
   </div>
 
   <div class="tabs">
+
    ${cats.map((x,i)=>`
+
     <button
       class="tab ${i===0?'active':''}"
       data-resultcat="${x}"
     >
-      ${x}
+     ${x}
     </button>
+
    `).join('')}
+
   </div>
 
   <div
@@ -946,57 +1295,91 @@ function resultModal(){
   ></div>
 
   <div class="modalfoot">
-   <button class="pill">View All</button>
+   <button class="pill">
+    View All
+   </button>
   </div>
 
- </div>`);
+ </div>
+ `);
 
  renderResult('ALL');
 
- document.querySelectorAll('[data-resultcat]')
- .forEach(b=>b.onclick=()=>{
+ document
+  .querySelectorAll('[data-resultcat]')
+  .forEach(b=>{
 
-   document
-   .querySelectorAll('[data-resultcat]')
-   .forEach(x=>x.classList.remove('active'));
+   b.onclick=()=>{
 
-   b.classList.add('active');
+    document
+     .querySelectorAll('[data-resultcat]')
+     .forEach(x=>
+      x.classList.remove('active')
+     );
 
-   renderResult(b.dataset.resultcat);
- });
+    b.classList.add('active');
+
+    renderResult(
+     b.dataset.resultcat
+    );
+   };
+
+  });
 }
 
 function renderResult(cat){
 
  const rows=[
+
   'Junior Secretariat Assistant / Lower Division Clerk Grade Limited Departmental Competitive Examination, 2023-24: Declaration of final result for the year 2024 of AFHQ Grade-II',
+
   'Combined Graduate Level Examination (CGLE), 2025: List of Candidates in Roll Number Order provisionally shortlisted',
+
   'Head Constable (Assistant Wireless Operator/Tele-Printer Operator) in Delhi Police Examination, 2025 — Additional Female Candidates qualified'
+
  ];
 
- document.getElementById('resultBody').innerHTML=
-   rows.map(x=>`
-    <div class="resultrow">
-     <span>${esc(x)}</span>
-     <span>
-      416.08 KB
-      <i class="pdf">PDF</i>
-      <u>Write up</u>
-      <u>Result</u>
-     </span>
-    </div>
-   `)
-   .join('');
+ const body =
+  document.getElementById('resultBody');
+
+ if(!body)return;
+
+ body.innerHTML =
+  rows.map(x=>`
+
+   <div class="resultrow">
+
+    <span>${esc(x)}</span>
+
+    <span>
+     416.08 KB
+     <i class="pdf">PDF</i>
+     <u>Write up</u>
+     <u>Result</u>
+    </span>
+
+   </div>
+
+  `)
+  .join('');
 }
+
+/* =========================
+   ADMIT / ANSWER
+========================= */
 
 function admitModal(){
 
  modal(`
+
  <div class="modal small">
 
   <div class="modalhead">
+
    <h3>▣ Admit Card</h3>
+
    <button class="close">×</button>
+
   </div>
 
   <div class="modalbody">
@@ -1009,7 +1392,7 @@ function admitModal(){
     ]
     .map(x=>`
      <div class="resultrow">
-      <span>${x}</span>
+      <span>${esc(x)}</span>
      </div>
     `)
     .join('')
@@ -1025,7 +1408,9 @@ function admitModal(){
    </div>
 
   </div>
- </div>`);
+
+ </div>
+ `);
 
  bindModalRoutes();
 }
@@ -1033,11 +1418,15 @@ function admitModal(){
 function answerModal(){
 
  modal(`
+
  <div class="modal">
 
   <div class="modalhead">
+
    <h3>▤ Answer Key</h3>
+
    <button class="close">×</button>
+
   </div>
 
   <div class="modalbody">
@@ -1050,7 +1439,7 @@ function answerModal(){
     ]
     .map(x=>`
      <div class="resultrow">
-      <span>${x}</span>
+      <span>${esc(x)}</span>
       <span>
        191.93 KB
        <i class="pdf">PDF</i>
@@ -1062,12 +1451,20 @@ function answerModal(){
    }
 
    <div class="center">
-    <button class="pill">View All</button>
+    <button class="pill">
+     View All
+    </button>
    </div>
 
   </div>
- </div>`);
+
+ </div>
+ `);
 }
+
+/* =========================
+   PAGES
+========================= */
 
 function applyPage(){
 
@@ -1083,29 +1480,35 @@ function applyPage(){
    </p>
 
    ${
-    EXAMS.slice(0,6)
-    .map(x=>`
-     <button
-       class="serviceitem"
-       data-route="exam:${encodeURIComponent(x)}"
-     >
-      ${esc(x)}
-      <b>→</b>
-     </button>
-    `)
-    .join('')
+    EXAMS
+     .slice(0,6)
+     .map(x=>`
+
+      <button
+        class="serviceitem"
+        data-route="exam:${encodeURIComponent(x)}"
+      >
+       ${esc(x)}
+       <b>→</b>
+      </button>
+
+     `)
+     .join('')
    }
 
-  </div>`
+  </div>
+  `
  );
 }
 
 function loginPage(){
 
  return `
+
  ${header('login')}
 
  <main class="page loginPage">
+
   <div class="wrap">
 
    <h2>Login to your Account</h2>
@@ -1113,8 +1516,15 @@ function loginPage(){
    <div class="loginbox">
 
     <div class="logintabs">
-     <button class="active">Candidate</button>
-     <button data-route="admin-login">Admin</button>
+
+     <button class="active">
+      Candidate
+     </button>
+
+     <button data-route="admin-login">
+      Admin
+     </button>
+
     </div>
 
     <label>
@@ -1133,12 +1543,15 @@ function loginPage(){
     </label>
 
     <div class="passrow">
+
      <input
        id="loginPass"
        type="password"
        placeholder="Password"
      >
+
      <button>◉</button>
+
     </div>
 
     <a class="forgot">
@@ -1151,8 +1564,7 @@ function loginPage(){
     </div>
 
     <label>
-     Captcha
-     <i>*</i>
+     Captcha <i>*</i>
     </label>
 
     <input placeholder="Captcha">
@@ -1170,7 +1582,9 @@ function loginPage(){
     </div>
 
    </div>
+
   </div>
+
  </main>
 
  ${footer()}
@@ -1182,6 +1596,7 @@ function chairmanPage(){
  return genericPage(
   "Chairman's Message",
   `
+
   <div class="chaircard">
 
    <div class="chairhero">
@@ -1192,22 +1607,27 @@ function chairmanPage(){
     >
 
     <div>
+
      <h3>Chairman's Message</h3>
 
      <p>
-      Staff Selection Commission has evolved as one of the trusted
-      recruiting agencies in India. The Commission uses technology
-      and transparent processes to conduct fair recruitment.
+      Staff Selection Commission has evolved as one
+      of the trusted recruiting agencies in India.
+      The Commission uses technology and transparent
+      processes to conduct fair recruitment.
      </p>
 
      <p>
-      For the full message and downloadable documents, use the
-      links provided by the administrator.
+      For the full message and downloadable documents,
+      use the links provided by the administrator.
      </p>
+
     </div>
 
    </div>
-  </div>`
+
+  </div>
+  `
  );
 }
 
@@ -1216,6 +1636,7 @@ function tenderPage(){
  return genericPage(
   'SSC Tender',
   `
+
   <p>
    Welcome to the SSC Tenders page,
    your gateway to tender announcements.
@@ -1225,44 +1646,50 @@ function tenderPage(){
 
    ${
     Array.from(
-      {length:9},
-      (_,i)=>`
-       <div class="tenderrow">
+     {length:9},
+     (_,i)=>`
 
-        <span class="datebox">
-         <small>APR</small>
-         <b>${8-i%7}</b>
-         <small>2026</small>
-        </span>
+      <div class="tenderrow">
 
-        <span>
-         Opening of Financial Bids in respect of RFP
-         for Selection of Service Provider (SP) for SSC
-         Examinations and Candidate Services
-        </span>
+       <span class="datebox">
+        <small>APR</small>
+        <b>${8-i%7}</b>
+        <small>2026</small>
+       </span>
 
-        <span>
-         PDF · ${(158+i*17)}.89 KB
-        </span>
+       <span>
+        Opening of Financial Bids in respect of RFP
+        for Selection of Service Provider (SP)
+        for SSC Examinations and Candidate Services
+       </span>
 
-        <span>
-         ↓ ◉
-        </span>
+       <span>
+        PDF · ${(158+i*17)}.89 KB
+       </span>
 
-       </div>`
+       <span>
+        ↓ ◉
+       </span>
+
+      </div>
+
+     `
     ).join('')
    }
 
-  </div>`
+  </div>
+  `
  );
 }
 
 function genericPage(title,body){
 
  return `
+
  ${header('')}
 
  <main class="page">
+
   <div class="wrap">
 
    <div class="crumb">
@@ -1274,80 +1701,114 @@ function genericPage(title,body){
    ${body}
 
   </div>
+
  </main>
 
  ${footer()}
  `;
 }
 
+/* =========================
+   NOTICE MODAL
+========================= */
+
 function openNotice(id){
 
- const n=state.notices.find(
+ const n =
+  state.notices.find(
    x=>String(x.id)===String(id)
- );
+  ) ||
+  FALLBACK_NOTICES.find(
+   x=>String(x.id)===String(id)
+  );
 
  if(!n)return;
 
- const link=n.file_path
-   ?fileUrl(n.file_path)
-   :'#';
+ const link =
+  n.file_path
+   ? fileUrl(n.file_path)
+   : '#';
 
  modal(`
+
  <div class="modal">
 
   <div class="modalhead">
+
    <h3>Notice</h3>
+
    <button class="close">×</button>
+
   </div>
 
   <div class="modalbody">
 
-   <h3>${esc(n.title)}</h3>
+   <h3>
+    ${esc(n.title)}
+   </h3>
 
-   <p>${esc(n.notice_date||'')}</p>
+   <p>
+    ${esc(n.notice_date || '')}
+   </p>
 
-   <p>${esc(n.file_size||'')}</p>
+   <p>
+    ${esc(n.file_size || '')}
+   </p>
 
    ${
     n.file_path
-    ?`
-     <a
-       class="pill"
-       href="${esc(link)}"
-       target="_blank"
-     >
-      Open PDF
-     </a>`
-    :`
-     <p class="muted">
-      No PDF attached.
-     </p>`
+     ? `
+       <a
+         class="pill"
+         href="${esc(link)}"
+         target="_blank"
+       >
+        Open PDF
+       </a>
+       `
+     : `
+       <p class="muted">
+        No PDF attached.
+       </p>
+       `
    }
 
   </div>
- </div>`);
+
+ </div>
+ `);
 }
+
+/* =========================
+   EXAM MODAL
+========================= */
 
 function examModal(name){
 
  modal(`
+
  <div class="modal exammodal">
 
   <div class="modalhead">
+
    <h3>${esc(name)}</h3>
+
    <button class="close">×</button>
+
   </div>
 
   <div class="tabs">
 
    ${
     EXAM_RESOURCES.map((x,i)=>`
+
      <button
        class="tab ${i===0?'active':''}"
        data-examtab="${slug(x)}"
      >
       ${esc(x)}
      </button>
+
     `).join('')
    }
 
@@ -1357,6 +1818,7 @@ function examModal(name){
     class="modalbody"
     id="examBody"
   >
+
    <h4>Notice</h4>
 
    <p>
@@ -1366,48 +1828,64 @@ function examModal(name){
 
   </div>
 
- </div>`);
-
- document.querySelectorAll('[data-examtab]')
- .forEach(b=>b.onclick=()=>{
-
-   document
-   .querySelectorAll('[data-examtab]')
-   .forEach(x=>x.classList.remove('active'));
-
-   b.classList.add('active');
-
-   document.getElementById('examBody').innerHTML=`
-    <h4>${esc(b.textContent)}</h4>
-    <p>
-     ${esc(name)} —
-     ${esc(b.textContent)}
-     documents and links can be published
-     by the administrator.
-    </p>`;
- });
-}
-
-function bindModalRoutes(){
+ </div>
+ `);
 
  document
- .querySelectorAll('#modal-root [data-route]')
- .forEach(b=>b.onclick=()=>{
-   route(b.dataset.route);
- });
+  .querySelectorAll('[data-examtab]')
+  .forEach(b=>{
+
+   b.onclick=()=>{
+
+    document
+     .querySelectorAll('[data-examtab]')
+     .forEach(x=>
+      x.classList.remove('active')
+     );
+
+    b.classList.add('active');
+
+    document.getElementById(
+     'examBody'
+    ).innerHTML=`
+
+     <h4>
+      ${esc(b.textContent)}
+     </h4>
+
+     <p>
+      ${esc(name)} —
+      ${esc(b.textContent)}
+      documents and links can be published
+      by the administrator.
+     </p>
+
+    `;
+   };
+
+  });
 }
+
+/* =========================
+   SEARCH
+========================= */
 
 function doSearch(){
 
- const q=(
-   document.getElementById('searchInput')?.value||''
- )
- .trim()
- .toLowerCase();
+ const q =
+  (
+   document.getElementById(
+    'searchInput'
+   )?.value || ''
+  )
+  .trim()
+  .toLowerCase();
 
  if(!q){
-   toast('Enter a search term');
-   return;
+
+  toast('Enter a search term');
+  return;
+
  }
 
  const all=[
@@ -1416,44 +1894,63 @@ function doSearch(){
   ...ABOUT,
   ...TENDER,
   ...RTI,
-  ...state.notices.map(n=>n.title)
+  ...state.notices.map(
+   n=>n.title
+  )
  ];
 
- const hits=
-   all.filter(
-     x=>x.toLowerCase().includes(q)
-   );
+ const hits =
+  all.filter(
+   x=>x.toLowerCase().includes(q)
+  );
 
  modal(`
+
  <div class="modal">
 
   <div class="modalhead">
+
    <h3>Search</h3>
+
    <button class="close">×</button>
+
   </div>
 
   <div class="modalbody">
 
    ${
     hits.length
-    ?hits.map(x=>`
-      <button
-        class="serviceitem"
-        data-route="${slug(x)}"
-      >
-       ${esc(x)}
-       <b>→</b>
-      </button>
-     `).join('')
-    :'<p>No matching results found.</p>'
+
+     ? hits.map(x=>`
+
+       <button
+         class="serviceitem"
+         data-route="${slug(x)}"
+       >
+        ${esc(x)}
+        <b>→</b>
+       </button>
+
+      `).join('')
+
+     : `
+       <p>
+        No matching results found.
+       </p>
+       `
    }
 
   </div>
 
- </div>`);
+ </div>
+ `);
 
  bindModalRoutes();
 }
+
+/* =========================
+   ROUTING
+========================= */
 
 function route(r){
 
@@ -1462,413 +1959,584 @@ function route(r){
  location.hash=r;
 
  document
- .querySelectorAll('.navmenu.open')
- .forEach(x=>x.classList.remove('open'));
+  .querySelectorAll('.navmenu.open')
+  .forEach(
+   x=>x.classList.remove('open')
+  );
 
  closeModal();
 
  if(r==='home'){
-   renderHome();
-   return;
- }
-
- if(r==='login'||r==='candidate-login'){
-   document.getElementById('app').innerHTML=
-     loginPage();
-   bindCommon();
-   return;
- }
-
- if(r==='admin-login'){
-   location.href='admin.html';
-   return;
- }
-
- if(r==='result'){
-   resultModal();
-   return;
- }
-
- if(r==='admit-card'){
-   admitModal();
-   return;
- }
-
- if(r==='answer-key'){
-   answerModal();
-   return;
- }
-
- if(r==='apply-online'){
-   document.getElementById('app').innerHTML=
-     applyPage();
-   bindCommon();
-   return;
- }
-
- if(r==='chair'){
-   document.getElementById('app').innerHTML=
-     chairmanPage();
-   bindCommon();
-   return;
+  renderHome();
+  return;
  }
 
  if(
-   r==='tender' ||
-   r==='current-tenders' ||
-   r==='tender-archive' ||
-   r==='corrigenda'
+  r==='login' ||
+  r==='candidate-login'
  ){
-   document.getElementById('app').innerHTML=
-     tenderPage();
-   bindCommon();
-   return;
+
+  document.getElementById(
+   'app'
+  ).innerHTML=loginPage();
+
+  bindCommon();
+  return;
+ }
+
+ if(r==='admin-login'){
+  location.href='admin.html';
+  return;
+ }
+
+ if(r==='result'){
+  resultModal();
+  return;
+ }
+
+ if(r==='admit-card'){
+  admitModal();
+  return;
+ }
+
+ if(r==='answer-key'){
+  answerModal();
+  return;
+ }
+
+ if(r==='apply-online'){
+
+  document.getElementById(
+   'app'
+  ).innerHTML=applyPage();
+
+  bindCommon();
+  return;
+ }
+
+ if(r==='chair'){
+
+  document.getElementById(
+   'app'
+  ).innerHTML=chairmanPage();
+
+  bindCommon();
+  return;
+ }
+
+ if(
+  r==='tender' ||
+  r==='current-tenders' ||
+  r==='tender-archive' ||
+  r==='corrigenda'
+ ){
+
+  document.getElementById(
+   'app'
+  ).innerHTML=tenderPage();
+
+  bindCommon();
+  return;
  }
 
  if(r==='browse'){
 
-   modal(`
+  modal(`
+
    <div class="modal">
 
     <div class="modalhead">
-     <h3>Browse by Examinations</h3>
-     <button class="close">×</button>
+
+     <h3>
+      Browse by Examinations
+     </h3>
+
+     <button class="close">
+      ×
+     </button>
+
     </div>
 
     <div class="modalbody exammenu">
 
      ${
       EXAMS.map(x=>`
+
        <button
          data-route="exam:${encodeURIComponent(x)}"
        >
         ${esc(x)}
         <b>→</b>
        </button>
+
       `).join('')
      }
 
     </div>
 
-   </div>`);
+   </div>
+  `);
 
-   bindModalRoutes();
-   return;
+  bindModalRoutes();
+  return;
  }
 
  if(r.startsWith('exam:')){
-   examModal(
-     decodeURIComponent(r.slice(5))
-   );
-   return;
+
+  examModal(
+   decodeURIComponent(
+    r.slice(5)
+   )
+  );
+
+  return;
  }
 
  if(r.startsWith('notice:')){
-   openNotice(r.slice(7));
-   return;
+
+  openNotice(
+   r.slice(7)
+  );
+
+  return;
  }
 
  if(r==='notices'){
 
-   document.getElementById('app').innerHTML=
-     genericPage(
-       'Notice Board',
-       '<div class="servicecard" id="allNotices"></div>'
-     );
+  document.getElementById(
+   'app'
+  ).innerHTML =
+   genericPage(
+    'Notice Board',
+    '<div class="servicecard" id="allNotices"></div>'
+   );
 
-   bindCommon();
+  bindCommon();
 
-   document.getElementById('allNotices').innerHTML=
-     state.notices.map(n=>`
-      <div class="resultrow">
+  const el =
+   document.getElementById(
+    'allNotices'
+   );
 
-       <span>
-        ${esc(n.title)}
-       </span>
+  if(el){
 
-       <span>
+   el.innerHTML =
+    state.notices.map(n=>`
 
-        <a
-          href="${
-            n.file_path
-            ?esc(fileUrl(n.file_path))
-            :'#'
-          }"
-          target="_blank"
-        >
-         PDF
-        </a>
+     <div class="resultrow">
 
-        <button
-          data-notice="${esc(n.id)}"
-        >
-         ◉
-        </button>
+      <span>
+       ${esc(n.title)}
+      </span>
 
-       </span>
+      <span>
 
-      </div>
-     `).join('');
+       <a
+         href="${
+          n.file_path
+           ? esc(fileUrl(n.file_path))
+           : '#'
+         }"
+         target="_blank"
+       >
+        PDF
+       </a>
 
-   document
+       <button
+         data-notice="${esc(n.id)}"
+       >
+        ◉
+       </button>
+
+      </span>
+
+     </div>
+
+    `).join('');
+
+  }
+
+  document
    .querySelectorAll('[data-notice]')
-   .forEach(b=>b.onclick=()=>{
-     openNotice(b.dataset.notice);
-   });
+   .forEach(
+    b=>b.onclick=()=>
+     openNotice(
+      b.dataset.notice
+     )
+   );
 
-   return;
+  return;
  }
 
  if(r==='calendar'){
 
-   document.getElementById('app').innerHTML=
-     genericPage(
-       'SSC Calendar',
-       CALENDAR.map(x=>`
-        <div class="resultrow">
-         <b>${esc(x[0])}</b>
-         <span>${esc(x[1])}</span>
-        </div>
-       `).join('')
-     );
+  document.getElementById(
+   'app'
+  ).innerHTML =
+   genericPage(
+    'SSC Calendar',
+    CALENDAR.map(x=>`
 
-   bindCommon();
-   return;
+     <div class="resultrow">
+
+      <b>${esc(x[0])}</b>
+
+      <span>
+       ${esc(x[1])}
+      </span>
+
+     </div>
+
+    `).join('')
+   );
+
+  bindCommon();
+  return;
  }
 
  if(r==='faq'){
 
-   document.getElementById('app').innerHTML=
-     genericPage(
-       'Frequently Asked Questions',
-       FAQ.map(x=>`
-        <div class="faqfull">
-         <b>${esc(x[0])}</b>
-         <p>${esc(x[1])}</p>
-        </div>
-       `).join('')
-     );
-
-   bindCommon();
-   return;
- }
-
- if(r==='rti'||r.startsWith('rti-')){
-
-   document.getElementById('app').innerHTML=
-     genericPage(
-       'RTI',
-       `
-       <div class="servicecard">
-
-        ${
-         RTI.map(x=>`
-          <button
-            class="serviceitem"
-            data-route="${slug(x)}"
-          >
-           ${esc(x)}
-           <b>→</b>
-          </button>
-         `).join('')
-        }
-
-       </div>`
-     );
-
-   bindCommon();
-   return;
- }
-
- if(r==='about'||ABOUT.map(slug).includes(r)){
-
-   document.getElementById('app').innerHTML=
-     genericPage(
-       'About Us',
-       `
-       <div class="servicecard">
-
-        ${
-         ABOUT.map(x=>`
-          <button
-            class="serviceitem"
-            data-route="${slug(x)}"
-          >
-           ${esc(x)}
-           <b>→</b>
-          </button>
-         `).join('')
-        }
-
-       </div>`
-     );
-
-   bindCommon();
-   return;
- }
-
- document.getElementById('app').innerHTML=
+  document.getElementById(
+   'app'
+  ).innerHTML =
    genericPage(
-     r.replace(/-/g,' '),
-     `
-     <div class="servicecard">
+    'Frequently Asked Questions',
+    FAQ.map(x=>`
+
+     <div class="faqfull">
+
+      <b>
+       ${esc(x[0])}
+      </b>
+
       <p>
-       This option is active and ready for
-       administrator-managed content and documents.
+       ${esc(x[1])}
       </p>
-     </div>`
+
+     </div>
+
+    `).join('')
    );
 
+  bindCommon();
+  return;
+ }
+
+ if(
+  r==='rti' ||
+  r.startsWith('rti-')
+ ){
+
+  document.getElementById(
+   'app'
+  ).innerHTML =
+   genericPage(
+    'RTI',
+    `
+    <div class="servicecard">
+
+     ${
+      RTI.map(x=>`
+
+       <button
+         class="serviceitem"
+         data-route="${slug(x)}"
+       >
+        ${esc(x)}
+        <b>→</b>
+       </button>
+
+      `).join('')
+     }
+
+    </div>
+    `
+   );
+
+  bindCommon();
+  return;
+ }
+
+ if(
+  r==='about' ||
+  ABOUT.map(slug).includes(r)
+ ){
+
+  document.getElementById(
+   'app'
+  ).innerHTML =
+   genericPage(
+    'About Us',
+    `
+    <div class="servicecard">
+
+     ${
+      ABOUT.map(x=>`
+
+       <button
+         class="serviceitem"
+         data-route="${slug(x)}"
+       >
+        ${esc(x)}
+        <b>→</b>
+       </button>
+
+      `).join('')
+     }
+
+    </div>
+    `
+   );
+
+  bindCommon();
+  return;
+ }
+
+ document.getElementById(
+  'app'
+ ).innerHTML =
+  genericPage(
+   r.replace(/-/g,' '),
+   `
+   <div class="servicecard">
+
+    <p>
+     This option is active and ready for
+     administrator-managed content and documents.
+    </p>
+
+   </div>
+   `
+  );
+
  bindCommon();
+}
+
+/* =========================
+   COMMON BINDINGS
+========================= */
+
+function bindModalRoutes(){
+
+ document
+  .querySelectorAll(
+   '#modal-root [data-route]'
+  )
+  .forEach(
+   b=>b.onclick=()=>
+    route(
+     b.dataset.route
+    )
+  );
 }
 
 function bindCommon(){
 
  document
- .querySelectorAll('[data-route]')
- .forEach(b=>b.onclick=()=>{
-   route(b.dataset.route);
- });
+  .querySelectorAll('[data-route]')
+  .forEach(
+   b=>b.onclick=()=>
+    route(
+     b.dataset.route
+    )
+  );
 
  document
- .querySelectorAll('[data-menu]')
- .forEach(b=>b.onclick=e=>{
+  .querySelectorAll('[data-menu]')
+  .forEach(b=>{
 
-   e.stopPropagation();
+   b.onclick=e=>{
 
-   const p=b.parentElement;
+    e.stopPropagation();
 
-   document
-   .querySelectorAll('.navmenu.open')
-   .forEach(x=>{
-     if(x!==p)x.classList.remove('open');
-   });
+    const p =
+     b.parentElement;
 
-   p.classList.toggle('open');
- });
+    document
+     .querySelectorAll(
+      '.navmenu.open'
+     )
+     .forEach(x=>{
+
+      if(x!==p)
+       x.classList.remove('open');
+
+     });
+
+    p.classList.toggle('open');
+   };
+
+  });
 
  document.addEventListener(
-   'click',
-   closeMenus,
-   {once:true}
+  'click',
+  closeMenus,
+  {once:true}
  );
 
  document
- .getElementById('langToggle')
- ?.addEventListener('click',()=>{
+  .getElementById(
+   'langToggle'
+  )
+  ?.addEventListener(
+   'click',
+   ()=>{
 
-   state.lang=
+    state.lang =
      state.lang==='en'
-     ?'hi'
-     :'en';
+      ? 'hi'
+      : 'en';
 
-   localStorage.setItem(
+    localStorage.setItem(
      'sscLang',
      state.lang
-   );
+    );
 
-   renderHome();
- });
+    renderHome();
+
+   }
+  );
 
  document
- .getElementById('searchBtn')
- ?.addEventListener(
+  .getElementById(
+   'searchBtn'
+  )
+  ?.addEventListener(
    'click',
    doSearch
- );
+  );
 
  document
- .getElementById('searchInput')
- ?.addEventListener(
+  .getElementById(
+   'searchInput'
+  )
+  ?.addEventListener(
    'keydown',
    e=>{
-     if(e.key==='Enter')doSearch();
+
+    if(e.key==='Enter')
+     doSearch();
+
    }
- );
+  );
 
  document
- .getElementById('prevMonth')
- ?.addEventListener(
+  .getElementById(
+   'prevMonth'
+  )
+  ?.addEventListener(
    'click',
    ()=>{
-     state.month=
-       (state.month+11)%12;
-     renderCalendar();
+
+    state.month =
+     (state.month+11)%12;
+
+    renderCalendar();
+
    }
- );
+  );
 
  document
- .getElementById('nextMonth')
- ?.addEventListener(
+  .getElementById(
+   'nextMonth'
+  )
+  ?.addEventListener(
    'click',
    ()=>{
-     state.month=
-       (state.month+1)%12;
-     renderCalendar();
+
+    state.month =
+     (state.month+1)%12;
+
+    renderCalendar();
+
    }
- );
+  );
 
  document
- .getElementById('candidateLogin')
- ?.addEventListener(
+  .getElementById(
+   'candidateLogin'
+  )
+  ?.addEventListener(
    'click',
-   ()=>{
-     toast(
-       'Candidate login form is ready; connect your candidate authentication service to validate credentials.'
-     );
-   }
- );
+   ()=>toast(
+    'Candidate login form is ready; connect your candidate authentication service to validate credentials.'
+   )
+  );
 }
 
 function closeMenus(){
 
  document
- .querySelectorAll('.navmenu.open')
- .forEach(x=>x.classList.remove('open'));
+  .querySelectorAll(
+   '.navmenu.open'
+  )
+  .forEach(
+   x=>x.classList.remove('open')
+  );
 }
+
+/* =========================
+   RENDER HOME
+========================= */
 
 function renderHome(){
 
- document.getElementById('app').innerHTML=
-   home();
+ document.getElementById(
+  'app'
+ ).innerHTML=home();
 
  bindCommon();
 
  loadNotices();
 
  renderCalendar();
+
  renderExams();
+
  renderPromos();
+
  renderInitiatives();
+
  renderFaq();
 
- clearInterval(window.sscTimer);
+ clearInterval(
+  window.sscTimer
+ );
 
- window.sscTimer=
-   setInterval(()=>{
+ window.sscTimer =
+  setInterval(
+   ()=>{
 
-     state.promoPage=
-       (state.promoPage+1)%3;
+    state.promoPage =
+     (state.promoPage+1)%3;
 
-     state.initiativePage=
-       (state.initiativePage+1)%2;
+    state.initiativePage =
+     (state.initiativePage+1)%2;
 
-     renderPromos();
-     renderInitiatives();
+    renderPromos();
 
-   },5000);
+    renderInitiatives();
+
+   },
+   5000
+  );
 }
+
+/* =========================
+   START
+========================= */
 
 window.addEventListener(
  'hashchange',
  ()=>{
-   const r=
-     location.hash.slice(1)||'home';
+  const r =
+   location.hash.slice(1) ||
+   'home';
 
-   if(r==='home')
-     renderHome();
-   else
-     route(r);
+  if(r==='home')
+   renderHome();
+  else
+   route(r);
  }
 );
 
