@@ -1,12 +1,13 @@
 const cfg = window.SSC_CONFIG || {};
 
-const has = !!(
-  cfg.SUPABASE_URL &&
-  cfg.SUPABASE_ANON_KEY &&
-  window.supabase
-);
+const hasSupabase =
+  !!(
+    cfg.SUPABASE_URL &&
+    cfg.SUPABASE_ANON_KEY &&
+    window.supabase
+  );
 
-const db = has
+const db = hasSupabase
   ? window.supabase.createClient(
       cfg.SUPABASE_URL,
       cfg.SUPABASE_ANON_KEY
@@ -57,11 +58,13 @@ function escapeHtml(value) {
   );
 }
 
+
 /* =========================================================
    CATEGORY FIELD
    ========================================================= */
 
 function ensureCategoryField() {
+
   if (!$('publish')) return;
 
   if ($('noticeCategory')) return;
@@ -72,23 +75,29 @@ function ensureCategoryField() {
   select.name = 'noticeCategory';
 
   select.innerHTML = CATEGORIES
-    .map(
-      category =>
-        `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
-    )
+    .map(category => `
+      <option value="${escapeHtml(category)}">
+        ${escapeHtml(category)}
+      </option>
+    `)
     .join('');
 
   const title = $('noticeTitle');
   const date = $('noticeDate');
 
   if (title && title.parentElement) {
+
     title.parentElement.insertBefore(
       select,
       title.nextSibling
     );
+
   } else if (date && date.parentElement) {
+
     date.parentElement.appendChild(select);
+
   } else if ($('publish').parentElement) {
+
     $('publish').parentElement.insertBefore(
       select,
       $('publish')
@@ -104,15 +113,15 @@ function ensureCategoryField() {
   select.style.color = '#111';
 }
 
+
 /* =========================================================
-   INITIAL CONFIG
+   CONFIG CHECK
    ========================================================= */
 
-ensureCategoryField();
+if (!hasSupabase) {
 
-if (!has) {
   status(
-    'Supabase configuration is missing. Check config.js and make sure Supabase is loaded before admin.js.'
+    'Supabase configuration is missing.'
   );
 
   if ($('login')) {
@@ -120,85 +129,66 @@ if (!has) {
   }
 }
 
+
 /* =========================================================
    LOGIN
    ========================================================= */
 
 if ($('login')) {
+
   $('login').onclick = async () => {
+
     if (!db) {
       status('Supabase is not configured.');
       return;
     }
 
-    const email = $('email')
-      ? $('email').value.trim()
-      : '';
+    const email =
+      $('email')?.value.trim() || '';
 
-    const password = $('password')
-      ? $('password').value
-      : '';
+    const password =
+      $('password')?.value || '';
 
     if (!email || !password) {
-      status('Enter email and password.');
+
+      status(
+        'Enter email and password.'
+      );
+
       return;
     }
-
-    status('Checking Supabase configuration…');
-
-    const {
-      data,
-      error
-    } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      status(error.message);
-      return;
-    }
-
-    user = data.user;
-
-    if ($('auth')) {
-      $('auth').hidden = true;
-    }
-
-    if ($('manager')) {
-      $('manager').hidden = false;
-    }
-
-    ensureCategoryField();
 
     status(
-      'Logged in. Upload a PDF/file, select its category, then publish it.'
+      'Checking Supabase configuration…'
     );
 
-    await loadNotices();
-  };
-}
+    try {
 
-/* =========================================================
-   RESTORE EXISTING SESSION
-   ========================================================= */
+      const result =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
 
-async function restoreSession() {
-  if (!db) return;
+      if (result.error) {
 
-  try {
-    const {
-      data,
-      error
-    } = await db.auth.getSession();
+        status(
+          result.error.message
+        );
 
-    if (error) {
-      console.error('Session error:', error);
-      return;
-    }
+        return;
+      }
 
-    if (data && data.session && data.session.user) {
-      user = data.session.user;
+      user = result.data.user;
+
+      if (!user) {
+
+        status(
+          'Login succeeded but user session was not found.'
+        );
+
+        return;
+      }
 
       if ($('auth')) {
         $('auth').hidden = true;
@@ -211,106 +201,218 @@ async function restoreSession() {
       ensureCategoryField();
 
       status(
-        'Logged in. Upload a PDF/file, select its category, then publish it.'
+        'Logged in. Select a PDF, upload it, choose its result category, then publish it.'
       );
 
       await loadNotices();
+
+    } catch (error) {
+
+      console.error(
+        'Login error:',
+        error
+      );
+
+      status(
+        'Login failed: ' +
+        (error?.message || String(error))
+      );
     }
-  } catch (error) {
-    console.error('Session restore error:', error);
-  }
+  };
 }
 
-restoreSession();
 
 /* =========================================================
-   UPLOAD FILE
+   UPLOAD
    ========================================================= */
 
 if ($('upload')) {
+
   $('upload').onclick = async () => {
+
     if (!db) {
+
       if ($('uploadMsg')) {
         $('uploadMsg').textContent =
           'Supabase is not configured.';
       }
+
       return;
     }
 
-    if (!user) {
-      if ($('uploadMsg')) {
-        $('uploadMsg').textContent =
-          'Please login first.';
-      }
-      return;
-    }
-
-    const file = $('file')
-      ? $('file').files[0]
-      : null;
-
-    if (!file) {
-      if ($('uploadMsg')) {
-        $('uploadMsg').textContent =
-          'Choose a file first.';
-      }
-      return;
-    }
-
-    if ($('uploadMsg')) {
-      $('uploadMsg').textContent =
-        'Uploading file...';
-    }
-
-    const safe = file.name.replace(
-      /[^a-zA-Z0-9._-]/g,
-      '_'
-    );
-
-    const path =
-      `${user.id}/${Date.now()}-${safe}`;
+    /*
+     * Get current authenticated session.
+     * This makes the upload more reliable on mobile.
+     */
 
     try {
-      const {
-        data,
-        error
-      } = await db.storage
-        .from('ssc-files')
-        .upload(
-          path,
-          file,
-          {
-            cacheControl: '3600',
-            upsert: false,
-            contentType:
-              file.type || 'application/pdf'
-          }
-        );
 
-      if (error) {
-        console.error(
-          'Upload error:',
-          error
-        );
+      const sessionResult =
+        await db.auth.getSession();
+
+      if (sessionResult.error) {
 
         if ($('uploadMsg')) {
           $('uploadMsg').textContent =
-            'Upload failed: ' + error.message;
+            sessionResult.error.message;
         }
 
         return;
       }
 
-      console.log(
-        'Upload successful:',
-        data
+      user =
+        sessionResult.data?.session?.user || user;
+
+    } catch (error) {
+
+      console.error(
+        'Session error:',
+        error
+      );
+    }
+
+    if (!user) {
+
+      if ($('uploadMsg')) {
+        $('uploadMsg').textContent =
+          'Please login first.';
+      }
+
+      return;
+    }
+
+    const input = $('file');
+
+    const file =
+      input?.files?.[0];
+
+    if (!file) {
+
+      if ($('uploadMsg')) {
+        $('uploadMsg').textContent =
+          'Choose a PDF file first.';
+      }
+
+      return;
+    }
+
+
+    /* -----------------------------------------------------
+       File information
+       ----------------------------------------------------- */
+
+    const originalName =
+      file.name || 'document.pdf';
+
+    const safeName =
+      originalName
+        .replace(
+          /[^a-zA-Z0-9._-]/g,
+          '_'
+        );
+
+    const extension =
+      safeName
+        .split('.')
+        .pop()
+        .toLowerCase();
+
+    const contentType =
+      file.type ||
+      (
+        extension === 'pdf'
+          ? 'application/pdf'
+          : 'application/octet-stream'
       );
 
-      uploadedPath = path;
+    const fileSize =
+      Number(file.size || 0);
 
-      uploadedSize =
-        (file.size / 1024).toFixed(2) +
-        ' KB';
+    const readableSize =
+      (fileSize / 1024).toFixed(2) +
+      ' KB';
+
+
+    /* -----------------------------------------------------
+       Create unique storage path
+       ----------------------------------------------------- */
+
+    const path =
+      `${user.id}/${Date.now()}-${safeName}`;
+
+
+    if ($('uploadMsg')) {
+      $('uploadMsg').textContent =
+        'Uploading… please wait.';
+    }
+
+
+    console.log(
+      'SSC upload started:',
+      {
+        bucket: 'ssc-files',
+        path,
+        name: originalName,
+        type: contentType,
+        size: fileSize,
+        user: user.id
+      }
+    );
+
+
+    try {
+
+      /*
+       * Supabase Storage upload
+       */
+
+      const result =
+        await db.storage
+          .from('ssc-files')
+          .upload(
+            path,
+            file,
+            {
+              cacheControl: '3600',
+              contentType,
+              upsert: false
+            }
+          );
+
+
+      console.log(
+        'SSC upload response:',
+        result
+      );
+
+
+      if (result.error) {
+
+        console.error(
+          'Supabase Storage error:',
+          result.error
+        );
+
+        if ($('uploadMsg')) {
+          $('uploadMsg').textContent =
+            'Upload failed: ' +
+            (
+              result.error.message ||
+              'Storage upload error'
+            );
+        }
+
+        return;
+      }
+
+
+      /*
+       * Upload successful
+       */
+
+      uploadedPath = path;
+      uploadedSize = readableSize;
+
 
       if ($('noticePath')) {
         $('noticePath').value =
@@ -324,138 +426,215 @@ if ($('upload')) {
 
       if ($('fileTitle')) {
         $('fileTitle').value =
-          file.name;
+          originalName;
       }
+
 
       if ($('uploadMsg')) {
         $('uploadMsg').textContent =
-          'Uploaded successfully. Select the result category and publish it.';
+          'Upload successful. Now select the result category and click Publish.';
       }
 
       status(
-        'File uploaded successfully.'
+        'PDF uploaded successfully.'
       );
 
+
     } catch (error) {
+
       console.error(
-        'Upload exception:',
+        'SSC upload exception:',
         error
       );
+
+      let message =
+        error?.message ||
+        String(error) ||
+        'Unknown upload error';
+
+
+      /*
+       * Extra mobile/browser diagnostic
+       */
+
+      if (
+        message
+          .toLowerCase()
+          .includes('failed to fetch')
+      ) {
+
+        message =
+          'Failed to fetch. Storage is reachable from Supabase, but the browser upload request failed. Check the browser/network connection and site HTTPS.';
+      }
+
 
       if ($('uploadMsg')) {
         $('uploadMsg').textContent =
           'Upload failed: ' +
-          (error.message || error);
+          message;
       }
+
+      status(
+        'Upload failed.'
+      );
     }
   };
 }
 
+
 /* =========================================================
-   PUBLISH NOTICE / RESULT
+   PUBLISH
    ========================================================= */
 
 if ($('publish')) {
+
   $('publish').onclick = async () => {
+
     if (!db) {
+
       status(
         'Supabase is not configured.'
       );
+
       return;
     }
 
+    try {
+
+      const sessionResult =
+        await db.auth.getSession();
+
+      user =
+        sessionResult.data?.session?.user ||
+        user;
+
+    } catch (error) {
+
+      console.error(
+        'Session check failed:',
+        error
+      );
+    }
+
+
     if (!user) {
+
       status(
         'Please login first.'
       );
+
       return;
     }
 
+
     ensureCategoryField();
 
-    const title = $('noticeTitle')
-      ? $('noticeTitle').value.trim()
-      : '';
+
+    const title =
+      $('noticeTitle')?.value.trim() ||
+      '';
 
     const category =
       $('noticeCategory')
         ? $('noticeCategory').value
         : 'OTHERS';
 
+
     if (!title) {
+
       status(
         'Enter notice title.'
       );
+
       return;
     }
 
+
     if (!category) {
+
       status(
         'Select a result category.'
       );
+
       return;
     }
+
 
     const filePath =
       uploadedPath ||
-      ($('noticePath')
-        ? $('noticePath').value.trim()
-        : '');
+      ($('noticePath')?.value || '');
+
 
     if (!filePath) {
+
       status(
         'Upload a file first.'
       );
+
       return;
     }
 
+
+    const fileSize =
+      $('noticeSize')?.value.trim() ||
+      uploadedSize ||
+      '';
+
+
+    const noticeDate =
+      $('noticeDate')?.value ||
+      null;
+
+
     const payload = {
-      title: title,
+
+      title,
 
       notice_date:
-        $('noticeDate') &&
-        $('noticeDate').value
-          ? $('noticeDate').value
-          : null,
+        noticeDate,
 
-      category: category,
+      category,
 
-      file_path: filePath,
+      file_path:
+        filePath,
 
       file_size:
-        $('noticeSize') &&
-        $('noticeSize').value.trim()
-          ? $('noticeSize').value.trim()
-          : uploadedSize || ''
+        fileSize
     };
 
+
     status(
-      'Publishing notice...'
+      'Publishing notice…'
     );
 
-    try {
-      const {
-        error
-      } = await db
-        .from('ssc_notices')
-        .insert(payload);
 
-      if (error) {
+    try {
+
+      const result =
+        await db
+          .from('ssc_notices')
+          .insert(payload);
+
+
+      if (result.error) {
+
         console.error(
           'Publish error:',
-          error
+          result.error
         );
 
         status(
-          error.message
+          result.error.message
         );
 
         return;
       }
 
+
       status(
         `Notice published successfully in ${category} category.`
       );
+
 
       if ($('noticeTitle')) {
         $('noticeTitle').value = '';
@@ -496,40 +675,51 @@ if ($('publish')) {
       await loadNotices();
 
     } catch (error) {
+
       console.error(
         'Publish exception:',
         error
       );
 
       status(
-        error.message ||
-        'Unable to publish notice.'
+        'Publish failed: ' +
+        (
+          error?.message ||
+          String(error)
+        )
       );
     }
   };
 }
+
 
 /* =========================================================
    REFRESH
    ========================================================= */
 
 if ($('refresh')) {
-  $('refresh').onclick = async () => {
-    await loadNotices();
-  };
+
+  $('refresh').onclick =
+    loadNotices;
 }
+
 
 /* =========================================================
    LOGOUT
    ========================================================= */
 
 if ($('logout')) {
+
   $('logout').onclick = async () => {
+
     try {
+
       if (db) {
         await db.auth.signOut();
       }
+
     } catch (error) {
+
       console.error(
         'Logout error:',
         error
@@ -540,101 +730,116 @@ if ($('logout')) {
   };
 }
 
+
 /* =========================================================
    LOAD NOTICES
    ========================================================= */
 
 async function loadNotices() {
+
   if (!db) return;
 
   if (!$('noticeList')) return;
 
-  $('noticeList').innerHTML =
-    '<div class="muted">Loading notices...</div>';
 
   try {
-    const {
-      data,
-      error
-    } = await db
-      .from('ssc_notices')
-      .select('*')
-      .order(
-        'created_at',
-        {
-          ascending: false
-        }
-      );
 
-    if (error) {
+    const result =
+      await db
+        .from('ssc_notices')
+        .select('*')
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        );
+
+
+    if (result.error) {
+
       console.error(
         'Load notices error:',
-        error
+        result.error
       );
 
       $('noticeList').innerHTML =
-        `<div class="muted">${escapeHtml(error.message)}</div>`;
+        `<div class="muted">
+          ${escapeHtml(result.error.message)}
+        </div>`;
 
       return;
     }
 
+
+    const data =
+      result.data || [];
+
+
     $('noticeList').innerHTML =
-      (data || [])
-        .map(notice => {
+      data
+        .map(n => {
 
           const url =
-            notice.file_path
+            n.file_path
               ? db.storage
                   .from('ssc-files')
                   .getPublicUrl(
-                    notice.file_path
+                    n.file_path
                   )
-                  .data.publicUrl
+                  .data
+                  .publicUrl
               : '#';
 
+
           const category =
-            notice.category ||
+            n.category ||
             'OTHERS';
+
 
           return `
             <article>
 
               <div>
+
                 <b>
-                  ${escapeHtml(notice.title)}
+                  ${escapeHtml(n.title)}
                 </b>
 
                 <div class="muted">
+
                   ${escapeHtml(
-                    notice.notice_date || ''
+                    n.notice_date || ''
                   )}
+
                   ·
-                  ${escapeHtml(category)}
-                  ·
+
                   ${escapeHtml(
-                    notice.file_size || ''
+                    category
                   )}
+
+                  ·
+
+                  ${escapeHtml(
+                    n.file_size || ''
+                  )}
+
                 </div>
+
               </div>
 
-              ${
-                notice.file_path
-                  ? `
-                    <a
-                      href="${escapeHtml(url)}"
-                      target="_blank"
-                      rel="noopener"
-                    >
-                      PDF
-                    </a>
-                  `
-                  : ''
-              }
+
+              <a
+                href="${escapeHtml(url)}"
+                target="_blank"
+                rel="noopener"
+              >
+                PDF
+              </a>
+
 
               <button
-                data-delete="${escapeHtml(
-                  notice.id
-                )}"
+                data-delete="${escapeHtml(n.id)}"
               >
                 Delete
               </button>
@@ -646,6 +851,7 @@ async function loadNotices() {
         .join('') ||
       '<div class="muted">No notices published.</div>';
 
+
     document
       .querySelectorAll(
         '[data-delete]'
@@ -653,9 +859,11 @@ async function loadNotices() {
       .forEach(button => {
 
         button.onclick = () => {
+
           deleteNotice(
             button.dataset.delete
           );
+
         };
 
       });
@@ -668,21 +876,24 @@ async function loadNotices() {
     );
 
     $('noticeList').innerHTML =
-      `<div class="muted">${escapeHtml(
-        error.message ||
-        'Unable to load notices.'
-      )}</div>`;
+      `<div class="muted">
+        ${escapeHtml(
+          error?.message ||
+          String(error)
+        )}
+      </div>`;
   }
 }
+
 
 /* =========================================================
    DELETE NOTICE
    ========================================================= */
 
 async function deleteNotice(id) {
-  if (!db) return;
 
   if (
+    !db ||
     !confirm(
       'Delete this notice?'
     )
@@ -690,58 +901,73 @@ async function deleteNotice(id) {
     return;
   }
 
+
   try {
 
-    const {
-      data,
-      error
-    } = await db
-      .from('ssc_notices')
-      .select('file_path')
-      .eq('id', id)
-      .single();
+    const result =
+      await db
+        .from('ssc_notices')
+        .select('file_path')
+        .eq('id', id)
+        .single();
 
-    if (error) {
+
+    if (result.error) {
+
       status(
-        error.message
+        result.error.message
       );
+
       return;
     }
 
-    const del =
+
+    const filePath =
+      result.data?.file_path ||
+      '';
+
+
+    const deleted =
       await db
         .from('ssc_notices')
         .delete()
         .eq('id', id);
 
-    if (del.error) {
+
+    if (deleted.error) {
+
       status(
-        del.error.message
+        deleted.error.message
       );
+
       return;
     }
 
-    if (data && data.file_path) {
 
-      const {
-        error: storageError
-      } = await db.storage
-        .from('ssc-files')
-        .remove([
-          data.file_path
-        ]);
+    if (filePath) {
 
-      if (storageError) {
-        console.error(
-          'Storage delete error:',
-          storageError
+      const storageResult =
+        await db.storage
+          .from('ssc-files')
+          .remove([
+            filePath
+          ]);
+
+
+      if (storageResult.error) {
+
+        console.warn(
+          'Storage file could not be removed:',
+          storageResult.error
         );
       }
     }
 
+
     status(
       'Notice deleted.'
     );
+
 
     await loadNotices();
 
@@ -753,19 +979,25 @@ async function deleteNotice(id) {
     );
 
     status(
-      error.message ||
-      'Unable to delete notice.'
+      'Delete failed: ' +
+      (
+        error?.message ||
+        String(error)
+      )
     );
   }
 }
 
+
 /* =========================================================
-   DOM READY
+   PAGE LOAD
    ========================================================= */
 
 window.addEventListener(
   'DOMContentLoaded',
   () => {
+
     ensureCategoryField();
+
   }
 );
