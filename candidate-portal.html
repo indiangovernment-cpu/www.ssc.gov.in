@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SSC Candidate Portal</title><link rel="stylesheet" href="candidate-portal.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SSC Candidate Portal</title><link rel="stylesheet" href="candidate-portal.css"><style id="password-toggle-style">.password-wrap{position:relative;display:flex;align-items:center}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:10px;border:0;background:transparent;cursor:pointer;font-size:18px;padding:6px}</style></head>
 <body>
 <header class="portal-head"><div class="head-in"><div class="brand">Staff Selection Commission<small>Candidate Services Portal</small></div><button id="logout" class="btn light hidden">Logout</button></div></header>
 <main class="wrap">
@@ -29,4 +29,4 @@
 <section id="messages" class="card panel hidden"><h2>Messages</h2><div id="messageList" class="list"></div></section>
 </section></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="candidate-portal.js"></script>
-</body></html>
+<script id="password-toggle-script">document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('input[type="password"]').forEach(input=>{if(input.dataset.toggleAdded)return;input.dataset.toggleAdded='1';const wrap=document.createElement('span');wrap.className='password-wrap';input.parentNode.insertBefore(wrap,input);wrap.appendChild(input);const b=document.createElement('button');b.type='button';b.className='password-toggle';b.setAttribute('aria-label','Show password');b.textContent='👁️';b.onclick=()=>{const show=input.type==='password';input.type=show?'text':'password';b.textContent=show?'🙈':'👁️';b.setAttribute('aria-label',show?'Hide password':'Show password')};wrap.appendChild(b)})});</script></body></html>
