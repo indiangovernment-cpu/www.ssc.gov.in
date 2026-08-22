@@ -131,6 +131,61 @@ if (!hasSupabase) {
 
 
 /* =========================================================
+   RESTORE EXISTING SESSION
+   ========================================================= */
+
+async function restoreSession() {
+
+  if (!db) return;
+
+  try {
+
+    const result =
+      await db.auth.getSession();
+
+    if (result.error) {
+      console.error(
+        'Session restore error:',
+        result.error
+      );
+      return;
+    }
+
+    const session =
+      result.data?.session;
+
+    if (session?.user) {
+
+      user = session.user;
+
+      if ($('auth')) {
+        $('auth').hidden = true;
+      }
+
+      if ($('manager')) {
+        $('manager').hidden = false;
+      }
+
+      ensureCategoryField();
+
+      status(
+        'Logged in. Select a PDF, upload it, choose its result category, then publish it.'
+      );
+
+      await loadNotices();
+    }
+
+  } catch (error) {
+
+    console.error(
+      'Session restore exception:',
+      error
+    );
+  }
+}
+
+
+/* =========================================================
    LOGIN
    ========================================================= */
 
@@ -139,7 +194,11 @@ if ($('login')) {
   $('login').onclick = async () => {
 
     if (!db) {
-      status('Supabase is not configured.');
+
+      status(
+        'Supabase is not configured.'
+      );
+
       return;
     }
 
@@ -179,7 +238,8 @@ if ($('login')) {
         return;
       }
 
-      user = result.data.user;
+      user =
+        result.data?.user || null;
 
       if (!user) {
 
@@ -215,7 +275,10 @@ if ($('login')) {
 
       status(
         'Login failed: ' +
-        (error?.message || String(error))
+        (
+          error?.message ||
+          String(error)
+        )
       );
     }
   };
@@ -240,10 +303,10 @@ if ($('upload')) {
       return;
     }
 
-    /*
-     * Get current authenticated session.
-     * This makes the upload more reliable on mobile.
-     */
+
+    /* -----------------------------------------------------
+       Get current session
+       ----------------------------------------------------- */
 
     try {
 
@@ -261,7 +324,8 @@ if ($('upload')) {
       }
 
       user =
-        sessionResult.data?.session?.user || user;
+        sessionResult.data?.session?.user ||
+        user;
 
     } catch (error) {
 
@@ -270,6 +334,7 @@ if ($('upload')) {
         error
       );
     }
+
 
     if (!user) {
 
@@ -280,6 +345,11 @@ if ($('upload')) {
 
       return;
     }
+
+
+    /* -----------------------------------------------------
+       Get selected file
+       ----------------------------------------------------- */
 
     const input = $('file');
 
@@ -302,7 +372,8 @@ if ($('upload')) {
        ----------------------------------------------------- */
 
     const originalName =
-      file.name || 'document.pdf';
+      file.name ||
+      'document.pdf';
 
     const safeName =
       originalName
@@ -334,7 +405,7 @@ if ($('upload')) {
 
 
     /* -----------------------------------------------------
-       Create unique storage path
+       Create storage path
        ----------------------------------------------------- */
 
     const path =
@@ -343,38 +414,83 @@ if ($('upload')) {
 
     if ($('uploadMsg')) {
       $('uploadMsg').textContent =
-        'Uploading… please wait.';
+        'Reading file…';
     }
 
 
     console.log(
-      'SSC upload started:',
+      'SSC upload file:',
       {
-        bucket: 'ssc-files',
-        path,
         name: originalName,
         type: contentType,
         size: fileSize,
-        user: user.id
+        path
       }
     );
 
 
     try {
 
-      /*
-       * Supabase Storage upload
-       */
+      /* ---------------------------------------------------
+         IMPORTANT MOBILE FIX
+
+         Read the selected File first.
+         This avoids some mobile browser/file-picker
+         problems where direct File upload can fail.
+         --------------------------------------------------- */
+
+      if (
+        typeof file.arrayBuffer !== 'function'
+      ) {
+
+        throw new Error(
+          'This browser cannot read the selected file.'
+        );
+      }
+
+      const buffer =
+        await file.arrayBuffer();
+
+
+      if (!buffer || !buffer.byteLength) {
+
+        throw new Error(
+          'The selected file could not be read.'
+        );
+      }
+
+
+      if ($('uploadMsg')) {
+        $('uploadMsg').textContent =
+          'Uploading… please wait.';
+      }
+
+
+      console.log(
+        'SSC upload started:',
+        {
+          bucket: 'ssc-files',
+          path,
+          bytes: buffer.byteLength,
+          type: contentType,
+          user: user.id
+        }
+      );
+
+
+      /* ---------------------------------------------------
+         Upload ArrayBuffer instead of File
+         --------------------------------------------------- */
 
       const result =
         await db.storage
           .from('ssc-files')
           .upload(
             path,
-            file,
+            buffer,
             {
               cacheControl: '3600',
-              contentType,
+              contentType: contentType,
               upsert: false
             }
           );
@@ -406,12 +522,15 @@ if ($('upload')) {
       }
 
 
-      /*
-       * Upload successful
-       */
+      /* ---------------------------------------------------
+         SUCCESS
+         --------------------------------------------------- */
 
-      uploadedPath = path;
-      uploadedSize = readableSize;
+      uploadedPath =
+        path;
+
+      uploadedSize =
+        readableSize;
 
 
       if ($('noticePath')) {
@@ -453,10 +572,6 @@ if ($('upload')) {
         'Unknown upload error';
 
 
-      /*
-       * Extra mobile/browser diagnostic
-       */
-
       if (
         message
           .toLowerCase()
@@ -464,7 +579,7 @@ if ($('upload')) {
       ) {
 
         message =
-          'Failed to fetch. Storage is reachable from Supabase, but the browser upload request failed. Check the browser/network connection and site HTTPS.';
+          'Failed to fetch. The mobile browser could not complete the Storage request. Check internet connection and HTTPS.';
       }
 
 
@@ -498,6 +613,7 @@ if ($('publish')) {
 
       return;
     }
+
 
     try {
 
@@ -669,8 +785,10 @@ if ($('publish')) {
           'OTHERS';
       }
 
+
       uploadedPath = '';
       uploadedSize = '';
+
 
       await loadNotices();
 
@@ -995,9 +1113,11 @@ async function deleteNotice(id) {
 
 window.addEventListener(
   'DOMContentLoaded',
-  () => {
+  async () => {
 
     ensureCategoryField();
+
+    await restoreSession();
 
   }
 );
