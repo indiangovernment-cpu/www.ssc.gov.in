@@ -18,3 +18,6 @@ The candidate tables/RLS and candidate storage bucket are separate from the exis
 
 ## Email
 The Edge Function `ssc-send-candidate-email` is deployed and requires your own verified sender/provider credentials (for example Resend) as secrets. Do not use or impersonate `ssc.gov.in` unless you are officially authorized to send from that government domain.
+
+
+Login update: Candidate login uses Registration Number + Password through the deployed ssc-candidate-login-by-registration Edge Function. Register Now opens the registration form. Forgot Password accepts Registration Number and sends reset to the registered email.
