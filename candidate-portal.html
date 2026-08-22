@@ -6,13 +6,13 @@
 <section id="loginView" class="card login">
 <h2>Candidate Login</h2><p class="muted">Use your registered email and password.</p>
 <label>Email</label><input id="email" type="email" autocomplete="username">
-<label>Password</label><input id="password" type="password" autocomplete="current-password">
+<label>Password</label><div class="password-wrap"><input id="password" type="password" autocomplete="current-password"><button type="button" class="toggle-password" data-target="password" aria-label="Show password">👁️</button></div>
 <div class="row"><button id="login" class="btn primary">Login</button><button id="register" class="btn ghost">New Candidate</button><button id="forgot" class="btn ghost">Forgot Password</button></div><p id="authMsg" class="muted small"></p>
 </section>
 <section id="registerView" class="card login hidden">
 <h2>Create Candidate Account</h2><p class="muted">Registration creates your login. Your profile can then be completed from the dashboard.</p>
 <label>Email</label><input id="regEmail" type="email">
-<label>Password</label><input id="regPassword" type="password" minlength="8">
+<label>Password</label><div class="password-wrap"><input id="regPassword" type="password" minlength="8" autocomplete="new-password"><button type="button" class="toggle-password" data-target="regPassword" aria-label="Show password">👁️</button></div>
 <label>Registration Number</label><input id="regNo">
 <label>Full Name</label><input id="regName">
 <div class="row"><button id="doRegister" class="btn primary">Register</button><button id="backLogin" class="btn ghost">Back</button></div><p id="regMsg" class="muted small"></p>

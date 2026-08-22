@@ -22,3 +22,15 @@ $('newApp').onclick=()=>show('appForm');
 $('saveApp').onclick=async()=>{const {error}=await db.from('ssc_applications').insert({candidate_id:me.id,exam_name:$('aExam').value,post_name:$('aPost').value.trim()||null,status:'Draft',form_data:{details:$('aData').value}});if(error)alert(error.message);else{show('appForm',false);await loadAll()}};
 $('uploadDoc').onclick=async()=>{const f=$('docFile').files[0];if(!f)return alert('Choose a document.');const path=`${me.id}/documents/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;const up=await db.storage.from('ssc-candidate-files').upload(path,f,{upsert:false,contentType:f.type||'application/octet-stream'});if(up.error)return alert(up.error.message);const ins=await db.from('ssc_candidate_documents').insert({candidate_id:me.id,document_type:$('docType').value,title:f.name,file_path:path});if(ins.error)alert(ins.error.message);else await loadAll()};
 init();
+
+// Password visibility controls
+document.querySelectorAll('.toggle-password').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const input=document.getElementById(btn.dataset.target);
+    if(!input) return;
+    const showing=input.type==='text';
+    input.type=showing?'password':'text';
+    btn.textContent=showing?'👁️':'🙈';
+    btn.setAttribute('aria-label',showing?'Show password':'Hide password');
+  });
+});

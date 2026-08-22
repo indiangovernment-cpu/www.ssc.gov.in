@@ -14,3 +14,16 @@ $('saveMessage').onclick=async()=>{const title=$('mTitle').value.trim(),body=$('
 $('savePayment').onclick=async()=>{const {error}=await db.from('ssc_payments').insert({candidate_id:current.user_id,amount:$('payAmount').value||0,status:$('payStatus').value,payment_method:$('payMethod').value.trim()||null,transaction_ref:$('payRef').value.trim()||null,challan_no:$('payChallan').value.trim()||null,paid_at:$('payDate').value||null});if(error)return $('editMsg').textContent=error.message;$('editMsg').textContent='Payment/challan record saved.';await loadCandidateRecords()};
 async function loadCandidateRecords(){if(!current)return;const [r,a,p,m]=await Promise.all([db.from('ssc_results').select('*').eq('candidate_id',current.user_id).order('created_at',{ascending:false}),db.from('ssc_applications').select('*').eq('candidate_id',current.user_id).order('created_at',{ascending:false}),db.from('ssc_payments').select('*').eq('candidate_id',current.user_id).order('created_at',{ascending:false}),db.from('ssc_candidate_messages').select('*').eq('candidate_id',current.user_id).order('created_at',{ascending:false})]);$('adminResults').innerHTML=(r.data||[]).map(x=>`<div class="item"><b>${esc(x.exam_name)}</b> — ${esc(x.post_name||'')} · ${esc(x.marks??'—')}/${esc(x.max_marks??'—')} · ${esc(x.selection_status||'—')} · ${x.published?'Published':'Hidden'} <button data-del-result="${x.id}">Delete</button></div>`).join('')||'No results';$('adminApps').innerHTML=(a.data||[]).map(x=>`<div class="item"><b>${esc(x.exam_name)}</b> — ${esc(x.post_name||'')} · ${esc(x.status)} · ${esc(x.application_no||'No application no.')}</div>`).join('')||'No applications';$('adminPayments').innerHTML=(p.data||[]).map(x=>`<div class="item">₹${esc(x.amount)} · ${esc(x.status)} · Challan ${esc(x.challan_no||'—')} · Ref ${esc(x.transaction_ref||'—')}</div>`).join('')||'No payments';$('adminMessages').innerHTML=(m.data||[]).map(x=>`<div class="item"><b>${esc(x.title)}</b> · ${x.published?'Published':'Hidden'}</div>`).join('')||'No messages';document.querySelectorAll('[data-del-result]').forEach(b=>b.onclick=async()=>{if(confirm('Delete this result?')){await db.from('ssc_results').delete().eq('id',b.dataset.delResult);await loadCandidateRecords()}})}
 init();
+
+
+// Password visibility controls
+document.querySelectorAll('.toggle-password').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const input=document.getElementById(btn.dataset.target);
+    if(!input) return;
+    const showing=input.type==='text';
+    input.type=showing?'password':'text';
+    btn.textContent=showing?'👁️':'🙈';
+    btn.setAttribute('aria-label',showing?'Show password':'Hide password');
+  });
+});
