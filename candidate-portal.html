@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SSC Candidate Portal</title><link rel="stylesheet" href="candidate-portal.css"></head>
+<body>
+<header class="portal-head"><div class="head-in"><div class="brand">Staff Selection Commission<small>Candidate Services Portal</small></div><button id="logout" class="btn light hidden">Logout</button></div></header>
+<main class="wrap">
+<section id="loginView" class="card login">
+<h2>Candidate Login</h2><p class="muted">Use your registered email and password.</p>
+<label>Email</label><input id="email" type="email" autocomplete="username">
+<label>Password</label><input id="password" type="password" autocomplete="current-password">
+<div class="row"><button id="login" class="btn primary">Login</button><button id="register" class="btn ghost">New Candidate</button><button id="forgot" class="btn ghost">Forgot Password</button></div><p id="authMsg" class="muted small"></p>
+</section>
+<section id="registerView" class="card login hidden">
+<h2>Create Candidate Account</h2><p class="muted">Registration creates your login. Your profile can then be completed from the dashboard.</p>
+<label>Email</label><input id="regEmail" type="email">
+<label>Password</label><input id="regPassword" type="password" minlength="8">
+<label>Registration Number</label><input id="regNo">
+<label>Full Name</label><input id="regName">
+<div class="row"><button id="doRegister" class="btn primary">Register</button><button id="backLogin" class="btn ghost">Back</button></div><p id="regMsg" class="muted small"></p>
+</section>
+<section id="dashboard" class="hidden">
+<div class="hero"><h1>Candidate Dashboard</h1><p id="welcome" class="muted"></p></div>
+<div class="stats"><div class="stat"><span class="muted small">Registration</span><b id="sReg">—</b></div><div class="stat"><span class="muted small">Roll No.</span><b id="sRoll">—</b></div><div class="stat"><span class="muted small">Application</span><b id="sApp">—</b></div><div class="stat"><span class="muted small">Result</span><b id="sResult">—</b></div></div>
+<div class="tabs"><button class="tab active" data-tab="profile">Profile</button><button class="tab" data-tab="applications">Forms</button><button class="tab" data-tab="results">Marks & Selection</button><button class="tab" data-tab="payments">Challan / Payment</button><button class="tab" data-tab="documents">Documents</button><button class="tab" data-tab="messages">Messages</button></div>
+<section id="profile" class="card panel"><h2>My Details</h2><div class="formgrid"><div><label>Full Name</label><input id="pName"></div><div><label>Registration No.</label><input id="pReg" readonly></div><div><label>Roll No.</label><input id="pRoll"></div><div><label>Phone</label><input id="pPhone"></div><div><label>Date of Birth</label><input id="pDob" type="date"></div><div><label>Category</label><input id="pCategory"></div><div><label>Father Name</label><input id="pFather"></div><div><label>Mother Name</label><input id="pMother"></div><div class="full"><label>Address</label><textarea id="pAddress"></textarea></div><div><label>City</label><input id="pCity"></div><div><label>State</label><input id="pState"></div><div><label>PIN Code</label><input id="pPin"></div></div><br><button id="saveProfile" class="btn primary">Save Details</button><p id="profileMsg" class="muted small"></p></section>
+<section id="applications" class="card panel hidden"><div class="item-head"><h2>Applications / Forms</h2><button id="newApp" class="btn primary">New Form</button></div><div id="appList" class="list"></div><div id="appForm" class="hidden"><div class="formgrid"><div><label>Exam</label><select id="aExam"><option>CGL</option><option>CHSL</option><option>JEN</option><option>CAPF</option><option>CTGD</option><option>MTS</option><option>STENOGRAPHER</option><option>DEPARTMENTAL EXAMS</option></select></div><div><label>Post</label><input id="aPost"></div><div class="full"><label>Form Details</label><textarea id="aData" placeholder="Qualification, address, category and other application details"></textarea></div></div><br><button id="saveApp" class="btn primary">Save Form</button></div></section>
+<section id="results" class="card panel hidden"><h2>Marks & Selection</h2><div id="resultList" class="list"></div></section>
+<section id="payments" class="card panel hidden"><h2>Challan / Payment</h2><p class="muted">Payment status and challan information published by the administrator appear here.</p><div id="paymentList" class="list"></div></section>
+<section id="documents" class="card panel hidden"><h2>Documents</h2><input id="docFile" type="file"><label>Document Type</label><select id="docType"><option>Photo</option><option>Signature</option><option>Certificate</option><option>Identity Proof</option><option>Other</option></select><br><br><button id="uploadDoc" class="btn primary">Upload Document</button><div id="docList" class="list"></div></section>
+<section id="messages" class="card panel hidden"><h2>Messages</h2><div id="messageList" class="list"></div></section>
+</section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="candidate-portal.js"></script>
+</body></html>

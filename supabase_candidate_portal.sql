@@ -1,0 +1,6 @@
+-- Already applied to the connected Supabase project.
+-- Keep this file as a backup/reference for a fresh project.
+-- See the migration applied by ChatGPT: add_candidate_portal_and_secure_admin.
+-- It creates: ssc_admins, ssc_candidates, ssc_applications, ssc_results,
+-- ssc_payments, ssc_candidate_documents, ssc_candidate_messages,
+-- secure RLS policies and private ssc-candidate-files storage.
