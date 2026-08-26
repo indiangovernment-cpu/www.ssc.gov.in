@@ -99,7 +99,7 @@ const I18N = {
 const tr = k => (I18N[state.lang] && I18N[state.lang][k]) || I18N.en[k] || k;
 const esc = v => String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const slug = x => String(x).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const fileUrl = path => db ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl : '#';
+const fileUrl = path => /^https?:\\/\\//i.test(String(path||'')) ? path : (db ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl : '#');
 function icon(type){
  const paths={
   apply:'<path d="M5 19l4.2-1 9.1-9.1a2 2 0 0 0-2.8-2.8L6.4 15.2 5 19Z"/><path d="m14.5 7.5 2 2"/>',
@@ -232,13 +232,28 @@ function resultModal(){
  renderResult('ALL');
  document.querySelectorAll('[data-resultcat]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-resultcat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderResult(b.dataset.resultcat)});
 }
-function renderResult(cat){
- const rows=[
-  'Junior Secretariat Assistant / Lower Division Clerk Grade Limited Departmental Competitive Examination, 2023-24: Declaration of final result for the year 2024 of AFHQ Grade-II',
-  'Combined Graduate Level Examination (CGLE), 2025: List of Candidates in Roll Number Order provisionally shortlisted',
-  'Head Constable (Assistant Wireless Operator/Tele-Printer Operator) in Delhi Police Examination, 2025 — Additional Female Candidates qualified'
- ];
- document.getElementById('resultBody').innerHTML=rows.map(x=>`<div class="resultrow"><span>${esc(x)}</span><span>416.08 KB <i class="pdf">PDF</i> <u>Write up</u> <u>Result</u></span></div>`).join('');
+async function renderResult(cat){
+ const body=document.getElementById('resultBody');
+ if(!body)return;
+ body.innerHTML='<p class="muted">Loading results…</p>';
+ let rows=[];
+ if(db){
+   const q=db.from('ssc_results').select('*').order('result_date',{ascending:false}).order('created_at',{ascending:false});
+   if(cat!=='ALL')q.eq('category',cat);
+   const {data,error}=await q;
+   if(!error)rows=data||[];
+   else body.innerHTML='<p class="muted">'+esc(error.message)+'</p>';
+ }
+ if(!rows.length){
+   body.innerHTML='<p class="muted">No published results are available in this category.</p>';
+   return;
+ }
+ body.innerHTML=rows.map(r=>{
+   const href=r.file_path?fileUrl(r.file_path):'#';
+   const date=r.result_date?esc(r.result_date):'';
+   const size=esc(r.file_size||'');
+   return `<div class="resultrow"><span>${esc(r.title)}</span><span>${date?date+' · ':''}${size} ${r.file_path?`<a class="pdf" href="${esc(href)}" target="_blank" rel="noopener">PDF</a>`:''}</span></div>`;
+ }).join('');
 }
 function admitModal(){
  modal(`<div class="modal small"><div class="modalhead"><h3>▣ Admit Card</h3><button class="close">×</button></div><div class="modalbody">${['Download E-Admit Card of Stenographer Grade C and D Examination, 2024','Download E-Admit Card of Combined Hindi Translators Examination','Download E-Admit Card of Combined Higher Secondary Level Examination'].map(x=>`<div class="resultrow"><span>${x}</span></div>`).join('')}<div class="center"><button class="pill" data-route="login">Login</button></div></div></div>`);
