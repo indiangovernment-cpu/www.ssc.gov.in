@@ -12,7 +12,7 @@ const db =
 
 /* =========================================================
    ASSETS
-   ========================================================= */
+========================================================= */
 
 const A = "assets/";
 
@@ -25,13 +25,15 @@ const ASSETS = {
 
 /* =========================================================
    STATE
-   ========================================================= */
+========================================================= */
 
 const state = {
   lang: localStorage.getItem("sscLang") || "en",
   notices: [],
   results: [],
   page: 1,
+  resultPage: 1,
+  resultCategory: "ALL",
   month: 7,
   year: 2026,
   examPage: 0,
@@ -41,7 +43,7 @@ const state = {
 
 /* =========================================================
    DATA
-   ========================================================= */
+========================================================= */
 
 const EXAMS = [
   "Selection Posts Examination",
@@ -112,7 +114,7 @@ const EXAM_RESOURCES = [
 
 /* =========================================================
    FALLBACK NOTICES
-   ========================================================= */
+========================================================= */
 
 const FALLBACK_NOTICES = [
   {
@@ -157,7 +159,7 @@ const FALLBACK_NOTICES = [
 
 /* =========================================================
    CALENDAR
-   ========================================================= */
+========================================================= */
 
 const CALENDAR = [
   [
@@ -195,8 +197,8 @@ const CALENDAR = [
 ];
 
 /* =========================================================
-   ACTUAL IMAGE FILE NAMES
-   ========================================================= */
+   PROMOS / INITIATIVES
+========================================================= */
 
 const PROMOS = [
   ["promo-1.jpg", "International Day of Yoga"],
@@ -205,31 +207,16 @@ const PROMOS = [
 ];
 
 const INITIATIVES = [
-  [
-    "initiative-azadi-ka-amrit-mahotsav.jpg",
-    "Azadi Ka Amrit Mahotsav"
-  ],
-  [
-    "initiative-india-gov.jpg",
-    "india.gov.in"
-  ],
-  [
-    "initiative-digital-india-make-in-india-azadi.jpg",
-    "Digital India / Make in India"
-  ],
-  [
-    "initiative-incredible-india.jpg",
-    "Incredible India"
-  ],
-  [
-    "initiative-data.jpg",
-    "data.gov.in"
-  ]
+  ["initiative-azadi-ka-amrit-mahotsav.jpg", "Azadi Ka Amrit Mahotsav"],
+  ["initiative-india-gov.jpg", "india.gov.in"],
+  ["initiative-digital-india-make-in-india-azadi.jpg", "Digital India / Make in India"],
+  ["initiative-incredible-india.jpg", "Incredible India"],
+  ["initiative-data.jpg", "data.gov.in"]
 ];
 
 /* =========================================================
    FAQ
-   ========================================================= */
+========================================================= */
 
 const FAQ = [
   [
@@ -256,7 +243,7 @@ const FAQ = [
 
 /* =========================================================
    LANGUAGE
-   ========================================================= */
+========================================================= */
 
 const I18N = {
   en: {
@@ -316,15 +303,13 @@ const tr = key =>
   key;
 
 const esc = value =>
-  String(value ?? "").replace(/[&<>"']/g, match => {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[match];
-  });
+  String(value ?? "").replace(/[&<>"']/g, match => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[match]));
 
 const slug = value =>
   String(value)
@@ -334,7 +319,7 @@ const slug = value =>
 
 /* =========================================================
    FILE URL
-   ========================================================= */
+========================================================= */
 
 const fileUrl = path => {
   if (!path) return "#";
@@ -353,7 +338,7 @@ const fileUrl = path => {
 
 /* =========================================================
    ICONS
-   ========================================================= */
+========================================================= */
 
 function icon(type) {
   const paths = {
@@ -388,7 +373,7 @@ function eyeIcon() {
 
 /* =========================================================
    DATE
-   ========================================================= */
+========================================================= */
 
 function dateParts(value) {
   const date = new Date(
@@ -397,19 +382,17 @@ function dateParts(value) {
 
   return {
     day: String(date.getDate()).padStart(2, "0"),
-    mon: date
-      .toLocaleString(
-        state.lang === "hi" ? "hi-IN" : "en-IN",
-        { month: "short" }
-      )
-      .toUpperCase(),
+    mon: date.toLocaleString(
+      state.lang === "hi" ? "hi-IN" : "en-IN",
+      { month: "short" }
+    ).toUpperCase(),
     year: date.getFullYear()
   };
 }
 
 /* =========================================================
    HEADER
-   ========================================================= */
+========================================================= */
 
 function nav(id, label, active) {
   return `
@@ -432,17 +415,13 @@ function menu(id, label, items, active) {
       </button>
 
       <div class="dropdown">
-        ${items
-          .map(
-            item => `
-            <button
-              class="dropitem"
-              data-route="${slug(item)}">
-              ${esc(item)}
-            </button>
-          `
-          )
-          .join("")}
+        ${items.map(item => `
+          <button
+            class="dropitem"
+            data-route="${slug(item)}">
+            ${esc(item)}
+          </button>
+        `).join("")}
       </div>
     </div>
   `;
@@ -503,33 +482,10 @@ function header(active = "home") {
         ${nav("home", tr("home"), active)}
         ${nav("chair", tr("chair"), active)}
 
-        ${menu(
-          "cand",
-          tr("cand"),
-          CANDIDATES,
-          active
-        )}
-
-        ${menu(
-          "tender",
-          tr("tender"),
-          TENDER,
-          active
-        )}
-
-        ${menu(
-          "rti",
-          tr("rti"),
-          RTI,
-          active
-        )}
-
-        ${menu(
-          "about",
-          tr("about"),
-          ABOUT,
-          active
-        )}
+        ${menu("cand", tr("cand"), CANDIDATES, active)}
+        ${menu("tender", tr("tender"), TENDER, active)}
+        ${menu("rti", tr("rti"), RTI, active)}
+        ${menu("about", tr("about"), ABOUT, active)}
 
       </div>
     </nav>
@@ -538,7 +494,7 @@ function header(active = "home") {
 
 /* =========================================================
    FOOTER
-   ========================================================= */
+========================================================= */
 
 function footer() {
   return `
@@ -548,11 +504,7 @@ function footer() {
 
         <div>
           <div class="footbrand">
-
-            <img
-              src="${A + ASSETS.brand}"
-              alt="SSC">
-
+            <img src="${A + ASSETS.brand}" alt="SSC">
             <span>
               Staff Selection<br>
               Commission
@@ -604,8 +556,8 @@ function footer() {
 }
 
 /* =========================================================
-   HOME PAGE
-   ========================================================= */
+   HOME
+========================================================= */
 
 function home() {
   return `
@@ -656,11 +608,7 @@ function home() {
 
           <div class="noticecard">
             <div id="noticeList"></div>
-
-            <div
-              id="pager"
-              class="pager">
-            </div>
+            <div id="pager" class="pager"></div>
           </div>
 
         </div>
@@ -716,14 +664,11 @@ function home() {
               <h2>${tr("calendar")}</h2>
 
               <div class="monthnav">
-
                 <button id="prevMonth">‹</button>
-
                 <b id="monthLabel"></b>
-
                 <button id="nextMonth">›</button>
-
               </div>
+
             </div>
 
             <div id="calendarList"></div>
@@ -761,17 +706,8 @@ function home() {
           </div>
 
           <div class="examarea">
-
-            <div
-              id="examGrid"
-              class="examgrid">
-            </div>
-
-            <div
-              id="examDots"
-              class="dots">
-            </div>
-
+            <div id="examGrid" class="examgrid"></div>
+            <div id="examDots" class="dots"></div>
           </div>
 
         </div>
@@ -780,15 +716,8 @@ function home() {
       <section class="section promoSection">
         <div class="wrap">
 
-          <div
-            id="promoGrid"
-            class="promogrid">
-          </div>
-
-          <div
-            id="promoDots"
-            class="dots dark">
-          </div>
+          <div id="promoGrid" class="promogrid"></div>
+          <div id="promoDots" class="dots dark"></div>
 
         </div>
       </section>
@@ -819,10 +748,7 @@ function home() {
 
             <h5>${tr("popular")}</h5>
 
-            <div
-              id="faqList"
-              class="faqlist">
-            </div>
+            <div id="faqList" class="faqlist"></div>
 
           </div>
 
@@ -858,7 +784,7 @@ function home() {
 
 /* =========================================================
    NOTICES
-   ========================================================= */
+========================================================= */
 
 function renderNotices() {
   const list =
@@ -889,9 +815,7 @@ function renderNotices() {
     .slice(start, start + pageSize)
     .map(notice => {
 
-      const date = dateParts(
-        notice.notice_date
-      );
+      const date = dateParts(notice.notice_date);
 
       return `
         <article class="noticeRow">
@@ -917,9 +841,7 @@ function renderNotices() {
               data-notice-action="pdf"
               data-notice="${esc(notice.id)}">
 
-              <span class="pdficon">
-                PDF
-              </span>
+              <span class="pdficon">PDF</span>
 
             </button>
 
@@ -941,15 +863,11 @@ function renderNotices() {
     })
     .join("");
 
-  const pager =
-    document.getElementById("pager");
+  const pager = document.getElementById("pager");
 
   if (!pager) return;
 
-  if (
-    list.length <= pageSize ||
-    total <= 1
-  ) {
+  if (list.length <= pageSize || total <= 1) {
     pager.innerHTML = "";
     pager.style.display = "none";
   } else {
@@ -958,124 +876,82 @@ function renderNotices() {
 
     const numbers = [
       ...new Set(
-        [
-          1,
-          page - 1,
-          page,
-          page + 1,
-          total
-        ].filter(
-          number =>
-            number >= 1 &&
-            number <= total
-        )
+        [1, page - 1, page, page + 1, total]
+          .filter(number =>
+            number >= 1 && number <= total
+          )
       )
     ];
 
     let html = `
-      <button
-        data-page="${Math.max(
-          1,
-          page - 1
-        )}">
-        ‹
-      </button>
+      <button data-page="${Math.max(1, page - 1)}">‹</button>
     `;
 
-    numbers.forEach(
-      (number, index) => {
+    numbers.forEach((number, index) => {
 
-        if (
-          index &&
-          number >
-            numbers[index - 1] + 1
-        ) {
-          html += "<span>…</span>";
-        }
-
-        html += `
-          <button
-            class="${
-              page === number
-                ? "active"
-                : ""
-            }"
-            data-page="${number}">
-            ${number}
-          </button>
-        `;
+      if (
+        index &&
+        number > numbers[index - 1] + 1
+      ) {
+        html += "<span>…</span>";
       }
-    );
+
+      html += `
+        <button
+          class="${page === number ? "active" : ""}"
+          data-page="${number}">
+          ${number}
+        </button>
+      `;
+    });
 
     html += `
-      <button
-        data-page="${Math.min(
-          total,
-          page + 1
-        )}">
-        ›
-      </button>
+      <button data-page="${Math.min(total, page + 1)}">›</button>
     `;
 
     pager.innerHTML = html;
   }
 
-  document
-    .querySelectorAll("[data-page]")
-    .forEach(button => {
+  document.querySelectorAll("[data-page]").forEach(button => {
+    button.onclick = () => {
+      state.page = Number(button.dataset.page);
+      renderNotices();
+    };
+  });
 
-      button.onclick = () => {
-        state.page =
-          Number(button.dataset.page);
+  document.querySelectorAll("[data-notice]").forEach(button => {
 
-        renderNotices();
-      };
-    });
+    button.onclick = () => {
 
-  document
-    .querySelectorAll("[data-notice]")
-    .forEach(button => {
+      const notice =
+        state.notices.find(
+          item => String(item.id) === String(button.dataset.notice)
+        ) ||
+        FALLBACK_NOTICES.find(
+          item => String(item.id) === String(button.dataset.notice)
+        );
 
-      button.onclick = () => {
-
-        const notice =
-          state.notices.find(
-            item =>
-              String(item.id) ===
-              String(button.dataset.notice)
-          ) ||
-          FALLBACK_NOTICES.find(
-            item =>
-              String(item.id) ===
-              String(button.dataset.notice)
-          );
-
-        if (
-          button.dataset.noticeAction ===
-            "pdf" &&
-          notice?.file_path
-        ) {
-          window.open(
-            fileUrl(notice.file_path),
-            "_blank",
-            "noopener"
-          );
-        } else {
-          openNotice(
-            button.dataset.notice
-          );
-        }
-      };
-    });
+      if (
+        button.dataset.noticeAction === "pdf" &&
+        notice?.file_path
+      ) {
+        window.open(
+          fileUrl(notice.file_path),
+          "_blank",
+          "noopener"
+        );
+      } else {
+        openNotice(button.dataset.notice);
+      }
+    };
+  });
 }
 
 async function loadNotices() {
   try {
 
     if (!db) {
-      state.notices =
-        FALLBACK_NOTICES;
-
+      state.notices = FALLBACK_NOTICES;
       renderNotices();
       return;
     }
@@ -1084,19 +960,11 @@ async function loadNotices() {
       await db
         .from("ssc_notices")
         .select("*")
-        .order(
-          "notice_date",
-          { ascending: false }
-        )
-        .order(
-          "created_at",
-          { ascending: false }
-        );
+        .order("notice_date", { ascending: false })
+        .order("created_at", { ascending: false });
 
     state.notices =
-      !error &&
-      data &&
-      data.length
+      !error && data && data.length
         ? data
         : FALLBACK_NOTICES;
 
@@ -1106,48 +974,381 @@ async function loadNotices() {
 
     console.error(error);
 
-    state.notices =
-      FALLBACK_NOTICES;
-
+    state.notices = FALLBACK_NOTICES;
     renderNotices();
   }
 }
 
 /* =========================================================
+   RESULTS
+========================================================= */
+
+async function loadResults(category = "ALL") {
+
+  if (!db) {
+    state.results = [];
+    renderResultsHome(category);
+    return;
+  }
+
+  try {
+
+    const { data, error } =
+      await db
+        .from("ssc_results")
+        .select("*")
+        .order("result_date", { ascending: false })
+        .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Result load error:", error);
+      state.results = [];
+    } else {
+      state.results = data || [];
+    }
+
+    state.resultCategory = category;
+    renderResultsHome(category);
+
+  } catch (error) {
+
+    console.error(error);
+    state.results = [];
+    renderResultsHome(category);
+  }
+}
+
+function filteredResults(category = "ALL") {
+  if (category === "ALL") {
+    return state.results;
+  }
+
+  return state.results.filter(
+    item =>
+      String(item.category || "").toUpperCase() ===
+      String(category).toUpperCase()
+  );
+}
+
+function resultRowsHtml(rows) {
+
+  if (!rows.length) {
+    return `
+      <p class="muted">
+        No uploaded result files in this category.
+      </p>
+    `;
+  }
+
+  return rows.map(item => {
+
+    const link =
+      item.file_path
+        ? fileUrl(item.file_path)
+        : "#";
+
+    return `
+      <div class="resultrow">
+
+        <span>
+
+          <b>
+            ${esc(item.title)}
+          </b>
+
+          <small>
+            ${esc(item.result_date || "")}
+            ·
+            ${esc(item.file_size || "")}
+            ·
+            ${esc(item.category || "")}
+          </small>
+
+        </span>
+
+        <span>
+
+          ${
+            item.file_path
+              ? `
+                <a
+                  class="result-link"
+                  href="${esc(link)}"
+                  target="_blank"
+                  rel="noopener">
+                  PDF
+                </a>
+              `
+              : "No file"
+          }
+
+        </span>
+
+      </div>
+    `;
+  }).join("");
+}
+
+function resultCategories() {
+  return [
+    "ALL",
+    "CHSL",
+    "JEN",
+    "CAPF",
+    "CTGD",
+    "CHT",
+    "OTHERS",
+    "DEPARTMENTAL EXAMS",
+    "DPHM",
+    "RHQ",
+    "DPCE",
+    "CGL",
+    "DPCD",
+    "DPHCT",
+    "CEDP",
+    "MTS",
+    "STENOGRAPHER"
+  ];
+}
+
+function resultModal() {
+
+  const categories = resultCategories();
+
+  modal(`
+    <div class="modal resultmodal">
+
+      <div class="modalhead">
+        <h3>Result</h3>
+        <button class="close">×</button>
+      </div>
+
+      <div class="tabs">
+
+        ${categories.map((category, index) => `
+          <button
+            class="tab ${index === 0 ? "active" : ""}"
+            data-resultcat="${esc(category)}">
+            ${esc(category)}
+          </button>
+        `).join("")}
+
+      </div>
+
+      <div
+        class="modalbody"
+        id="resultBody">
+
+        <p class="muted">
+          Loading results…
+        </p>
+
+      </div>
+
+      <div class="modalfoot">
+
+        <button
+          class="pill"
+          id="resultViewAll">
+          View All
+        </button>
+
+      </div>
+
+    </div>
+  `);
+
+  loadResults("ALL");
+
+  document
+    .querySelectorAll("[data-resultcat]")
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        document
+          .querySelectorAll("[data-resultcat]")
+          .forEach(item =>
+            item.classList.remove("active")
+          );
+
+        button.classList.add("active");
+
+        loadResults(
+          button.dataset.resultcat
+        );
+      };
+    });
+
+  document
+    .getElementById("resultViewAll")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        closeModal();
+
+        location.hash = "results";
+
+        route("results");
+      }
+    );
+}
+
+function renderResultsHome(category = "ALL") {
+
+  const body =
+    document.getElementById("resultBody");
+
+  if (!body) return;
+
+  const rows =
+    filteredResults(category);
+
+  body.innerHTML =
+    resultRowsHtml(rows);
+}
+
+/* =========================================================
+   RESULTS PAGE
+========================================================= */
+
+function resultsPage() {
+
+  const categories = resultCategories();
+
+  return `
+    ${header("")}
+
+    <main class="page">
+
+      <div class="wrap">
+
+        <div class="crumb">
+          ← Homepage &gt; Result
+        </div>
+
+        <h2>
+          Result
+        </h2>
+
+        <div class="servicecard">
+
+          <div class="tabs resultPageTabs">
+
+            ${categories.map((category, index) => `
+              <button
+                class="tab ${index === 0 ? "active" : ""}"
+                data-result-page-cat="${esc(category)}">
+                ${esc(category)}
+              </button>
+            `).join("")}
+
+          </div>
+
+          <div
+            id="resultsPageBody"
+            class="resultsPageBody">
+
+            <p class="muted">
+              Loading results…
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    ${footer()}
+  `;
+}
+
+function renderResultsPage(category = "ALL") {
+
+  const body =
+    document.getElementById(
+      "resultsPageBody"
+    );
+
+  if (!body) return;
+
+  const rows =
+    filteredResults(category);
+
+  body.innerHTML =
+    resultRowsHtml(rows);
+}
+
+async function openResultsPage() {
+
+  document.getElementById(
+    "app"
+  ).innerHTML = resultsPage();
+
+  bindCommon();
+
+  document
+    .querySelectorAll(
+      "[data-result-page-cat]"
+    )
+    .forEach(button => {
+
+      button.onclick = async () => {
+
+        document
+          .querySelectorAll(
+            "[data-result-page-cat]"
+          )
+          .forEach(item =>
+            item.classList.remove("active")
+          );
+
+        button.classList.add("active");
+
+        renderResultsPage(
+          button.dataset.resultPageCat
+        );
+      };
+    });
+
+  await loadResults("ALL");
+
+  renderResultsPage("ALL");
+}
+
+/* =========================================================
    CALENDAR
-   ========================================================= */
+========================================================= */
 
 function renderCalendar() {
+
   const month = state.month;
 
   const items =
     CALENDAR.filter(
       item =>
-        new Date(item[0])
-          .getMonth() === month
+        new Date(item[0]).getMonth() === month
     );
 
   const label =
-    document.getElementById(
-      "monthLabel"
-    );
+    document.getElementById("monthLabel");
 
   if (!label) return;
 
   label.textContent =
-    new Date(
-      state.year,
-      month,
-      1
-    ).toLocaleString(
-      state.lang === "hi"
-        ? "hi-IN"
-        : "en-IN",
-      {
-        month: "short",
-        year: "numeric"
-      }
-    );
+    new Date(state.year, month, 1)
+      .toLocaleString(
+        state.lang === "hi"
+          ? "hi-IN"
+          : "en-IN",
+        {
+          month: "short",
+          year: "numeric"
+        }
+      );
 
   const calendarList =
     document.getElementById(
@@ -1157,14 +1358,10 @@ function renderCalendar() {
   if (!calendarList) return;
 
   calendarList.innerHTML =
-    (items.length
-      ? items
-      : CALENDAR.slice(0, 4)
-    )
+    (items.length ? items : CALENDAR.slice(0, 4))
       .map(item => {
 
-        const date =
-          dateParts(item[0]);
+        const date = dateParts(item[0]);
 
         return `
           <div class="calrow">
@@ -1186,17 +1383,15 @@ function renderCalendar() {
 
 /* =========================================================
    EXAMS
-   ========================================================= */
+========================================================= */
 
 function renderExams() {
+
   const start =
     state.examPage * 6;
 
   const items =
-    EXAMS.slice(
-      start,
-      start + 6
-    );
+    EXAMS.slice(start, start + 6);
 
   const grid =
     document.getElementById(
@@ -1206,13 +1401,10 @@ function renderExams() {
   if (!grid) return;
 
   grid.innerHTML = items
-    .map(
-      exam => `
+    .map(exam => `
       <button
         class="examcard"
-        data-route="exam:${encodeURIComponent(
-          exam
-        )}">
+        data-route="exam:${encodeURIComponent(exam)}">
 
         <strong>
           ${esc(exam)}
@@ -1227,43 +1419,31 @@ function renderExams() {
         <b>→</b>
 
       </button>
-    `
-    )
+    `)
     .join("");
 
   const dots =
-    document.getElementById(
-      "examDots"
-    );
+    document.getElementById("examDots");
 
   if (!dots) return;
 
   dots.innerHTML = [0, 1]
-    .map(
-      page => `
+    .map(page => `
       <button
-        class="${
-          page === state.examPage
-            ? "on"
-            : ""
-        }"
+        class="${page === state.examPage ? "on" : ""}"
         data-exampage="${page}">
       </button>
-    `
-    )
+    `)
     .join("");
 
   document
-    .querySelectorAll(
-      "[data-exampage]"
-    )
+    .querySelectorAll("[data-exampage]")
     .forEach(button => {
 
       button.onclick = () => {
+
         state.examPage =
-          Number(
-            button.dataset.exampage
-          );
+          Number(button.dataset.exampage);
 
         renderExams();
       };
@@ -1272,33 +1452,29 @@ function renderExams() {
 
 /* =========================================================
    PROMOS
-   ========================================================= */
+========================================================= */
 
 function renderPromos() {
+
   const items =
     [0, 1, 2].map(
       index =>
         PROMOS[
           (state.promoPage + index) %
-            PROMOS.length
+          PROMOS.length
         ]
     );
 
   const grid =
-    document.getElementById(
-      "promoGrid"
-    );
+    document.getElementById("promoGrid");
 
   if (!grid) return;
 
-  grid.innerHTML = items
-    .map(
-      promo => `
+  grid.innerHTML =
+    items.map(promo => `
       <button
         class="promoCard"
-        data-promo="${esc(
-          promo[1]
-        )}">
+        data-promo="${esc(promo[1])}">
 
         <img
           src="${A + promo[0]}"
@@ -1310,47 +1486,29 @@ function renderPromos() {
         </span>
 
       </button>
-    `
-    )
-    .join("");
+    `).join("");
 
   const dots =
-    document.getElementById(
-      "promoDots"
-    );
+    document.getElementById("promoDots");
 
   if (!dots) return;
 
-  dots.innerHTML = [
-    0,
-    1,
-    2
-  ]
-    .map(
-      page => `
+  dots.innerHTML =
+    [0, 1, 2].map(page => `
       <button
-        class="${
-          page === state.promoPage
-            ? "on"
-            : ""
-        }"
+        class="${page === state.promoPage ? "on" : ""}"
         data-promopage="${page}">
       </button>
-    `
-    )
-    .join("");
+    `).join("");
 
   document
-    .querySelectorAll(
-      "[data-promopage]"
-    )
+    .querySelectorAll("[data-promopage]")
     .forEach(button => {
 
       button.onclick = () => {
+
         state.promoPage =
-          Number(
-            button.dataset.promopage
-          );
+          Number(button.dataset.promopage);
 
         renderPromos();
       };
@@ -1359,9 +1517,10 @@ function renderPromos() {
 
 /* =========================================================
    INITIATIVES
-   ========================================================= */
+========================================================= */
 
 function renderInitiatives() {
+
   const start =
     state.initiativePage;
 
@@ -1370,7 +1529,7 @@ function renderInitiatives() {
       index =>
         INITIATIVES[
           (start + index) %
-            INITIATIVES.length
+          INITIATIVES.length
         ]
     );
 
@@ -1381,9 +1540,8 @@ function renderInitiatives() {
 
   if (!grid) return;
 
-  grid.innerHTML = items
-    .map(
-      item => `
+  grid.innerHTML =
+    items.map(item => `
       <button class="initiativeCard">
 
         <img
@@ -1392,9 +1550,7 @@ function renderInitiatives() {
           onerror="this.style.display='none'">
 
       </button>
-    `
-    )
-    .join("");
+    `).join("");
 
   const dots =
     document.getElementById(
@@ -1403,21 +1559,17 @@ function renderInitiatives() {
 
   if (!dots) return;
 
-  dots.innerHTML = [0, 1]
-    .map(
-      page => `
+  dots.innerHTML =
+    [0, 1].map(page => `
       <button
         class="${
-          page ===
-          state.initiativePage % 2
+          page === state.initiativePage % 2
             ? "on"
             : ""
         }"
         data-initiativepage="${page}">
       </button>
-    `
-    )
-    .join("");
+    `).join("");
 
   document
     .querySelectorAll(
@@ -1426,10 +1578,10 @@ function renderInitiatives() {
     .forEach(button => {
 
       button.onclick = () => {
+
         state.initiativePage =
           Number(
-            button.dataset
-              .initiativepage
+            button.dataset.initiativepage
           );
 
         renderInitiatives();
@@ -1439,9 +1591,10 @@ function renderInitiatives() {
 
 /* =========================================================
    FAQ
-   ========================================================= */
+========================================================= */
 
 function renderFaq() {
+
   const faqList =
     document.getElementById(
       "faqList"
@@ -1452,24 +1605,22 @@ function renderFaq() {
   faqList.innerHTML =
     FAQ.map(
       (item, index) => `
-      <div class="faqitem">
+        <div class="faqitem">
 
-        <button data-faq="${index}">
+          <button data-faq="${index}">
+            <span>
+              ${esc(item[0])}
+            </span>
 
-          <span>
-            ${esc(item[0])}
-          </span>
+            <b>⊕</b>
+          </button>
 
-          <b>⊕</b>
+          <div class="faqanswer">
+            ${esc(item[1])}
+          </div>
 
-        </button>
-
-        <div class="faqanswer">
-          ${esc(item[1])}
         </div>
-
-      </div>
-    `
+      `
     ).join("");
 
   document
@@ -1477,18 +1628,21 @@ function renderFaq() {
     .forEach(button => {
 
       button.onclick = () => {
+
         button.parentElement
           .classList
           .toggle("open");
+
       };
     });
 }
 
 /* =========================================================
-   TOAST AND MODAL
-   ========================================================= */
+   TOAST / MODAL
+========================================================= */
 
 function toast(message) {
+
   const element =
     document.getElementById("toast");
 
@@ -1507,6 +1661,7 @@ function toast(message) {
 }
 
 function modal(html) {
+
   const root =
     document.getElementById(
       "modal-root"
@@ -1525,6 +1680,7 @@ function modal(html) {
     ?.addEventListener(
       "click",
       event => {
+
         if (
           event.target.classList.contains(
             "modalback"
@@ -1543,6 +1699,7 @@ function modal(html) {
 }
 
 function closeModal() {
+
   const root =
     document.getElementById(
       "modal-root"
@@ -1554,265 +1711,11 @@ function closeModal() {
 }
 
 /* =========================================================
-   RESULTS
-   ========================================================= */
-
-function resultModal() {
-  const categories = [
-    "ALL",
-    "CHSL",
-    "JEN",
-    "CAPF",
-    "CTGD",
-    "CHT",
-    "OTHERS",
-    "DEPARTMENTAL EXAMS",
-    "DPHM",
-    "RHQ",
-    "DPCE",
-    "CGL",
-    "DPCD",
-    "DPHCT",
-    "CEDP",
-    "MTS",
-    "STENOGRAPHER"
-  ];
-
-  modal(`
-    <div class="modal resultmodal">
-
-      <div class="modalhead">
-        <h3>Result</h3>
-        <button class="close">×</button>
-      </div>
-
-      <div class="tabs">
-        ${categories
-          .map(
-            (category, index) => `
-            <button
-              class="tab ${
-                index === 0
-                  ? "active"
-                  : ""
-              }"
-              data-resultcat="${category}">
-              ${category}
-            </button>
-          `
-          )
-          .join("")}
-      </div>
-
-      <div
-        class="modalbody"
-        id="resultBody">
-
-        <p class="muted">
-          Loading results…
-        </p>
-
-      </div>
-
-      <div class="modalfoot">
-        <button
-          class="pill"
-          id="resultViewAll">
-          View All
-        </button>
-      </div>
-
-    </div>
-  `);
-
-  loadResults("ALL");
-
-  document
-    .querySelectorAll(
-      "[data-resultcat]"
-    )
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        document
-          .querySelectorAll(
-            "[data-resultcat]"
-          )
-          .forEach(item =>
-            item.classList.remove(
-              "active"
-            )
-          );
-
-        button.classList.add(
-          "active"
-        );
-
-        loadResults(
-          button.dataset.resultcat
-        );
-      };
-    });
-
-  document
-    .getElementById("resultViewAll")
-    ?.addEventListener(
-      "click",
-      () => loadResults("ALL")
-    );
-}
-
-async function loadResults(category = "ALL") {
-  const body =
-    document.getElementById(
-      "resultBody"
-    );
-
-  if (!body) return;
-
-  if (!db) {
-    body.innerHTML = `
-      <p class="muted">
-        Connect Supabase to show
-        uploaded result files.
-      </p>
-    `;
-    return;
-  }
-
-  body.innerHTML = `
-    <p class="muted">
-      Loading results…
-    </p>
-  `;
-
-  try {
-
-    const { data, error } =
-      await db
-        .from("ssc_results")
-        .select("*")
-        .order(
-          "result_date",
-          { ascending: false }
-        )
-        .order(
-          "created_at",
-          { ascending: false }
-        );
-
-    if (error) {
-      console.error(error);
-
-      body.innerHTML = `
-        <p class="muted">
-          Unable to load results.
-          Check Supabase configuration.
-        </p>
-      `;
-
-      return;
-    }
-
-    state.results = data || [];
-
-    const rows =
-      category === "ALL"
-        ? state.results
-        : state.results.filter(
-            item =>
-              String(
-                item.category || ""
-              ).toUpperCase() ===
-              category
-          );
-
-    if (!rows.length) {
-      body.innerHTML = `
-        <p class="muted">
-          No uploaded result files
-          in this category.
-        </p>
-      `;
-      return;
-    }
-
-    body.innerHTML = rows
-      .map(item => {
-
-        const link =
-          item.file_path
-            ? fileUrl(
-                item.file_path
-              )
-            : "#";
-
-        return `
-          <div class="resultrow">
-
-            <span>
-
-              <b>
-                ${esc(item.title)}
-              </b>
-
-              <small>
-                ${esc(
-                  item.result_date || ""
-                )}
-                ·
-                ${esc(
-                  item.file_size || ""
-                )}
-                ·
-                ${esc(
-                  item.category || ""
-                )}
-              </small>
-
-            </span>
-
-            <span>
-
-              ${
-                item.file_path
-                  ? `
-                    <a
-                      class="result-link"
-                      href="${esc(link)}"
-                      target="_blank"
-                      rel="noopener">
-                      PDF
-                    </a>
-                  `
-                  : "No file"
-              }
-
-            </span>
-
-          </div>
-        `;
-      })
-      .join("");
-
-  } catch (error) {
-
-    console.error(error);
-
-    body.innerHTML = `
-      <p class="muted">
-        Unable to load results.
-      </p>
-    `;
-  }
-}
-
-/* =========================================================
    ADMIT CARD
-   ========================================================= */
+========================================================= */
 
 function admitModal() {
+
   const cards = [
     "Download E-Admit Card of Stenographer Grade C and D Examination, 2024",
     "Download E-Admit Card of Combined Hindi Translators Examination",
@@ -1829,22 +1732,20 @@ function admitModal() {
 
       <div class="modalbody">
 
-        ${cards
-          .map(
-            item => `
-            <div class="resultrow">
-              <span>${item}</span>
-            </div>
-          `
-          )
-          .join("")}
+        ${cards.map(item => `
+          <div class="resultrow">
+            <span>${esc(item)}</span>
+          </div>
+        `).join("")}
 
         <div class="center">
+
           <button
             class="pill"
             data-route="login">
             Login
           </button>
+
         </div>
 
       </div>
@@ -1857,9 +1758,10 @@ function admitModal() {
 
 /* =========================================================
    ANSWER KEY
-   ========================================================= */
+========================================================= */
 
 function answerModal() {
+
   const answers = [
     "Grade C Stenographers Limited Departmental Competitive Examination, 2025: Uploading of Tentative Answer Keys along with Candidates Response Sheets.",
     "Constable (Executive) Male and Female in Delhi Police Examination, 2025: Uploading of Final Answer Keys.",
@@ -1876,18 +1778,12 @@ function answerModal() {
 
       <div class="modalbody">
 
-        ${answers
-          .map(
-            item => `
-            <div class="resultrow">
-              <span>${item}</span>
-              <span>
-                PDF
-              </span>
-            </div>
-          `
-          )
-          .join("")}
+        ${answers.map(item => `
+          <div class="resultrow">
+            <span>${esc(item)}</span>
+            <span>PDF</span>
+          </div>
+        `).join("")}
 
         <div class="center">
           <button class="pill">
@@ -1902,13 +1798,11 @@ function answerModal() {
 }
 
 /* =========================================================
-   PAGES
-   ========================================================= */
+   GENERIC PAGES
+========================================================= */
 
-function genericPage(
-  title,
-  body
-) {
+function genericPage(title, body) {
+
   return `
     ${header("")}
 
@@ -1936,6 +1830,7 @@ function genericPage(
 }
 
 function applyPage() {
+
   return genericPage(
     "Apply Online",
     `
@@ -1951,20 +1846,16 @@ function applyPage() {
         </p>
 
         ${EXAMS.slice(0, 6)
-          .map(
-            exam => `
+          .map(exam => `
             <button
               class="serviceitem"
-              data-route="exam:${encodeURIComponent(
-                exam
-              )}">
+              data-route="exam:${encodeURIComponent(exam)}">
 
               ${esc(exam)}
               <b>→</b>
 
             </button>
-          `
-          )
+          `)
           .join("")}
 
       </div>
@@ -1973,6 +1864,7 @@ function applyPage() {
 }
 
 function loginPage() {
+
   return `
     ${header("login")}
 
@@ -1992,8 +1884,7 @@ function loginPage() {
               Candidate
             </button>
 
-            <button
-              data-route="admin-login">
+            <button data-route="admin-login">
               Admin
             </button>
 
@@ -2048,9 +1939,7 @@ function loginPage() {
           <button
             id="candidateLogin"
             class="loginfull">
-
             Login
-
           </button>
 
           <div class="loginlinks">
@@ -2071,6 +1960,7 @@ function loginPage() {
 }
 
 function chairmanPage() {
+
   return genericPage(
     "Chairman's Message",
     `
@@ -2113,6 +2003,7 @@ function chairmanPage() {
 }
 
 function tenderPage() {
+
   return genericPage(
     "SSC Tender",
     `
@@ -2126,29 +2017,29 @@ function tenderPage() {
         ${Array.from(
           { length: 9 },
           (_, index) => `
-          <div class="tenderrow">
+            <div class="tenderrow">
 
-            <span class="datebox">
-              <small>APR</small>
-              <b>${8 - (index % 7)}</b>
-              <small>2026</small>
-            </span>
+              <span class="datebox">
+                <small>APR</small>
+                <b>${8 - (index % 7)}</b>
+                <small>2026</small>
+              </span>
 
-            <span>
-              Opening of Financial Bids in respect
-              of RFP for Selection of Service Provider
-              for SSC Examinations and Candidate Services
-            </span>
+              <span>
+                Opening of Financial Bids in respect
+                of RFP for Selection of Service Provider
+                for SSC Examinations and Candidate Services
+              </span>
 
-            <span>
-              PDF ·
-              ${158 + index * 17}.89 KB
-            </span>
+              <span>
+                PDF ·
+                ${158 + index * 17}.89 KB
+              </span>
 
-            <span>↓</span>
+              <span>↓</span>
 
-          </div>
-        `
+            </div>
+          `
         ).join("")}
 
       </div>
@@ -2158,28 +2049,25 @@ function tenderPage() {
 
 /* =========================================================
    NOTICE MODAL
-   ========================================================= */
+========================================================= */
 
 function openNotice(id) {
+
   const notice =
     state.notices.find(
       item =>
-        String(item.id) ===
-        String(id)
+        String(item.id) === String(id)
     ) ||
     FALLBACK_NOTICES.find(
       item =>
-        String(item.id) ===
-        String(id)
+        String(item.id) === String(id)
     );
 
   if (!notice) return;
 
   const link =
     notice.file_path
-      ? fileUrl(
-          notice.file_path
-        )
+      ? fileUrl(notice.file_path)
       : "#";
 
   modal(`
@@ -2197,15 +2085,11 @@ function openNotice(id) {
         </h3>
 
         <p>
-          ${esc(
-            notice.notice_date || ""
-          )}
+          ${esc(notice.notice_date || "")}
         </p>
 
         <p>
-          ${esc(
-            notice.file_size || ""
-          )}
+          ${esc(notice.file_size || "")}
         </p>
 
         ${
@@ -2234,9 +2118,10 @@ function openNotice(id) {
 
 /* =========================================================
    EXAM MODAL
-   ========================================================= */
+========================================================= */
 
 function examModal(name) {
+
   modal(`
     <div class="modal exammodal">
 
@@ -2254,25 +2139,21 @@ function examModal(name) {
 
       <div class="tabs">
 
-        ${EXAM_RESOURCES
-          .map(
-            (item, index) => `
+        ${EXAM_RESOURCES.map(
+          (item, index) => `
             <button
               class="tab ${
                 index === 0
                   ? "active"
                   : ""
               }"
-              data-examtab="${slug(
-                item
-              )}">
+              data-examtab="${slug(item)}">
 
               ${esc(item)}
 
             </button>
           `
-          )
-          .join("")}
+        ).join("")}
 
       </div>
 
@@ -2294,26 +2175,18 @@ function examModal(name) {
   `);
 
   document
-    .querySelectorAll(
-      "[data-examtab]"
-    )
+    .querySelectorAll("[data-examtab]")
     .forEach(button => {
 
       button.onclick = () => {
 
         document
-          .querySelectorAll(
-            "[data-examtab]"
-          )
+          .querySelectorAll("[data-examtab]")
           .forEach(item =>
-            item.classList.remove(
-              "active"
-            )
+            item.classList.remove("active")
           );
 
-        button.classList.add(
-          "active"
-        );
+        button.classList.add("active");
 
         const body =
           document.getElementById(
@@ -2321,19 +2194,16 @@ function examModal(name) {
           );
 
         if (body) {
+
           body.innerHTML = `
             <h4>
-              ${esc(
-                button.textContent
-              )}
+              ${esc(button.textContent)}
             </h4>
 
             <p>
               ${esc(name)}
               —
-              ${esc(
-                button.textContent
-              )}
+              ${esc(button.textContent)}
               documents and links can be
               published by the administrator.
             </p>
@@ -2345,9 +2215,10 @@ function examModal(name) {
 
 /* =========================================================
    SEARCH
-   ========================================================= */
+========================================================= */
 
 function doSearch() {
+
   const input =
     document.getElementById(
       "searchInput"
@@ -2359,9 +2230,7 @@ function doSearch() {
       .toLowerCase();
 
   if (!query) {
-    toast(
-      "Enter a search term"
-    );
+    toast("Enter a search term");
     return;
   }
 
@@ -2373,12 +2242,15 @@ function doSearch() {
     ...RTI,
     ...state.notices.map(
       notice => notice.title
+    ),
+    ...state.results.map(
+      result => result.title
     )
   ];
 
   const hits =
     all.filter(item =>
-      item
+      String(item)
         .toLowerCase()
         .includes(query)
     );
@@ -2395,27 +2267,21 @@ function doSearch() {
 
         ${
           hits.length
-            ? hits
-                .map(
-                  item => `
-                  <button
-                    class="serviceitem"
-                    data-route="${slug(
-                      item
-                    )}">
+            ? hits.map(item => `
+                <button
+                  class="serviceitem"
+                  data-route="${slug(item)}">
 
-                    ${esc(item)}
-                    <b>→</b>
+                  ${esc(item)}
+                  <b>→</b>
 
-                  </button>
-                `
-                )
-                .join("")
+                </button>
+              `).join("")
             : `
-                <p>
-                  No matching results found.
-                </p>
-              `
+              <p>
+                No matching results found.
+              </p>
+            `
         }
 
       </div>
@@ -2428,21 +2294,15 @@ function doSearch() {
 
 /* =========================================================
    ROUTING
-   ========================================================= */
+========================================================= */
 
 function route(routeName) {
+
   if (!routeName) return;
 
   location.hash = routeName;
 
-  document
-    .querySelectorAll(
-      ".navmenu.open"
-    )
-    .forEach(item =>
-      item.classList.remove("open")
-    );
-
+  closeMenus();
   closeModal();
 
   if (routeName === "home") {
@@ -2454,6 +2314,7 @@ function route(routeName) {
     routeName === "login" ||
     routeName === "candidate-login"
   ) {
+
     document.getElementById(
       "app"
     ).innerHTML = loginPage();
@@ -2472,6 +2333,11 @@ function route(routeName) {
     return;
   }
 
+  if (routeName === "results") {
+    openResultsPage();
+    return;
+  }
+
   if (routeName === "admit-card") {
     admitModal();
     return;
@@ -2483,6 +2349,7 @@ function route(routeName) {
   }
 
   if (routeName === "apply-online") {
+
     document.getElementById(
       "app"
     ).innerHTML = applyPage();
@@ -2492,6 +2359,7 @@ function route(routeName) {
   }
 
   if (routeName === "chair") {
+
     document.getElementById(
       "app"
     ).innerHTML = chairmanPage();
@@ -2506,6 +2374,7 @@ function route(routeName) {
     routeName === "tender-archive" ||
     routeName === "corrigenda"
   ) {
+
     document.getElementById(
       "app"
     ).innerHTML = tenderPage();
@@ -2520,6 +2389,7 @@ function route(routeName) {
       <div class="modal">
 
         <div class="modalhead">
+
           <h3>
             Browse by Examinations
           </h3>
@@ -2527,25 +2397,20 @@ function route(routeName) {
           <button class="close">
             ×
           </button>
+
         </div>
 
         <div class="modalbody exammenu">
 
-          ${EXAMS
-            .map(
-              exam => `
-              <button
-                data-route="exam:${encodeURIComponent(
-                  exam
-                )}">
+          ${EXAMS.map(exam => `
+            <button
+              data-route="exam:${encodeURIComponent(exam)}">
 
-                ${esc(exam)}
-                <b>→</b>
+              ${esc(exam)}
+              <b>→</b>
 
-              </button>
-            `
-            )
-            .join("")}
+            </button>
+          `).join("")}
 
         </div>
 
@@ -2556,23 +2421,23 @@ function route(routeName) {
     return;
   }
 
-  if (
-    routeName.startsWith("exam:")
-  ) {
+  if (routeName.startsWith("exam:")) {
+
     examModal(
       decodeURIComponent(
         routeName.slice(5)
       )
     );
+
     return;
   }
 
-  if (
-    routeName.startsWith("notice:")
-  ) {
+  if (routeName.startsWith("notice:")) {
+
     openNotice(
       routeName.slice(7)
     );
+
     return;
   }
 
@@ -2605,8 +2470,7 @@ function route(routeName) {
           : FALLBACK_NOTICES;
 
       box.innerHTML = list
-        .map(
-          notice => `
+        .map(notice => `
           <div class="resultrow">
 
             <span>
@@ -2615,40 +2479,32 @@ function route(routeName) {
 
             <span>
 
-              <a
-                href="${
-                  notice.file_path
-                    ? esc(
-                        fileUrl(
-                          notice.file_path
-                        )
-                      )
-                    : "#"
-                }"
-                target="_blank">
-
-                PDF
-
-              </a>
+              ${
+                notice.file_path
+                  ? `
+                    <a
+                      href="${esc(fileUrl(notice.file_path))}"
+                      target="_blank"
+                      rel="noopener">
+                      PDF
+                    </a>
+                  `
+                  : "No file"
+              }
 
               <button
-                data-notice="${esc(
-                  notice.id
-                )}">
+                data-notice="${esc(notice.id)}">
                 ◉
               </button>
 
             </span>
 
           </div>
-        `
-        )
+        `)
         .join("");
 
       document
-        .querySelectorAll(
-          "[data-notice]"
-        )
+        .querySelectorAll("[data-notice]")
         .forEach(button => {
 
           button.onclick = () =>
@@ -2667,8 +2523,7 @@ function route(routeName) {
       "app"
     ).innerHTML = genericPage(
       "SSC Calendar",
-      CALENDAR.map(
-        item => `
+      CALENDAR.map(item => `
         <div class="resultrow">
 
           <b>
@@ -2680,8 +2535,7 @@ function route(routeName) {
           </span>
 
         </div>
-      `
-      ).join("")
+      `).join("")
     );
 
     bindCommon();
@@ -2694,8 +2548,7 @@ function route(routeName) {
       "app"
     ).innerHTML = genericPage(
       "Frequently Asked Questions",
-      FAQ.map(
-        item => `
+      FAQ.map(item => `
         <div class="faqfull">
 
           <b>
@@ -2707,8 +2560,7 @@ function route(routeName) {
           </p>
 
         </div>
-      `
-      ).join("")
+      `).join("")
     );
 
     bindCommon();
@@ -2727,20 +2579,16 @@ function route(routeName) {
       `
         <div class="servicecard">
 
-          ${RTI.map(
-            item => `
+          ${RTI.map(item => `
             <button
               class="serviceitem"
-              data-route="${slug(
-                item
-              )}">
+              data-route="${slug(item)}">
 
               ${esc(item)}
               <b>→</b>
 
             </button>
-          `
-          ).join("")}
+          `).join("")}
 
         </div>
       `
@@ -2752,9 +2600,7 @@ function route(routeName) {
 
   if (
     routeName === "about" ||
-    ABOUT.map(slug).includes(
-      routeName
-    )
+    ABOUT.map(slug).includes(routeName)
   ) {
 
     document.getElementById(
@@ -2764,20 +2610,16 @@ function route(routeName) {
       `
         <div class="servicecard">
 
-          ${ABOUT.map(
-            item => `
+          ${ABOUT.map(item => `
             <button
               class="serviceitem"
-              data-route="${slug(
-                item
-              )}">
+              data-route="${slug(item)}">
 
               ${esc(item)}
               <b>→</b>
 
             </button>
-          `
-          ).join("")}
+          `).join("")}
 
         </div>
       `
@@ -2790,10 +2632,7 @@ function route(routeName) {
   document.getElementById(
     "app"
   ).innerHTML = genericPage(
-    routeName.replace(
-      /-/g,
-      " "
-    ),
+    routeName.replace(/-/g, " "),
     `
       <div class="servicecard">
 
@@ -2812,9 +2651,10 @@ function route(routeName) {
 
 /* =========================================================
    COMMON EVENTS
-   ========================================================= */
+========================================================= */
 
 function bindModalRoutes() {
+
   document
     .querySelectorAll(
       "#modal-root [data-route]"
@@ -2831,9 +2671,7 @@ function bindModalRoutes() {
 function bindCommon() {
 
   document
-    .querySelectorAll(
-      "[data-route]"
-    )
+    .querySelectorAll("[data-route]")
     .forEach(button => {
 
       button.onclick = () =>
@@ -2843,9 +2681,7 @@ function bindCommon() {
     });
 
   document
-    .querySelectorAll(
-      "[data-menu]"
-    )
+    .querySelectorAll("[data-menu]")
     .forEach(button => {
 
       button.onclick = event => {
@@ -2856,31 +2692,21 @@ function bindCommon() {
           button.parentElement;
 
         document
-          .querySelectorAll(
-            ".navmenu.open"
-          )
+          .querySelectorAll(".navmenu.open")
           .forEach(item => {
 
             if (item !== parent) {
-              item.classList.remove(
-                "open"
-              );
+              item.classList.remove("open");
             }
           });
 
-        parent.classList.toggle(
-          "open"
-        );
+        parent.classList.toggle("open");
       };
     });
 
   document.onclick = event => {
 
-    if (
-      !event.target.closest(
-        ".navmenu"
-      )
-    ) {
+    if (!event.target.closest(".navmenu")) {
       closeMenus();
     }
   };
@@ -2918,9 +2744,7 @@ function bindCommon() {
       "keydown",
       event => {
 
-        if (
-          event.key === "Enter"
-        ) {
+        if (event.key === "Enter") {
           doSearch();
         }
       }
@@ -2933,8 +2757,7 @@ function bindCommon() {
       () => {
 
         state.month =
-          (state.month + 11) %
-          12;
+          (state.month + 11) % 12;
 
         renderCalendar();
       }
@@ -2947,17 +2770,14 @@ function bindCommon() {
       () => {
 
         state.month =
-          (state.month + 1) %
-          12;
+          (state.month + 1) % 12;
 
         renderCalendar();
       }
     );
 
   document
-    .getElementById(
-      "candidateLogin"
-    )
+    .getElementById("candidateLogin")
     ?.addEventListener(
       "click",
       () => {
@@ -2970,20 +2790,17 @@ function bindCommon() {
 }
 
 function closeMenus() {
+
   document
-    .querySelectorAll(
-      ".navmenu.open"
-    )
+    .querySelectorAll(".navmenu.open")
     .forEach(item =>
-      item.classList.remove(
-        "open"
-      )
+      item.classList.remove("open")
     );
 }
 
 /* =========================================================
-   RENDER HOME
-   ========================================================= */
+   HOME RENDER
+========================================================= */
 
 function renderHome() {
 
@@ -3020,19 +2837,17 @@ function renderHome() {
         PROMOS.length;
 
       state.initiativePage =
-        (state.initiativePage + 1) %
-        2;
+        (state.initiativePage + 1) % 2;
 
       renderPromos();
-
       renderInitiatives();
 
     }, 5000);
 }
 
 /* =========================================================
-   HASH CHANGE
-   ========================================================= */
+   HASH
+========================================================= */
 
 window.addEventListener(
   "hashchange",
@@ -3042,18 +2857,12 @@ window.addEventListener(
       location.hash.slice(1) ||
       "home";
 
-    if (
-      routeName === "home"
-    ) {
-      renderHome();
-    } else {
-      route(routeName);
-    }
+    route(routeName);
   }
 );
 
 /* =========================================================
    START
-   ========================================================= */
+========================================================= */
 
 renderHome();
