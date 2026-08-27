@@ -1,0 +1,2 @@
+-- RLS/storage policies are already installed in the connected Supabase project.
+-- No destructive policy changes are included in this release package.

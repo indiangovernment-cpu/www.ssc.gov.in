@@ -1,0 +1,2 @@
+-- Candidate portal schema is already installed in the connected Supabase project.
+-- This file is intentionally non-destructive and contains no DDL.

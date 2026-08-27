@@ -7,7 +7,6 @@ const A = 'assets/';
 const state = {
   lang: localStorage.getItem('sscLang') || 'en',
   notices: [],
-  results: [],
   page: 1,
   month: 7,
   year: 2026,
@@ -100,11 +99,7 @@ const I18N = {
 const tr = k => (I18N[state.lang] && I18N[state.lang][k]) || I18N.en[k] || k;
 const esc = v => String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const slug = x => String(x).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const fileUrl = path => {
-  if (!path) return '#';
-  if (/^https?:\/\//i.test(path)) return path;
-  return db ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl : '#';
-};
+const fileUrl = path => db ? db.storage.from('ssc-files').getPublicUrl(path).data.publicUrl : '#';
 function icon(type){
  const paths={
   apply:'<path d="M5 19l4.2-1 9.1-9.1a2 2 0 0 0-2.8-2.8L6.4 15.2 5 19Z"/><path d="m14.5 7.5 2 2"/>',
@@ -125,7 +120,7 @@ function header(active='home'){
  return `<div class="topline"><div class="wrap topflex"><span>${tr('feedback')}</span><span>${tr('skip')} | <button id="langToggle" class="plain">${state.lang==='en'?'हिन्दी':'English'}</button> | A- | A | A+</span></div></div>
  <header class="sitehead"><div class="wrap headrow">
    <button class="brandbtn" data-route="home"><img src="${A}brand-reference.jpg" alt="Staff Selection Commission"></button>
-   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}government-emblem.png" alt="Government of India"></div>
+   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}emblem-demo.svg" alt="Demo emblem"></div>
  </div></header>
  <nav class="mainnav"><div class="wrap navrow">
    ${nav('home',tr('home'),active)}${nav('chair',tr('chair'),active)}
@@ -190,12 +185,10 @@ function renderNotices(){
  });
 }
 async function loadNotices(){
- try {
  if(!db){state.notices=FALLBACK_NOTICES;renderNotices();return}
  const {data,error}=await db.from('ssc_notices').select('*').order('notice_date',{ascending:false}).order('created_at',{ascending:false});
  state.notices=(!error && data && data.length)?data:FALLBACK_NOTICES;
  renderNotices();
- } catch(e) { state.notices=FALLBACK_NOTICES; renderNotices(); }
 }
 
 function renderCalendar(){
@@ -235,27 +228,30 @@ function modal(html){document.getElementById('modal-root').innerHTML=`<div class
 function closeModal(){document.getElementById('modal-root').innerHTML=''}
 function resultModal(){
  const cats=['ALL','CHSL','JEN','CAPF','CTGD','CHT','OTHERS','DEPARTMENTAL EXAMS','DPHM','RHQ','DPCE','CGL','DPCD','DPHCT','CEDP','MTS','STENOGRAPHER'];
- modal(`<div class="modal resultmodal"><div class="modalhead"><h3>Result</h3><button class="close">×</button></div><div class="tabs">${cats.map((x,i)=>`<button class="tab ${i===0?'active':''}" data-resultcat="${x}">${x}</button>`).join('')}</div><div class="modalbody" id="resultBody"><p class="muted">Loading results…</p></div><div class="modalfoot"><button class="pill" id="resultViewAll">View All</button></div></div>`);
- loadResults('ALL');
- document.querySelectorAll('[data-resultcat]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-resultcat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');loadResults(b.dataset.resultcat)});
- document.getElementById('resultViewAll')?.addEventListener('click',()=>loadResults('ALL'));
+ modal(`<div class="modal resultmodal"><div class="modalhead"><h3>🟢 Result</h3><button class="close">×</button></div><div class="tabs">${cats.map((x,i)=>`<button class="tab ${i===0?'active':''}" data-resultcat="${x}">${x}</button>`).join('')}</div><div class="modalbody" id="resultBody"></div><div class="modalfoot"><button class="pill">View All</button></div></div>`);
+ renderResult('ALL');
+ document.querySelectorAll('[data-resultcat]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-resultcat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderResult(b.dataset.resultcat)});
 }
-async function loadResults(cat='ALL'){
- const body=document.getElementById('resultBody'); if(!body)return;
- if(!db){
-   body.innerHTML='<p class="muted">Connect Supabase to show uploaded result files.</p>'; return;
- }
+async function renderResult(cat){
+ const body=document.getElementById('resultBody');
+ if(!body)return;
  body.innerHTML='<p class="muted">Loading results…</p>';
- const {data,error}=await db.from('ssc_results').select('*').order('result_date',{ascending:false}).order('created_at',{ascending:false});
- if(error){body.innerHTML=`<p class="muted">Unable to load results. Run the updated supabase_setup.sql once.</p>`;return;}
- state.results=data||[];
- const rows=cat==='ALL'?state.results:state.results.filter(x=>String(x.category||'').toUpperCase()===cat);
- if(!rows.length){body.innerHTML='<p class="muted">No uploaded result files in this category.</p>';return;}
- body.innerHTML=rows.map(x=>{
-   const link=x.file_path?fileUrl(x.file_path):'#';
-   return `<div class="resultrow"><span><b>${esc(x.title)}</b><small>${esc(x.result_date||'')} · ${esc(x.file_size||'')} · ${esc(x.category||'')}</small></span><span>${x.file_path?`<a class="result-link" href="${esc(link)}" target="_blank" rel="noopener">PDF</a>`:'No file'}</span></div>`;
+ if(!db){body.innerHTML='<p class="muted">Result service is not configured.</p>';return;}
+ let q=db.from('ssc_public_results').select('*').order('result_date',{ascending:false}).order('created_at',{ascending:false});
+ if(cat!=='ALL')q=q.eq('category',cat);
+ const {data,error}=await q;
+ if(error){body.innerHTML='<p class="muted">Unable to load results right now.</p>';return;}
+ const rows=data||[];
+ if(!rows.length){body.innerHTML='<p class="muted">No published results are available in this category.</p>';return;}
+ body.innerHTML=rows.map(r=>{
+   const href=r.file_path?fileUrl(r.file_path):'#';
+   const date=r.result_date?esc(r.result_date):'';
+   const size=esc(r.file_size||'');
+   const pdf=r.file_path?`<a class="pdf" href="${esc(href)}" target="_blank" rel="noopener">PDF</a>`:'';
+   return `<div class="resultrow"><span>${esc(r.title)}</span><span>${date?date+' · ':''}${size} ${pdf}</span></div>`;
  }).join('');
 }
+
 function admitModal(){
  modal(`<div class="modal small"><div class="modalhead"><h3>▣ Admit Card</h3><button class="close">×</button></div><div class="modalbody">${['Download E-Admit Card of Stenographer Grade C and D Examination, 2024','Download E-Admit Card of Combined Hindi Translators Examination','Download E-Admit Card of Combined Higher Secondary Level Examination'].map(x=>`<div class="resultrow"><span>${x}</span></div>`).join('')}<div class="center"><button class="pill" data-route="login">Login</button></div></div></div>`);
  bindModalRoutes();
