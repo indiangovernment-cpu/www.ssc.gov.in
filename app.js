@@ -125,7 +125,7 @@ function header(active='home'){
  return `<div class="topline"><div class="wrap topflex"><span>${tr('feedback')}</span><span>${tr('skip')} | <button id="langToggle" class="plain">${state.lang==='en'?'हिन्दी':'English'}</button> | A- | A | A+</span></div></div>
  <header class="sitehead"><div class="wrap headrow">
    <button class="brandbtn" data-route="home"><img src="${A}brand-reference.jpg" alt="Staff Selection Commission"></button>
-   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}government-emblem.png" alt="Government of India" onerror="const a=['${A}ashok-stambh.png','${A}ashok-stambh.jpg','${A}ashoka-stambh.png','${A}ashoka-stambh.jpg','${A}emblem.png','${A}emblem.jpg'];this.onerror=()=>{const n=a.shift();if(n)this.src=n};const n=a.shift();if(n)this.src=n;"></div>
+   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}government-emblem.png" alt="Government of India"></div>
  </div></header>
  <nav class="mainnav"><div class="wrap navrow">
    ${nav('home',tr('home'),active)}${nav('chair',tr('chair'),active)}
@@ -309,7 +309,7 @@ function answerModal(){
 }
 function applyPage(){return genericPage('Apply Online',`<div class="servicecard"><h3>Apply Online</h3><p>Select an examination to continue your application.</p>${EXAMS.slice(0,6).map(x=>`<button class="serviceitem" data-route="exam:${encodeURIComponent(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`)}
 function loginPage(){
- return `${header('login')}<main class="page loginPage"><div class="wrap"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><div class="passrow"><input id="loginPass" type="password" placeholder="Password"><button>◉</button></div><a class="forgot">Forgot Password</a><div class="captcha"><b>69vXs</b><button>↻ Refresh</button></div><label>Captcha <i>*</i></label><input placeholder="Captcha"><button id="candidateLogin" class="loginfull">Login</button><div class="loginlinks">New User? <a href="candidate.html#register">Register Now</a></div></div></div></main>${footer()}`;
+ return `${header('login')}<main class="page loginPage"><div class="wrap"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><div class="passrow"><input id="loginPass" type="password" placeholder="Password"><button>◉</button></div><a class="forgot">Forgot Password</a><div class="captcha"><b>69vXs</b><button>↻ Refresh</button></div><label>Captcha <i>*</i></label><input placeholder="Captcha"><button id="candidateLogin" class="loginfull">Login</button><div class="loginlinks">New User? <a>Register Now</a></div></div></div></main>${footer()}`;
 }
 function chairmanPage(){return genericPage("Chairman's Message",`<div class="chaircard"><div class="chairhero"><img src="${A}chairman.jpg" alt="Chairman"><div><h3>Chairman's Message</h3><p>Staff Selection Commission has evolved as one of the trusted recruiting agencies in India. The Commission uses technology and transparent processes to conduct fair recruitment.</p><p>For the full message and downloadable documents, use the links provided by the administrator.</p></div></div></div>`)}
 function tenderPage(){return genericPage('SSC Tender',`<p>Welcome to the SSC Tenders page, your gateway to tender announcements.</p><div class="servicecard">${Array.from({length:9},(_,i)=>`<div class="tenderrow"><span class="datebox"><small>APR</small><b>${8-i%7}</b><small>2026</small></span><span>Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for SSC Examinations and Candidate Services</span><span>PDF · ${(158+i*17)}.89 KB</span><span>↓ ◉</span></div>`).join('')}</div>`)}
@@ -370,7 +370,7 @@ function bindCommon(){
  document.getElementById('searchInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
  document.getElementById('prevMonth')?.addEventListener('click',()=>{state.month=(state.month+11)%12;renderCalendar()});
  document.getElementById('nextMonth')?.addEventListener('click',()=>{state.month=(state.month+1)%12;renderCalendar()});
- document.getElementById('candidateLogin')?.addEventListener('click',()=>{ location.href='candidate.html'; });
+ document.getElementById('candidateLogin')?.addEventListener('click',()=>toast('Candidate login form is ready; connect your candidate authentication service to validate credentials.'));
 }
 function closeMenus(){document.querySelectorAll('.navmenu.open').forEach(x=>x.classList.remove('open'))}
 
