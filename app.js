@@ -309,7 +309,7 @@ function answerModal(){
 }
 function applyPage(){return genericPage('Apply Online',`<div class="servicecard"><h3>Apply Online</h3><p>Select an examination to continue your application.</p>${EXAMS.slice(0,6).map(x=>`<button class="serviceitem" data-route="exam:${encodeURIComponent(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`)}
 function loginPage(){
- return `${header('login')}<main class="page loginPage"><div class="wrap"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><div class="passrow"><input id="loginPass" type="password" placeholder="Password"><button>◉</button></div><a class="forgot">Forgot Password</a><div class="captcha"><b>69vXs</b><button>↻ Refresh</button></div><label>Captcha <i>*</i></label><input placeholder="Captcha"><button id="candidateLogin" class="loginfull">Login</button><div class="loginlinks">New User? <a>Register Now</a></div></div></div></main>${footer()}`;
+ return `${header('login')}<main class="page loginPage"><div class="wrap"><h2>Login to your Account</h2><div class="loginbox"><div class="logintabs"><button class="active">Candidate</button><button data-route="admin-login">Admin</button></div><label>Username (Registration Number) <i>*</i></label><input id="loginUser" placeholder="Registration Number"><label>Password (SSC Registration Password) <i>*</i></label><div class="passrow"><input id="loginPass" type="password" placeholder="Password"><button id="loginPassToggle" type="button">◉</button></div><a id="forgotLink" class="forgot" href="#">Forgot Password</a><div class="captcha"><b>69vXs</b><button id="captchaRefresh" type="button">↻ Refresh</button></div><label>Captcha <i>*</i></label><input id="loginCaptcha" placeholder="Captcha"><button id="candidateLogin" class="loginfull" type="button">Login</button><div class="loginlinks">New User? <a id="registerNow" href="candidate.html?mode=signup">Register Now</a></div></div></div></main>${footer()}`;
 }
 function chairmanPage(){return genericPage("Chairman's Message",`<div class="chaircard"><div class="chairhero"><img src="${A}chairman.jpg" alt="Chairman"><div><h3>Chairman's Message</h3><p>Staff Selection Commission has evolved as one of the trusted recruiting agencies in India. The Commission uses technology and transparent processes to conduct fair recruitment.</p><p>For the full message and downloadable documents, use the links provided by the administrator.</p></div></div></div>`)}
 function tenderPage(){return genericPage('SSC Tender',`<p>Welcome to the SSC Tenders page, your gateway to tender announcements.</p><div class="servicecard">${Array.from({length:9},(_,i)=>`<div class="tenderrow"><span class="datebox"><small>APR</small><b>${8-i%7}</b><small>2026</small></span><span>Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for SSC Examinations and Candidate Services</span><span>PDF · ${(158+i*17)}.89 KB</span><span>↓ ◉</span></div>`).join('')}</div>`)}
@@ -370,7 +370,21 @@ function bindCommon(){
  document.getElementById('searchInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
  document.getElementById('prevMonth')?.addEventListener('click',()=>{state.month=(state.month+11)%12;renderCalendar()});
  document.getElementById('nextMonth')?.addEventListener('click',()=>{state.month=(state.month+1)%12;renderCalendar()});
- document.getElementById('candidateLogin')?.addEventListener('click',()=>toast('Candidate login form is ready; connect your candidate authentication service to validate credentials.'));
+ document.getElementById('candidateLogin')?.addEventListener('click',()=>{
+   const user=document.getElementById('loginUser')?.value.trim()||'';
+   const pass=document.getElementById('loginPass')?.value||'';
+   if(!user||!pass){toast('Enter your Registration Number and Password.');return}
+   location.href='candidate.html?mode=login';
+ });
+ document.getElementById('registerNow')?.addEventListener('click',e=>{
+   e.preventDefault();
+   location.href='candidate.html?mode=signup';
+ });
+ document.getElementById('loginPassToggle')?.addEventListener('click',()=>{
+   const input=document.getElementById('loginPass');if(!input)return;
+   input.type=input.type==='password'?'text':'password';
+ });
+ document.getElementById('forgotLink')?.addEventListener('click',e=>{e.preventDefault();location.href='candidate.html?mode=login&reset=1'});
 }
 function closeMenus(){document.querySelectorAll('.navmenu.open').forEach(x=>x.classList.remove('open'))}
 
