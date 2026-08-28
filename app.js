@@ -125,7 +125,7 @@ function header(active='home'){
  return `<div class="topline"><div class="wrap topflex"><span>${tr('feedback')}</span><span>${tr('skip')} | <button id="langToggle" class="plain">${state.lang==='en'?'हिन्दी':'English'}</button> | A- | A | A+</span></div></div>
  <header class="sitehead"><div class="wrap headrow">
    <button class="brandbtn" data-route="home"><img src="${A}brand-reference.jpg" alt="Staff Selection Commission"></button>
-   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}government-emblem.png" alt="Government of India"></div>
+   <div class="headtools"><div class="searchbox"><input id="searchInput" placeholder="${tr('search')}"><button id="searchBtn">⌕</button></div><button class="loginBtn" data-route="login">${tr('login')}</button><img class="emblem" src="${A}government-emblem.png" alt="Government of India" onerror="const a=['${A}ashok-stambh.png','${A}ashok-stambh.jpg','${A}ashoka-stambh.png','${A}ashoka-stambh.jpg','${A}emblem.png','${A}emblem.jpg'];this.onerror=()=>{const n=a.shift();if(n)this.src=n};const n=a.shift();if(n)this.src=n;"></div>
  </div></header>
  <nav class="mainnav"><div class="wrap navrow">
    ${nav('home',tr('home'),active)}${nav('chair',tr('chair'),active)}
