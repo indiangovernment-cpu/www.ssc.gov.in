@@ -14,5 +14,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js?v=20260827-results-fix"></script>
+<script>
+(function(){
+  const map={'brand-reference.jpg':'brand.jpg','government-emblem.png':'emblem-header.jpg','hero-reference.jpg':'hero.jpg'};
+  function fix(){document.querySelectorAll('img[src]').forEach(function(img){const n=(img.getAttribute('src')||'').split('/').pop();if(map[n])img.setAttribute('src','assets/'+map[n]);});}
+  fix(); new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src']});
+})();
+</script>
 </body>
 </html>
