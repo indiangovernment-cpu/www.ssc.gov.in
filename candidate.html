@@ -9,9 +9,9 @@
 <main class="wrap page">
 <section id="authCard" class="auth card">
 <div class="brand">SSC Candidate Portal</div><p class="muted">Login to view your profile, applications, results, documents and messages.</p>
-<div class="tabs"><button type="button" class="tab active" data-auth="login">Login</button><button type="button" class="tab" data-auth="signup">New User Registration</button></div>
+<div class="tabs"><button type="button" class="tab active" data-auth="login">Login</button></div>
 <form id="loginForm"><label>Registration No. or Email<input id="loginIdentifier" type="text" autocomplete="username" required placeholder="Registration No. or Email"></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="primary full" type="submit">Login</button><button id="forgotBtn" class="linkbtn" type="button">Forgot Password?</button></form>
-<form id="signupForm" hidden><label>Full Name<input id="signupName" required></label><label>Email<input id="signupEmail" type="email" autocomplete="email" required></label><label>Mobile Number<input id="signupPhone" inputmode="tel"></label><label>Create Password<input id="signupPassword" type="password" minlength="6" required></label><button class="primary full" type="submit">Create Candidate Account</button></form>
+<p class="muted" style="margin-top:12px">New candidate accounts and Registration No./Roll No. are created and assigned by Admin. Candidates can change their password after login.</p>
 <p id="authMsg" class="msg"></p></section>
 <section id="portal" hidden>
 <header class="portalHead card"><div><span class="eyebrow">CANDIDATE DASHBOARD</span><h1 id="welcome">Welcome</h1><p id="regLine" class="muted"></p></div><button type="button" id="logout" class="outline">Logout</button></header>
