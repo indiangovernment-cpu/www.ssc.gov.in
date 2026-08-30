@@ -105,16 +105,15 @@
       doc.setLineWidth(0.6); doc.rect(M,M,W-2*M,H-2*M);
       doc.setLineWidth(0.25); doc.rect(M+2,M+2,W-2*M-4,H-2*M-4);
 
-      // Header modeled on the supplied reference: commission name, regional office, emblem and certificate title.
-      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text('STAFF SELECTION COMMISSION',105,18,{align:'center'});
-      doc.setFontSize(7); doc.text('Government of India',105,23,{align:'center'});
+      // Header follows the supplied reference's structure while using the site's existing emblem asset.
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text('STAFF SELECTION COMMISSION',105,17,{align:'center'});
+      doc.setFontSize(7); doc.text('Government of India',105,22,{align:'center'});
       doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.text('Staff Selection Commission — Admission Certificate',105,27,{align:'center'});
       doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text('e-ADMISSION CERTIFICATE',105,35,{align:'center'});
       doc.setFontSize(8); doc.text(`${$('agExamCategory').value} — ${exam}`,105,40,{align:'center',maxWidth:175});
       doc.setLineWidth(0.4); line(doc,15,44,195);
 
-      // Emblem from the site's existing asset. If unavailable, the document remains valid without it.
-      try { const er = await fetch('assets/emblem-header.jpg'); if (er.ok) { const eb = await er.blob(); const ed = await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(eb)}); doc.addImage(ed,'JPEG',95,12,20,14); } } catch (_) {}
+      try { const er = await fetch('assets/emblem-header.jpg'); if (er.ok) { const eb = await er.blob(); const ed = await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(eb)}); doc.addImage(ed,'JPEG',16,13,20,14); } } catch (_) {}
 
       const photo = await imageData(await getPhotoUrl(candidate));
       if (photo) doc.addImage(photo,'JPEG',165,48,28,34);
