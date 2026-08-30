@@ -40,8 +40,13 @@
         <div class="row"><input id="cmAdmitFile" type="file" accept="application/pdf"><button id="cmAdmitUpload" type="button">Upload & Publish</button></div>
         <p id="cmAdmitMsg"></p><div id="cmAdmitList"></div>
       </div>`;
-    const sessionPanel = Array.from(manager.children).find(x => x.querySelector && x.querySelector('#logout'));
-    manager.insertBefore(panel, sessionPanel || null);
+
+    // Keep Candidate Management near the top of the manager, immediately before
+    // the public Result publisher, instead of leaving it at the very bottom.
+    const resultHeading = Array.from(manager.querySelectorAll('h2')).find(h => h.textContent.trim() === 'Publish Result');
+    const resultPanel = resultHeading ? resultHeading.closest('.panel') : null;
+    manager.insertBefore(panel, resultPanel || manager.firstElementChild || null);
+
     $('cmCreate').onclick = createCandidate;
     $('cmSearchBtn').onclick = search;
     $('cmSearch').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
