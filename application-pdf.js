@@ -59,7 +59,48 @@
   }
   window.sscGenerateApplicationPdf=makeApplicationPdf;
   async function latestApplication(){const ctx=await getContext();if(!ctx)return null;const r=await ctx.db.from('ssc_applications').select('*').eq('candidate_id',ctx.user.id).order('created_at',{ascending:false}).limit(1);return r.data?.[0]||null;}
-  function hook(){const form=document.getElementById('applicationForm');if(!form||form.dataset.pdfHooked)return;form.dataset.pdfHooked='1';form.addEventListener('submit',()=>setTimeout(async()=>{try{const app=await latestApplication();if(app)await makeApplicationPdf(app);}catch(e){console.error('Application PDF',e);}},1200));}
-  window.addEventListener('DOMContentLoaded',()=>setTimeout(hook,1000));
-  const timer=setInterval(()=>{if((capturedDb||window.__sscPdfDb)&&document.getElementById('applicationForm')){hook();clearInterval(timer);}},500);
+
+  async function makeStatusPdf(app) {
+    if(!window.jspdf?.jsPDF) throw new Error('PDF library is not loaded.');
+    const ctx=await getContext(); if(!ctx) throw new Error('Please login again.');
+    const {db,user,candidate}=ctx;
+    const docs=(await db.from('ssc_candidate_documents').select('document_type,verified').eq('candidate_id',user.id)).data||[];
+    const pays=(await db.from('ssc_payments').select('*').eq('candidate_id',user.id).order('created_at',{ascending:false})).data||[];
+    const apps=(await db.from('ssc_applications').select('id,status').eq('candidate_id',user.id)).data||[];
+    const photo=docs.some(x=>String(x.document_type||'').toUpperCase()==='PHOTO');
+    const sign=docs.some(x=>String(x.document_type||'').toUpperCase()==='SIGNATURE');
+    const submitted=String(app?.status||'').toLowerCase()==='submitted';
+    const regStatus=candidate.registration_no?'Completed (Contents not Verified)':'Pending (Registration No. not assigned)';
+    const applicationStatus=submitted?'Success':(app?.status||'Pending');
+    const photoStatus=photo&&sign?'Photo and Signature uploaded':photo?'Photo uploaded':sign?'Signature uploaded':'Photo and Signature not uploaded';
+    const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+    doc.setFont('helvetica','normal');doc.setTextColor(25,25,25);doc.setFontSize(23);doc.text('Application Status',12,18);
+    doc.setFillColor(250,247,241);doc.rect(0,28,210,34,'F');doc.setTextColor(143,70,75);doc.setFontSize(22);doc.text('Content Verification Status',12,50);
+    doc.setTextColor(35,35,35);doc.setFont('helvetica','bold');doc.setFontSize(10);
+    doc.text('Name',12,83);doc.text('Registration',105,83);doc.text('Number Of Attempts',12,113);
+    doc.setFont('helvetica','normal');doc.setFontSize(13);doc.text(candidate.full_name||'—',12,96);doc.text(candidate.registration_no||'—',105,96);doc.text(String(apps.filter(x=>String(x.status||'').toLowerCase()==='submitted').length||0),12,126);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('Registration',12,157);doc.text('Application',72,157);doc.text('Photo &',135,157);doc.text('Status',12,164);doc.text('Status',72,164);doc.text('Signature',135,164);doc.text('Upload',135,171);
+    doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(doc.splitTextToSize(regStatus,48),12,178);doc.text(applicationStatus,72,178);doc.text(doc.splitTextToSize(photoStatus,55),135,178);
+    doc.setFillColor(250,247,241);doc.rect(0,213,210,13,'F');doc.setTextColor(143,70,75);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Payment Details',12,222);
+    doc.setTextColor(35,35,35);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('Challan No.',12,237);doc.text('Amount',75,237);doc.text('Status',115,237);doc.text('Transaction Ref.',150,237);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    if(pays.length){let y=244;for(const p of pays.slice(0,5)){doc.text(String(p.challan_no||'—'),12,y);doc.text(`₹${p.amount??0}`,75,y);doc.text(String(p.status||'Pending'),115,y);doc.text(String(p.transaction_ref||'—'),150,y);y+=9;}}
+    else doc.text('No payment/challan record available.',12,246);
+    doc.setFontSize(7);doc.text('This is a system-generated application status document.',12,286);doc.text('SSC Candidate Portal',198,286,{align:'right'});
+    doc.save(`SSC_Application_Status_${safe(candidate.registration_no||app?.application_no||app?.id||user.id)}.pdf`);
+  }
+  window.sscGenerateStatusPdf=makeStatusPdf;
+  function injectStatusButtons(){
+    document.querySelectorAll('#applicationList [data-application-pdf]').forEach(b=>{
+      const id=b.getAttribute('data-application-pdf');
+      if(b.parentElement?.querySelector(`[data-status-pdf="${id}"]`)) return;
+      const x=document.createElement('button');x.type='button';x.className='outline';x.dataset.statusPdf=id;x.textContent='Download Application Status PDF';
+      x.addEventListener('click',async()=>{try{const ctx=await getContext();const r=await ctx.db.from('ssc_applications').select('*').eq('id',id).maybeSingle();if(r.data)await makeStatusPdf(r.data);}catch(e){console.error('Status PDF',e);}});
+      b.parentElement.appendChild(x);
+    });
+  }
+  function hook(){const form=document.getElementById('applicationForm');if(!form||form.dataset.pdfHooked)return;form.dataset.pdfHooked='1';form.addEventListener('submit',()=>setTimeout(async()=>{try{const app=await latestApplication();if(app){await makeApplicationPdf(app);await makeStatusPdf(app);}}catch(e){console.error('Application PDF',e);}},1200));}
+  window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{hook();injectStatusButtons();},1000));
+  const timer=setInterval(()=>{if((capturedDb||window.__sscPdfDb)&&document.getElementById('applicationForm')){hook();injectStatusButtons();}},500);
+  const buttonTimer=setInterval(()=>{if(document.getElementById('applicationList'))injectStatusButtons();},1000);
 })();
