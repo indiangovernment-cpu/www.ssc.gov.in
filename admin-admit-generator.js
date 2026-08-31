@@ -16,7 +16,7 @@
     panel.id = 'directAdmitGenerator';
     panel.innerHTML = `
       <h2>Direct Admit Card Generator</h2>
-      <p>Generate a candidate-specific PDF in an SSC-style admission-certificate layout. The PDF is saved to the candidate record and can be downloaded immediately.</p>
+      <p>Generate a candidate-specific PDF in an admission-certificate layout. The PDF is saved to the candidate record and can be downloaded immediately.</p>
       <div class="row">
         <select id="agExamCategory">${categories.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('')}</select>
         <input id="agExamName" placeholder="Exam Name (e.g. Combined Graduate Level Examination)">
@@ -30,9 +30,6 @@
       </div>
       <div class="row">
         <input id="agVenue" placeholder="Examination Venue / Centre">
-        <input id="agSubject" placeholder="Subject / Paper">
-        <input id="agQuestions" type="number" placeholder="No. of Questions">
-        <input id="agMaxMarks" type="number" placeholder="Maximum Marks">
       </div>
       <div class="row">
         <input id="agDuration" placeholder="Total Duration (e.g. 60 Minutes)">
@@ -105,7 +102,6 @@
       doc.setLineWidth(0.6); doc.rect(M,M,W-2*M,H-2*M);
       doc.setLineWidth(0.25); doc.rect(M+2,M+2,W-2*M-4,H-2*M-4);
 
-      // Header follows the supplied reference's structure while using the site's existing emblem asset.
       doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text('STAFF SELECTION COMMISSION',105,17,{align:'center'});
       doc.setFontSize(7); doc.text('Government of India',105,22,{align:'center'});
       doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.text('Staff Selection Commission — Admission Certificate',105,27,{align:'center'});
@@ -120,7 +116,7 @@
       doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text('CANDIDATE DETAILS',15,51);
       field(doc,'Applicant Name',candidate.full_name,15,58,65);
       field(doc,'Registration No.',candidate.registration_no,82,58,70);
-      field(doc,'Roll No.',15,72,65);
+      field(doc,'Roll No.',candidate.roll_no,15,72,65);
       field(doc,'Category',candidate.category,82,72,70);
       field(doc,'Date of Birth',candidate.dob,15,86,65);
       field(doc,'Father / Mother',`${candidate.father_name || ''} / ${candidate.mother_name || ''}`,82,86,70);
@@ -139,20 +135,13 @@
       field(doc,'Entry Closing Time',$('agClosing').value,15,165,55);
       field(doc,'Examination Venue',$('agVenue').value,75,165,120);
       field(doc,'Centre City',$('agCity').value,15,179,55);
-      field(doc,'Subject / Paper',$('agSubject').value,75,179,55);
-      field(doc,'Duration',$('agDuration').value,135,179,55);
+      field(doc,'Duration',$('agDuration').value,75,179,55);
 
-      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text('PAPER / MARKS DETAILS',15,193);
-      doc.setLineWidth(0.25); doc.rect(15,197,180,18);
-      doc.setFontSize(7); doc.text('Subject / Paper',18,203); doc.text('No. of Questions',92,203); doc.text('Maximum Marks',145,203);
-      line(doc,15,207,195); doc.setFont('helvetica','normal'); doc.setFontSize(8);
-      doc.text($('agSubject').value || '—',18,212); doc.text($('agQuestions').value || '—',99,212); doc.text($('agMaxMarks').value || '—',151,212);
-
-      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text('SPECIAL INSTRUCTIONS FOR THE CANDIDATE',15,225);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text('SPECIAL INSTRUCTIONS FOR THE CANDIDATE',15,193);
       const instructions = $('agInstructions').value.trim() || 'Carry a valid original photo identity document. Follow the examination centre instructions and arrive before the reporting time.';
       doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
-      const wrapped = doc.splitTextToSize(instructions,175); doc.text(wrapped,18,232,{maxWidth:175});
-      let y = Math.min(272,232 + wrapped.length*4.2 + 5);
+      const wrapped = doc.splitTextToSize(instructions,175); doc.text(wrapped,18,200,{maxWidth:175});
+      let y = Math.min(272,200 + wrapped.length*4.2 + 5);
       const defaults = ['Bring this Admission Certificate to the examination centre.','Do not carry prohibited electronic devices or material.','Candidate details must match the submitted application and identity document.'];
       defaults.forEach((t,i)=>{ if(y < 276){ doc.text(`${i+1}. ${t}`,18,y); y += 5; }});
       doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.text('This is a computer-generated admission certificate.',105,285,{align:'center'});
