@@ -2,33 +2,79 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SSC Candidate Portal</title><link rel="stylesheet" href="candidate.css">
+<title>SSC Candidate Dashboard</title><link rel="stylesheet" href="candidate.css">
 </head>
 <body>
-<div class="top"><div class="wrap topin"><b>STAFF SELECTION COMMISSION</b><a href="index.html">Main Website</a></div></div>
-<main class="wrap page">
+<header class="siteHeader">
+  <div class="tinyBar"><div class="shell"><span>Feedback</span><span>SSC Candidate Portal</span></div></div>
+  <div class="brandBar"><div class="shell brandIn"><div class="sscBrand"><span class="seal">✺</span><div><small>Government of India</small><strong>Staff Selection Commission</strong></div></div><div class="brandRight"><span class="profileIcon">●</span><span class="ashoka">♙</span></div></div></div>
+</header>
+<main class="shell page">
 <section id="authCard" class="auth card">
-<div class="brand">SSC Candidate Portal</div><p class="muted">Login to view your profile, applications, results, documents and messages.</p>
-<div class="tabs"><button type="button" class="tab active" data-auth="login">Login</button></div>
-<form id="loginForm"><label>Registration No. or Email<input id="loginIdentifier" type="text" autocomplete="username" required placeholder="Registration No. or Email"></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="primary full" type="submit">Login</button><button id="forgotBtn" class="linkbtn" type="button">Forgot Password?</button></form>
-<p class="muted" style="margin-top:12px">New candidate accounts and Registration No./Roll No. are created and assigned by Admin. Candidates can change their password after login.</p>
-<p id="authMsg" class="msg"></p></section>
+  <div class="brand">Candidate Login</div><p class="muted">Login to access your Candidate Dashboard.</p>
+  <div class="tabs"><button type="button" class="tab active" data-auth="login">Candidate</button></div>
+  <form id="loginForm">
+    <label>Registration No. or Email<input id="loginIdentifier" type="text" autocomplete="username" required placeholder="Registration No. or Email"></label>
+    <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Password"></label>
+    <button class="primary full" type="submit">Login</button><button id="forgotBtn" class="linkbtn" type="button">Forgot Password?</button>
+  </form>
+  <p class="muted" style="margin-top:12px">Registration No. and Roll No. are assigned by Admin. Candidates can change their password after login.</p>
+  <p id="authMsg" class="msg"></p>
+</section>
+
 <section id="portal" hidden>
-<header class="portalHead card"><div><span class="eyebrow">CANDIDATE DASHBOARD</span><h1 id="welcome">Welcome</h1><p id="regLine" class="muted"></p></div><button type="button" id="logout" class="outline">Logout</button></header>
-<div class="dashboard"><aside class="side card">
-<button type="button" class="sidebtn active" data-section="profile">My Profile</button><button type="button" class="sidebtn" data-section="education">Educational Details</button><button type="button" class="sidebtn" data-section="applications">My Applications</button><button type="button" class="sidebtn" data-section="documents">Documents</button><button type="button" class="sidebtn" data-section="payments">Challan / Payment</button><button type="button" class="sidebtn" data-section="admit">Admit Card</button><button type="button" class="sidebtn" data-section="answer">Answer Key</button><button type="button" class="sidebtn" data-section="results">Results & Selection</button><button type="button" class="sidebtn" data-section="messages">Messages</button></aside>
-<section class="content">
-<div id="profile" class="view"><div class="sectionTitle"><div><h2>My Profile</h2><p class="muted">Keep your personal details updated.</p></div><span id="profileStatus" class="badge"></span></div>
-<div class="card item"><b>Registration No.: </b><span id="assignedReg">Not assigned</span><br><b>Roll No.: </b><span id="assignedRoll">Not assigned</span><p class="muted">Registration No. and Roll No. are assigned and managed by Admin.</p><button id="changePassword" type="button" class="outline">Change Password</button></div>
-<form id="profileForm" class="card formgrid"><label>Full Name<input id="pName" required></label><label>Email<input id="pEmail" type="email" readonly></label><label>Mobile<input id="pPhone"></label><label>Date of Birth<input id="pDob" type="date"></label><label>Father's Name<input id="pFather"></label><label>Mother's Name<input id="pMother"></label><label>Category<select id="pCategory"><option>GEN</option><option>OBC</option><option>SC</option><option>ST</option><option>EWS</option><option>OTHER</option></select></label><label class="wide">Address<textarea id="pAddress"></textarea></label><label>City<input id="pCity"></label><label>State<input id="pState"></label><label>PIN Code<input id="pPincode" inputmode="numeric"></label><div class="wide actions"><button class="primary" type="submit">Save Personal Details</button></div></form></div>
-<div id="education" class="view" hidden><div class="sectionTitle"><div><h2>Educational Details</h2><p class="muted">Enter your educational qualifications.</p></div></div><form id="educationForm" class="card formgrid"><label>10th Board<input id="edu10Board"></label><label>10th Passing Year<input id="edu10Year"></label><label>10th Marks / %<input id="edu10Marks"></label><label>12th Board<input id="edu12Board"></label><label>12th Passing Year<input id="edu12Year"></label><label>12th Marks / %<input id="edu12Marks"></label><label>Graduation University<input id="eduGradUni"></label><label>Graduation Year<input id="eduGradYear"></label><label>Graduation Marks / %<input id="eduGradMarks"></label><label class="wide">Other Qualification<input id="eduOther"></label><div class="wide actions"><button class="primary" type="submit">Save Educational Details</button></div></form></div>
-<div id="applications" class="view" hidden><div class="sectionTitle"><div><h2>My Applications</h2><p class="muted">Fill and submit your application details. A clear A4 PDF is generated after saving.</p></div><button id="newApplication" class="primary" type="button">+ New Application</button></div><div id="applicationList" class="stack"></div><form id="applicationForm" class="card formgrid" hidden><input id="aId" type="hidden"><label>Exam Name<input id="aExam" required></label><label>Post Name<input id="aPost"></label><label class="wide">Exam Centre / City<select id="aCentre" required><option value="">Select Exam City</option><option>Ahmedabad</option><option>Allahabad / Prayagraj</option><option>Agra</option><option>Ajmer</option><option>Amritsar</option><option>Aurangabad</option><option>Bengaluru</option><option>Bhopal</option><option>Bhubaneswar</option><option>Chandigarh</option><option>Chennai</option><option>Coimbatore</option><option>Dehradun</option><option>Delhi</option><option>Guwahati</option><option>Hyderabad</option><option>Indore</option><option>Jaipur</option><option>Jammu</option><option>Jodhpur</option><option>Kanpur</option><option>Kochi</option><option>Kolkata</option><option>Lucknow</option><option>Mumbai</option><option>Nagpur</option><option>Patna</option><option>Pune</option><option>Ranchi</option><option>Surat</option><option>Thiruvananthapuram</option><option>Varanasi</option><option>Vijayawada</option><option>Visakhapatnam</option></select></label><div class="wide actions"><button class="primary" type="submit">Save Application & Generate PDF</button><button id="cancelApplication" class="outline" type="button">Cancel</button></div></form></div>
-<div id="documents" class="view" hidden><div class="sectionTitle"><div><h2>Documents</h2><p class="muted">Upload your photo, signature and required supporting documents.</p></div></div><form id="docForm" class="card uploadbox"><label>Document Type<select id="docType"><option>PHOTO</option><option>SIGNATURE</option><option>10TH CERTIFICATE</option><option>12TH CERTIFICATE</option><option>DEGREE CERTIFICATE</option><option>CASTE CERTIFICATE</option><option>CENTRAL CASTE CERTIFICATE</option><option>DOMICILE CERTIFICATE</option><option>AADHAAR CARD</option><option>PAN CARD</option><option>PASSPORT</option><option>OTHER</option></select></label><label>Title<input id="docTitle"></label><label>File<input id="docFile" type="file" required></label><button class="primary" type="submit">Upload Document</button><p id="docMsg" class="msg"></p></form><div id="documentList" class="stack"></div></div>
-<div id="payments" class="view" hidden><div class="sectionTitle"><div><h2>Challan / Payment</h2><p class="muted">View challan and payment status published by Admin.</p></div></div><div id="paymentList" class="stack"></div></div>
-<div id="admit" class="view" hidden><div class="sectionTitle"><div><h2>Admit Card</h2><p class="muted">Admit card will appear here only after Admin publishes it.</p></div></div><div id="admitList" class="stack"></div></div>
-<div id="answer" class="view" hidden><div class="sectionTitle"><div><h2>Answer Key</h2><p class="muted">Published answer keys for your application.</p></div></div><div id="answerList" class="stack"></div></div>
-<div id="results" class="view" hidden><div class="sectionTitle"><div><h2>Results & Selection</h2><p class="muted">Only results published by Admin are shown here.</p></div></div><div id="resultList" class="stack"></div></div>
-<div id="messages" class="view" hidden><div class="sectionTitle"><div><h2>Messages</h2><p class="muted">Important information sent to your candidate account.</p></div></div><div id="messageList" class="stack"></div></div>
-</section></div></section></main><div id="toast" class="toast"></div>
+  <div class="securityNote"><b>Note:</b> For your account's safety, keep your login credentials confidential and update your password periodically.</div>
+  <div class="crumb"><span>←</span><span>Homepage</span><b>›</b><span>Candidate Dashboard</span></div>
+  <div class="feedbackRow"><span>Click Here to share Feedback</span><button id="changePassword" type="button" class="outline small">✎ Edit / Change Password</button></div>
+
+  <section class="candidateProfile card">
+    <div class="avatarCol"><div class="avatar" id="avatarInitial">C</div><div class="avatarName" id="dashName">Candidate</div><div class="avatarMeta" id="dashReg">Reg. No.: Not assigned</div><div class="avatarMeta" id="dashRoll">Roll No.: Not assigned</div></div>
+    <div class="profileGrid">
+      <div><span id="welcome">Candidate</span><small>Candidate Name</small></div>
+      <div><span id="dashFather">—</span><small>Father's Name</small></div>
+      <div><span id="dashMother">—</span><small>Mother's Name</small></div>
+      <div><span id="dashPhone">—</span><small>Mobile Number</small></div>
+      <div><span id="dashEmail">—</span><small>Email ID</small></div>
+      <div class="addressCell"><span id="dashAddress">—</span><small>Address</small></div>
+    </div>
+  </section>
+
+  <section class="quickCards">
+    <button type="button" class="quickCard" data-section="admit"><span class="quickIcon blue">▣</span><span><strong>Admission Certificate</strong><small>Admit Card</small></span><b>›</b><em id="admitNotice">View status</em></button>
+    <button type="button" class="quickCard" data-section="results"><span class="quickIcon green">▥</span><span><strong>Result</strong><small>Result & Selection</small></span><b>›</b><em id="resultNotice">Check result</em></button>
+  </section>
+
+  <div class="portalTabs">
+    <button type="button" class="portalTab active" data-section="live">Live Examinations</button>
+    <button type="button" class="portalTab" data-section="applications">My Applications</button>
+    <button type="button" class="portalTab" data-section="history">Applications History</button>
+    <button type="button" class="portalTab" data-section="documents">Documents</button>
+    <button type="button" class="portalTab" data-section="payments">Challan / Payment</button>
+    <button type="button" class="portalTab" data-section="answer">Answer Key</button>
+    <button type="button" class="portalTab" data-section="profile">Profile</button>
+    <button type="button" class="portalTab" data-section="education">Education</button>
+    <span class="sortLabel">↕ Sort</span><span class="viewIcon">▦</span>
+  </div>
+
+  <section class="content">
+    <div id="live" class="view homeView"><div class="emptyCard card"><h2>Live Examinations</h2><p class="muted">Live examinations and instructions published by Admin will appear here.</p></div></div>
+    <div id="history" class="view" hidden><div class="sectionTitle"><div><h2>Applications History</h2><p class="muted">Your submitted applications.</p></div></div><div id="historyList" class="stack"></div></div>
+
+    <div id="profile" class="view" hidden><div class="sectionTitle"><div><h2>My Profile</h2><p class="muted">Personal details.</p></div><span id="profileStatus" class="badge"></span></div><form id="profileForm" class="card formgrid"><label>Full Name<input id="pName" required></label><label>Email<input id="pEmail" type="email" readonly></label><label>Mobile<input id="pPhone"></label><label>Date of Birth<input id="pDob" type="date"></label><label>Father's Name<input id="pFather"></label><label>Mother's Name<input id="pMother"></label><label>Category<select id="pCategory"><option>GEN</option><option>OBC</option><option>SC</option><option>ST</option><option>EWS</option><option>OTHER</option></select></label><label class="wide">Address<textarea id="pAddress"></textarea></label><label>City<input id="pCity"></label><label>State<input id="pState"></label><label>PIN Code<input id="pPincode" inputmode="numeric"></label><div class="wide actions"><button class="primary" type="submit">Save Personal Details</button></div></form></div>
+
+    <div id="education" class="view" hidden><div class="sectionTitle"><div><h2>Educational Details</h2><p class="muted">Your educational qualifications.</p></div></div><form id="educationForm" class="card formgrid"><label>10th Board<input id="edu10Board"></label><label>10th Passing Year<input id="edu10Year"></label><label>10th Marks / %<input id="edu10Marks"></label><label>12th Board<input id="edu12Board"></label><label>12th Passing Year<input id="edu12Year"></label><label>12th Marks / %<input id="edu12Marks"></label><label>Graduation University<input id="eduGradUni"></label><label>Graduation Year<input id="eduGradYear"></label><label>Graduation Marks / %<input id="eduGradMarks"></label><label class="wide">Other Qualification<input id="eduOther"></label><div class="wide actions"><button class="primary" type="submit">Save Educational Details</button></div></form></div>
+
+    <div id="applications" class="view" hidden><div class="sectionTitle"><div><h2>My Applications</h2><p class="muted">Submitted applications and generated A4 application PDFs.</p></div><button id="newApplication" class="primary" type="button">+ New Application</button></div><div id="applicationList" class="stack"></div><form id="applicationForm" class="card formgrid" hidden><input id="aId" type="hidden"><label>Exam Name<input id="aExam" required></label><label>Post Name<input id="aPost"></label><label class="wide">Exam Centre / City<select id="aCentre" required><option value="">Select Exam City</option><option>Ahmedabad</option><option>Agra</option><option>Ajmer</option><option>Amritsar</option><option>Aurangabad</option><option>Bengaluru</option><option>Bhopal</option><option>Bhubaneswar</option><option>Chandigarh</option><option>Chennai</option><option>Coimbatore</option><option>Dehradun</option><option>Delhi</option><option>Guwahati</option><option>Hyderabad</option><option>Indore</option><option>Jaipur</option><option>Jammu</option><option>Jodhpur</option><option>Kanpur</option><option>Kochi</option><option>Kolkata</option><option>Lucknow</option><option>Mumbai</option><option>Nagpur</option><option>Patna</option><option>Pune</option><option>Ranchi</option><option>Surat</option><option>Thiruvananthapuram</option><option>Varanasi</option><option>Vijayawada</option><option>Visakhapatnam</option></select></label><div class="wide actions"><button class="primary" type="submit">Save Application & Generate PDF</button><button id="cancelApplication" class="outline" type="button">Cancel</button></div></form></div>
+
+    <div id="documents" class="view" hidden><div class="sectionTitle"><div><h2>Documents</h2><p class="muted">Photo, signature and supporting documents.</p></div></div><form id="docForm" class="card uploadbox"><label>Document Type<select id="docType"><option>PHOTO</option><option>SIGNATURE</option><option>10TH CERTIFICATE</option><option>12TH CERTIFICATE</option><option>DEGREE CERTIFICATE</option><option>CASTE CERTIFICATE</option><option>CENTRAL CASTE CERTIFICATE</option><option>DOMICILE CERTIFICATE</option><option>AADHAAR CARD</option><option>PAN CARD</option><option>PASSPORT</option><option>OTHER</option></select></label><label>Title<input id="docTitle"></label><label>File<input id="docFile" type="file" required></label><button class="primary" type="submit">Upload Document</button><p id="docMsg" class="msg"></p></form><div id="documentList" class="stack"></div></div>
+    <div id="payments" class="view" hidden><div class="sectionTitle"><div><h2>Challan / Payment</h2><p class="muted">Payment status published by Admin.</p></div></div><div id="paymentList" class="stack"></div></div>
+    <div id="admit" class="view" hidden><div class="sectionTitle"><div><h2>Admission Certificate</h2><p class="muted">Your Admit Card appears here after Admin publishes it.</p></div></div><div id="admitList" class="stack"></div></div>
+    <div id="answer" class="view" hidden><div class="sectionTitle"><div><h2>Answer Key</h2><p class="muted">Published answer keys for your application.</p></div></div><div id="answerList" class="stack"></div></div>
+    <div id="results" class="view" hidden><div class="sectionTitle"><div><h2>Result & Selection</h2><p class="muted">Only results published by Admin are shown here.</p></div></div><div id="resultList" class="stack"></div></div>
+  </section>
+</section>
+</main>
+<footer class="footer"><div class="shell footerGrid"><div><div class="footerBrand"><span class="seal">✺</span><b>Staff Selection<br>Commission</b></div><p>Public Disclosure of Scores and Other<br>Details of Non-Recommended Willing<br>Candidates</p></div><div><h4>Useful links</h4><span>Archives</span><span>Disclaimer</span><span>Sitemap</span><span>Help</span><span>Website Policies</span><span>Web Information Manager</span></div><div><h4>Contact Us</h4><span>⌖ Block No-12, CGO<br>Complex, Lodhi Road<br>New Delhi</span></div></div><div class="shell footerBottom"><span>© 2024 SSC. All Rights Reserved</span><span>Candidate Portal</span><span>Last updated on Sep 02, 2026</span></div></footer>
+<div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script><script src="application-pdf.js"></script><script src="candidate.js"></script><script src="application-download.js"></script><script src="candidate-official-letters.js"></script><script src="private-rti.js"></script>
 </body></html>
