@@ -3,17 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admit Card - Sample Development</title>
-<link rel="stylesheet" href="admit-card.css?v=20260906f">
+<title>Sample Admission Certificate - Development</title>
+<link rel="stylesheet" href="admit-card.css?v=20260906g">
 </head>
 <body>
 <div class="no-print backbar"><button onclick="history.back()">← Back</button></div>
-<div class="card" id="card">
-  <div class="head">
+<main class="paper" id="card">
+  <div class="sideMark left"></div><div class="sideMark right"></div>
+  <div class="sampleTop">SAMPLE / DEVELOPMENT VERSION • NOT AN OFFICIAL GOVERNMENT DOCUMENT</div>
+  <header class="head">
+    <div class="headTop">SAMPLE CANDIDATE PORTAL</div>
     <h1>STAFF SELECTION COMMISSION</h1>
     <h2>ADMISSION CERTIFICATE / ADMIT CARD</h2>
     <p>Sample Development Version</p>
-  </div>
+  </header>
   <div class="title">EXAMINATION DETAILS</div>
   <div class="grid">
     <div class="details">
@@ -31,47 +34,12 @@
     </div>
     <div class="photo"><img id="photo" alt="Candidate Photo"><span id="photoText">CANDIDATE<br>PHOTO</span></div>
   </div>
-  <div class="section">
-    <h3>SUBJECTS / MARKS</h3>
-    <table class="tbl"><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody id="marks"></tbody></table>
-  </div>
-  <div class="section instructions">
-    <h3>IMPORTANT INSTRUCTIONS</h3>
-    <div class="notice"><ol>
-      <li>Carry this admission certificate and a valid photo identity document to the examination centre.</li>
-      <li>Reach the examination centre before the reporting time.</li>
-      <li>Follow all instructions issued for the examination.</li>
-      <li>Do not carry prohibited electronic devices or unauthorized material.</li>
-    </ol></div>
-  </div>
+  <div class="section"><h3>SUBJECTS / MARKS</h3><table class="tbl"><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody id="marks"></tbody></table></div>
+  <div class="section instructions"><h3>IMPORTANT INSTRUCTIONS</h3><div class="notice"><ol><li>Carry this admission certificate and a valid photo identity document to the examination centre.</li><li>Reach the examination centre before the reporting time.</li><li>Follow all instructions issued for the examination.</li><li>Do not carry prohibited electronic devices or unauthorized material.</li></ol></div></div>
   <div class="footer">NOT FOR OFFICE USE</div>
-  <div class="sample">SAMPLE / DEVELOPMENT — NOT AN OFFICIAL GOVERNMENT DOCUMENT</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=20260906f"></script>
+  <div class="sample">This sample/development template is not an official government document and is for website testing/demo use only.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260906g"></script>
 <script>
-(async()=>{
- const cfg=window.SSC_CONFIG||{}; const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY); const $=id=>document.getElementById(id);
- const val=(o,ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&String(o[k]).trim())return o[k]}return '—'};
- const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
- const set=(id,v)=>$(id).textContent=v||'—';
- const fmt=v=>{if(!v||v==='—')return '—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};
- try{
-  const ss=await db.auth.getSession(); const u=ss.data?.session?.user; if(!u)throw Error('Please login to the candidate portal first.');
-  const cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle(); if(cr.error)throw cr.error; if(!cr.data)throw Error('Candidate details not found.');
-  const c=cr.data;
-  const ar=await db.from('ssc_admit_cards').select('*').eq('candidate_id',u.id).eq('published',true).order('exam_date',{ascending:false}).limit(1); if(ar.error)throw ar.error; const a=ar.data?.[0]; if(!a)throw Error('No published admit card found.');
-  const f=a.form_data||{};
-  set('reg',val(a,['registration_no'])!=='—'?val(a,['registration_no']):c.registration_no); set('name',c.full_name); set('roll',val(a,['roll_no'])!=='—'?val(a,['roll_no']):c.roll_no); set('exam',val(a,['exam_name'])); set('dob',fmt(c.dob));
-  set('date',fmt(val(a,['exam_date'])!=='—'?val(a,['exam_date']):val(f,['exam_date','examDate','date_of_exam','date'])));
-  set('report',val(a,['reporting_time'])!=='—'?val(a,['reporting_time']):val(f,['reporting_time','reportingTime','report_time'])); set('time',val(a,['exam_time'])!=='—'?val(a,['exam_time']):val(f,['exam_time','examTime','time']));
-  set('shift',val(a,['shift','examination_shift'])!=='—'?val(a,['shift','examination_shift']):val(f,['shift','examination_shift'])); set('centre',val(a,['venue'])!=='—'?val(a,['venue']):val(f,['centre','exam_centre','exam_venue','examVenue'])); set('code',val(a,['centre_code','center_code'])!=='—'?val(a,['centre_code','center_code']):val(f,['centre_code','centreCode','exam_centre_code']));
-  const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);
-  $('marks').innerHTML=subjects.map(x=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—');const m=Array.isArray(x)?x[1]:(x.marks??x.maximum_marks??'—');return '<tr><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>'}).join('');
-  const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1); const p=dr.data?.[0]?.file_path;
-  if(p){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(p,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}
- }catch(e){$('card').innerHTML='<div style="padding:30px;text-align:center;font-family:Arial">'+esc(e.message||e)+'</div>'}
-})();
-</script>
-</body>
-</html>
+(async()=>{const cfg=window.SSC_CONFIG||{};const $=id=>document.getElementById(id);const val=(o,ks)=>{for(const k of ks)if(o&&o[k]!=null&&String(o[k]).trim())return o[k];return '—'};const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));const set=(id,v)=>$(id).textContent=v||'—';const fmt=v=>{if(!v||v==='—')return '—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};try{if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw Error('Sample configuration is not available.');const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const ss=await db.auth.getSession();const u=ss.data?.session?.user;if(!u)throw Error('Please login to the candidate portal first.');const cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();if(cr.error)throw cr.error;if(!cr.data)throw Error('Candidate details not found.');const c=cr.data;const ar=await db.from('ssc_admit_cards').select('*').eq('candidate_id',u.id).eq('published',true).order('exam_date',{ascending:false}).limit(1);if(ar.error)throw ar.error;const a=ar.data?.[0];if(!a)throw Error('No published admit card found.');const f=a.form_data||{};set('reg',val(a,['registration_no'])!=='—'?val(a,['registration_no']):c.registration_no);set('name',c.full_name);set('roll',val(a,['roll_no'])!=='—'?val(a,['roll_no']):c.roll_no);set('exam',val(a,['exam_name']));set('dob',fmt(c.dob));set('date',fmt(val(a,['exam_date'])!=='—'?val(a,['exam_date']):val(f,['exam_date','examDate','date_of_exam','date'])));set('report',val(a,['reporting_time'])!=='—'?val(a,['reporting_time']):val(f,['reporting_time','reportingTime','report_time']));set('time',val(a,['exam_time'])!=='—'?val(a,['exam_time']):val(f,['exam_time','examTime','time']));set('shift',val(a,['shift','examination_shift'])!=='—'?val(a,['shift','examination_shift']):val(f,['shift','examination_shift']));set('centre',val(a,['venue'])!=='—'?val(a,['venue']):val(f,['centre','exam_centre','exam_venue','examVenue']));set('code',val(a,['centre_code','center_code'])!=='—'?val(a,['centre_code','center_code']):val(f,['centre_code','centreCode','exam_centre_code']));const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);$('marks').innerHTML=subjects.map(x=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—');const m=Array.isArray(x)?x[1]:(x.marks??x.maximum_marks??'—');return '<tr><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>'}).join('');const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1);const p=dr.data?.[0]?.file_path;if(p){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(p,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}}catch(e){$('card').innerHTML='<div style="padding:30px;text-align:center;font-family:Arial"><b>SAMPLE / DEVELOPMENT</b><br><br>'+esc(e.message||e)+'<br><br><b>NOT AN OFFICIAL GOVERNMENT DOCUMENT</b></div>'}})();
+</script></body></html>
