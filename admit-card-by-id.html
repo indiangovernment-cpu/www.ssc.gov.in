@@ -4,24 +4,57 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>e-Admission Certificate</title>
-<link rel="stylesheet" href="admit-card.css?v=20260906c">
+<link rel="stylesheet" href="admit-card.css?v=20260906d">
 </head>
 <body>
 <div class="page-back no-print"><button type="button" onclick="goBack()">← Back to Candidate Dashboard</button></div>
 <main class="wrap">
 <article class="certificate" id="certificate">
-  <div class="head"><h1>STAFF SELECTION COMMISSION</h1><h2>ADMISSION CERTIFICATE / ADMIT CARD</h2><p id="examTitle">—</p></div>
-  <div class="title">Examination Details</div>
-  <div class="grid"><div class="details">
-    <div class="row"><b>Registration No.</b><span id="reg">—</span></div><div class="row"><b>Candidate Name</b><span id="name">—</span></div><div class="row"><b>Roll No.</b><span id="roll">—</span></div><div class="row"><b>Examination</b><span id="exam">—</span></div><div class="row"><b>Date of Birth</b><span id="dob">—</span></div><div class="row"><b>Exam Date</b><span id="date">—</span></div><div class="row"><b>Reporting Time</b><span id="report">—</span></div><div class="row"><b>Exam Time</b><span id="time">—</span></div><div class="row"><b>Shift</b><span id="shift">—</span></div><div class="row"><b>Centre</b><span id="venue">—</span></div><div class="row"><b>Centre Code</b><span id="centreCode">—</span></div>
-  </div><div class="photo"><img id="photo" alt="Candidate photo"><span id="photoText">CANDIDATE<br>PHOTO</span></div></div>
-  <div class="section"><h3>SUBJECTS / MARKS</h3><table class="tbl"><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody id="marksBody"></tbody></table></div>
-  <div class="section"><h3>IMPORTANT INSTRUCTIONS</h3><div class="notice"><ol><li>Carry this admission certificate and a valid photo identity document to the examination centre.</li><li>Reach the examination centre before the reporting time.</li><li>Follow all instructions issued for the examination.</li><li>Do not carry prohibited electronic devices or unauthorized material.</li></ol></div></div>
+  <header class="head">
+    <h1>STAFF SELECTION COMMISSION</h1>
+    <h2>ADMISSION CERTIFICATE / ADMIT CARD</h2>
+    <p id="examTitle">—</p>
+  </header>
+
+  <div class="title">EXAMINATION DETAILS</div>
+  <table class="details-table">
+    <tbody>
+      <tr><th>Registration No.</th><td id="reg">—</td></tr>
+      <tr><th>Candidate Name</th><td id="name">—</td></tr>
+      <tr><th>Roll No.</th><td id="roll">—</td></tr>
+      <tr><th>Examination</th><td id="exam">—</td></tr>
+      <tr><th>Date of Birth</th><td id="dob">—</td></tr>
+      <tr><th>Exam Date</th><td id="date">—</td></tr>
+      <tr><th>Reporting Time</th><td id="report">—</td></tr>
+      <tr><th>Exam Time</th><td id="time">—</td></tr>
+      <tr><th>Shift</th><td id="shift">—</td></tr>
+      <tr><th>Centre</th><td id="venue">—</td></tr>
+      <tr><th>Centre Code</th><td id="centreCode">—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="title section-title">SUBJECTS / MARKS</div>
+  <table class="marks-table">
+    <thead><tr><th>Subject</th><th>Marks</th></tr></thead>
+    <tbody id="marksBody"></tbody>
+  </table>
+
+  <div class="title section-title">IMPORTANT INSTRUCTIONS</div>
+  <ol class="instructions">
+    <li>Carry this admission certificate and a valid photo identity document to the examination centre.</li>
+    <li>Reach the examination centre before the reporting time.</li>
+    <li>Follow all instructions issued for the examination.</li>
+    <li>Do not carry prohibited electronic devices or unauthorized material.</li>
+  </ol>
+
   <div class="footer">NOT FOR OFFICE USE</div>
-</article></main>
+</article>
+</main>
 <script>function goBack(){location.href='candidate.html';}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=20260906c"></script>
 <script>
-(async()=>{const cfg=window.SSC_CONFIG||{},db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY),$=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m])),set=(id,v)=>{const e=$(id);if(e)e.textContent=v??'—'},val=(o,keys)=>{for(const k of keys)if(o?.[k]!==undefined&&o?.[k]!==null&&String(o[k]).trim()!=='')return o[k];return '—'},fmt=v=>{if(!v)return'—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};try{const s=await db.auth.getSession(),u=s.data?.session?.user;if(!u)throw Error('Please login to the candidate portal first.');const id=new URLSearchParams(location.search).get('admit_id');if(!id)throw Error('Admit Card reference is missing.');const ar=await db.from('ssc_admit_cards').select('*').eq('id',id).eq('candidate_id',u.id).eq('published',true).maybeSingle();if(ar.error)throw ar.error;if(!ar.data)throw Error('Admit Card not found or not published.');const a=ar.data,cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();if(cr.error)throw cr.error;if(!cr.data)throw Error('Candidate details not found.');const c=cr.data,f=a.form_data||{},exam=val(a,['exam_name']);set('examTitle',exam);set('exam',exam);set('reg',c.registration_no);set('name',c.full_name);set('roll',c.roll_no);set('dob',fmt(c.dob));set('date',fmt(val(a,['exam_date'])!=='—'?a.exam_date:val(f,['exam_date','examDate','date_of_exam','date'])));set('report',val(a,['reporting_time'])!=='—'?a.reporting_time:val(f,['reporting_time','reportingTime','report_time']));set('time',val(a,['exam_time'])!=='—'?a.exam_time:val(f,['exam_time','examTime','time']));set('shift',val(a,['shift','examination_shift'])!=='—'?val(a,['shift','examination_shift']):val(f,['shift','examination_shift']));set('venue',val(a,['venue'])!=='—'?a.venue:val(f,['centre','exam_centre','exam_venue','examVenue']));set('centreCode',val(a,['centre_code','center_code'])!=='—'?val(a,['centre_code','center_code']):val(f,['centre_code','centreCode','exam_centre_code']));const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);$('marksBody').innerHTML=subjects.map(x=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—'),m=Array.isArray(x)?x[1]:(x.marks??'—');return'<tr><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>'}).join('');const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1),p=dr.data?.[0]?.file_path;if(p){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(p,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}document.title='Admit Card - '+(c.registration_no||'Candidate')}catch(e){$('certificate').innerHTML='<div style="padding:35px;text-align:center;font-family:Arial"><b>'+esc(e.message||e)+'</b></div>'}})();
-</script></body></html>
+(async()=>{const cfg=window.SSC_CONFIG||{},db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY),$=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m])),set=(id,v)=>{const e=$(id);if(e)e.textContent=v??'—'},val=(o,keys)=>{for(const k of keys)if(o?.[k]!==undefined&&o?.[k]!==null&&String(o[k]).trim()!=='')return o[k];return '—'},fmt=v=>{if(!v)return'—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};try{const s=await db.auth.getSession(),u=s.data?.session?.user;if(!u)throw Error('Please login to the candidate portal first.');const id=new URLSearchParams(location.search).get('admit_id');if(!id)throw Error('Admit Card reference is missing.');const ar=await db.from('ssc_admit_cards').select('*').eq('id',id).eq('candidate_id',u.id).eq('published',true).maybeSingle();if(ar.error)throw ar.error;if(!ar.data)throw Error('Admit Card not found or not published.');const a=ar.data,cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();if(cr.error)throw cr.error;if(!cr.data)throw Error('Candidate details not found.');const c=cr.data,f=a.form_data||{},exam=val(a,['exam_name']);set('examTitle',exam);set('exam',exam);set('reg',c.registration_no);set('name',c.full_name);set('roll',c.roll_no);set('dob',fmt(c.dob));set('date',val(a,['exam_date'])!=='—'?fmt(a.exam_date):fmt(val(f,['exam_date','examDate','date_of_exam','date'])));set('report',val(a,['reporting_time'])!=='—'?a.reporting_time:val(f,['reporting_time','reportingTime','report_time']));set('time',val(a,['exam_time'])!=='—'?a.exam_time:val(f,['exam_time','examTime','time']));set('shift',val(a,['shift','examination_shift'])!=='—'?val(a,['shift','examination_shift']):val(f,['shift','examination_shift']));set('venue',val(a,['venue'])!=='—'?a.venue:val(f,['centre','exam_centre','exam_venue','examVenue']));set('centreCode',val(a,['centre_code','center_code'])!=='—'?val(a,['centre_code','center_code']):val(f,['centre_code','centreCode','exam_centre_code']));const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);$('marksBody').innerHTML=subjects.map(x=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—'),m=Array.isArray(x)?x[1]:(x.marks??'—');return'<tr><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>'}).join('');document.title='Admit Card - '+(c.registration_no||'Candidate')}catch(e){$('certificate').innerHTML='<div style="padding:35px;text-align:center;font-family:Arial"><b>'+esc(e.message||e)+'</b></div>'}})();
+</script>
+</body>
+</html>
