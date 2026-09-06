@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>e-Admission Certificate</title>
-<link rel="stylesheet" href="admit-card.css?v=20260906c">
+<title>e-Admission Certificate - Sample Development</title>
+<link rel="stylesheet" href="admit-card.css?v=20260906d">
 </head>
 <body>
 <div class="page-back no-print"><button type="button" onclick="history.back()">← Back to Candidate Dashboard</button></div>
@@ -14,6 +14,7 @@
     <h1>STAFF SELECTION COMMISSION</h1>
     <h2>ADMISSION CERTIFICATE / ADMIT CARD</h2>
     <p id="examTitle">—</p>
+    <div class="sample-note">SAMPLE / DEVELOPMENT — NOT AN OFFICIAL GOVERNMENT DOCUMENT</div>
   </div>
   <div class="title">Examination Details</div>
   <div class="grid">
@@ -52,7 +53,7 @@
 </article>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=20260906c"></script>
+<script src="config.js?v=20260906d"></script>
 <script>
 (async()=>{
   const cfg=window.SSC_CONFIG||{};
@@ -84,7 +85,7 @@
     const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1);
     const p=dr.data?.[0]?.file_path;
     if(p){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(p,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}
-    document.title='Admit Card - '+(c.registration_no||'Candidate');
+    document.title='Admit Card - '+(c.registration_no||'Candidate')+' - Sample';
   }catch(e){$('certificate').innerHTML='<div style="padding:35px;text-align:center;font-family:Arial"><b>'+esc(e.message||e)+'</b></div>'}
 })();
 </script>
