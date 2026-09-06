@@ -1,1 +1,92 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admit Card - Not for Office Use</title><style>@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f2f4f7;margin:0;color:#111}.card{width:190mm;margin:auto;background:#fff;border:2px solid #222;padding:12mm}.head{text-align:center;border-bottom:2px solid #222;padding-bottom:8px}.head h1{font-size:20px;margin:0 0 4px}.head h2{font-size:16px;margin:0 0 5px}.head p{margin:2px;font-size:11px}.title{margin:12px 0 8px;text-align:center;font-weight:700;font-size:15px;text-transform:uppercase}.grid{display:grid;grid-template-columns:1fr 38mm;gap:10px}.details{border:1px solid #555}.row{display:grid;grid-template-columns:48% 52%;border-bottom:1px solid #bbb;min-height:28px}.row:last-child{border:0}.row b,.row span{padding:6px;font-size:11px}.photo{border:1px solid #555;height:48mm;display:flex;align-items:center;justify-content:center;font-size:11px;color:#666;text-align:center}.photo img{width:100%;height:100%;object-fit:cover;display:none}.section{margin-top:12px;border:1px solid #555}.section h3{margin:0;background:#eee;padding:7px;font-size:12px}.tbl{width:100%;border-collapse:collapse}.tbl th,.tbl td{border:1px solid #777;padding:7px;font-size:11px;text-align:left}.notice{margin-top:12px;font-size:10px;line-height:1.5;padding:0 8px 8px}.footer{text-align:center;margin-top:16px;border-top:2px solid #222;padding-top:8px;font-weight:800;font-size:13px;letter-spacing:1px}.sample{font-size:9px;text-align:center;color:#555;margin-top:4px}@media print{body{background:#fff}.card{border:2px solid #222}}@media(max-width:700px){.card{width:100%;padding:7mm}.grid{grid-template-columns:1fr 32mm}.row{grid-template-columns:48% 52%}}</style></head><body><div class="card"><div class="head"><h1>STAFF SELECTION COMMISSION</h1><h2>ADMISSION CERTIFICATE / ADMIT CARD</h2><p>Sample Development Version</p></div><div class="title">Examination Details</div><div class="grid"><div class="details"><div class="row"><b>Registration No.</b><span id="reg">7205029455</span></div><div class="row"><b>Candidate Name</b><span id="name">Candidate Name</span></div><div class="row"><b>Roll No.</b><span id="roll">SAMPLE-ROLL-001</span></div><div class="row"><b>Examination</b><span id="exam">Combined Graduate Level Examination</span></div><div class="row"><b>Date of Birth</b><span id="dob">DD/MM/YYYY</span></div><div class="row"><b>Exam Date</b><span id="date">DD/MM/YYYY</span></div><div class="row"><b>Reporting Time</b><span id="report">08:00 AM</span></div><div class="row"><b>Exam Time</b><span id="time">09:00 AM – 10:00 AM</span></div><div class="row"><b>Shift</b><span id="shift">Shift 1</span></div><div class="row"><b>Centre</b><span id="venue">Examination Centre (Sample)</span></div><div class="row"><b>Centre Code</b><span id="centreCode">SAMPLE-001</span></div></div><div class="photo"><img id="photo" alt="Candidate photo"><span id="photoText">CANDIDATE<br>PHOTO</span></div></div><div class="section"><h3>SUBJECTS / MARKS</h3><table class="tbl"><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody><tr><td>General Intelligence and Reasoning</td><td id="m1">50</td></tr><tr><td>General Awareness</td><td id="m2">50</td></tr><tr><td>Quantitative Aptitude</td><td id="m3">50</td></tr><tr><td>English Comprehension</td><td id="m4">50</td></tr></tbody></table></div><div class="section"><h3>IMPORTANT INSTRUCTIONS</h3><div class="notice"><ol><li>Carry this admission certificate and a valid photo identity document to the examination centre.</li><li>Reach the examination centre before the reporting time.</li><li>Follow all instructions issued for the examination.</li><li>Do not carry prohibited electronic devices or unauthorized material.</li></ol></div></div><div class="footer">NOT FOR OFFICE USE</div><div class="sample">This is a sample/development template and is not an official government document.</div></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260905"></script><script>(async()=>{const cfg=window.SSC_CONFIG||{};const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const $=id=>document.getElementById(id),set=(id,v)=>{const e=$(id);if(e)e.textContent=v??'—'};try{const s=await db.auth.getSession(),u=s.data?.session?.user;if(!u)throw Error('Please login to the candidate portal first.');const cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();if(cr.error)throw cr.error;if(!cr.data)throw Error('Candidate details not found.');const c=cr.data;const ar=await db.from('ssc_admit_cards').select('*').eq('candidate_id',u.id).eq('published',true).order('exam_date',{ascending:false}).limit(1);if(ar.error)throw ar.error;const a=ar.data?.[0];if(!a)throw Error('No published admit card found.');set('reg',c.registration_no||'7205029455');set('name',c.full_name||'Candidate Name');set('roll',c.roll_no||'SAMPLE-ROLL-001');set('exam',a.exam_name||'Combined Graduate Level Examination');set('dob',c.dob||'DD/MM/YYYY');set('date',a.exam_date||'DD/MM/YYYY');set('report',a.reporting_time||'08:00 AM');set('time',a.exam_time||'09:00 AM – 10:00 AM');set('shift',a.shift||'Shift 1');set('venue',a.venue||'Examination Centre (Sample)');set('centreCode',a.centre_code||a.center_code||'SAMPLE-001');const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1);const path=dr.data?.[0]?.file_path;if(path){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(path,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}document.title='Admit Card - '+(c.registration_no||'Sample')}catch(e){document.querySelector('.card').innerHTML='<div style="padding:30px;text-align:center;font-family:Arial"><b>'+String(e.message||e).replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]))+'</b></div>'}})();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>e-Admission Certificate</title>
+<link rel="stylesheet" href="admit-card.css?v=20260906b">
+</head>
+<body>
+<div class="page-back no-print"><button type="button" onclick="history.back()">← Back to Candidate Dashboard</button></div>
+<main class="wrap">
+<article class="certificate" id="certificate">
+  <div class="head">
+    <h1>STAFF SELECTION COMMISSION</h1>
+    <h2>ADMISSION CERTIFICATE / ADMIT CARD</h2>
+    <p id="examTitle">—</p>
+  </div>
+  <div class="title">Examination Details</div>
+  <div class="grid">
+    <div class="details">
+      <div class="row"><b>Registration No.</b><span id="reg">—</span></div>
+      <div class="row"><b>Candidate Name</b><span id="name">—</span></div>
+      <div class="row"><b>Roll No.</b><span id="roll">—</span></div>
+      <div class="row"><b>Examination</b><span id="exam">—</span></div>
+      <div class="row"><b>Date of Birth</b><span id="dob">—</span></div>
+      <div class="row"><b>Exam Date</b><span id="date">—</span></div>
+      <div class="row"><b>Reporting Time</b><span id="report">—</span></div>
+      <div class="row"><b>Exam Time</b><span id="time">—</span></div>
+      <div class="row"><b>Shift</b><span id="shift">—</span></div>
+      <div class="row"><b>Centre</b><span id="venue">—</span></div>
+      <div class="row"><b>Centre Code</b><span id="centreCode">—</span></div>
+    </div>
+    <div class="photo"><img id="photo" alt="Candidate photo"><span id="photoText">CANDIDATE<br>PHOTO</span></div>
+  </div>
+
+  <div class="section">
+    <h3>SUBJECTS / MARKS</h3>
+    <table class="tbl"><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody id="marksBody"></tbody></table>
+  </div>
+
+  <div class="section">
+    <h3>IMPORTANT INSTRUCTIONS</h3>
+    <div class="notice"><ol>
+      <li>Carry this admission certificate and a valid photo identity document to the examination centre.</li>
+      <li>Reach the examination centre before the reporting time.</li>
+      <li>Follow all instructions issued for the examination.</li>
+      <li>Do not carry prohibited electronic devices or unauthorized material.</li>
+    </ol></div>
+  </div>
+
+  <div class="footer">NOT FOR OFFICE USE</div>
+</article>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=20260906b"></script>
+<script>
+(async()=>{
+  const cfg=window.SSC_CONFIG||{};
+  const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+  const $=id=>document.getElementById(id);
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
+  const set=(id,v)=>{const e=$(id);if(e)e.textContent=v??'—'};
+  const fmt=v=>{if(!v)return '—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};
+  const value=(o,keys)=>{for(const k of keys){if(o&&o[k]!==undefined&&o[k]!==null&&String(o[k]).trim()!=='')return o[k]}return '—'};
+  try{
+    const s=await db.auth.getSession(),u=s.data?.session?.user;
+    if(!u)throw Error('Please login to the candidate portal first.');
+    const r=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();
+    if(r.error)throw r.error;if(!r.data)throw Error('Candidate details not found.');
+    const c=r.data;
+    const ar=await db.from('ssc_admit_cards').select('*').eq('candidate_id',u.id).eq('published',true).order('exam_date',{ascending:false}).limit(1);
+    if(ar.error)throw ar.error;const a=ar.data?.[0];if(!a)throw Error('No published admit card found.');
+    const f=a.form_data||{};
+    const exam=value(a,['exam_name']);
+    set('examTitle',exam);set('exam',exam);set('reg',c.registration_no);set('name',c.full_name);set('roll',c.roll_no);
+    set('dob',fmt(c.dob));set('date',fmt(value(a,['exam_date'])==='—'?value(f,['exam_date','examDate','date_of_exam','date']):a.exam_date));
+    set('report',value(a,['reporting_time'])==='—'?value(f,['reporting_time','reportingTime','report_time']):a.reporting_time);
+    set('time',value(a,['exam_time'])==='—'?value(f,['exam_time','examTime','time']):a.exam_time);
+    set('shift',value(a,['shift','examination_shift'])==='—'?value(f,['shift','examination_shift']):value(a,['shift','examination_shift']));
+    set('venue',value(a,['venue'])==='—'?value(f,['centre','exam_centre','exam_venue','examVenue']):a.venue);
+    set('centreCode',value(a,['centre_code','center_code'])==='—'?value(f,['centre_code','centreCode','exam_centre_code']):value(a,['centre_code','center_code']));
+    const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);
+    $('marksBody').innerHTML=subjects.map(x=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—');const m=Array.isArray(x)?x[1]:(x.marks??'—');return '<tr><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>'}).join('');
+    const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1);
+    const p=dr.data?.[0]?.file_path;
+    if(p){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(p,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}
+    document.title='Admit Card - '+(c.registration_no||'Candidate');
+  }catch(e){$('certificate').innerHTML='<div style="padding:35px;text-align:center;font-family:Arial"><b>'+esc(e.message||e)+'</b></div>'}
+})();
+</script>
+</body>
+</html>
