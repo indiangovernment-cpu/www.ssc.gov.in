@@ -3,43 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sample Admission Certificate - Development</title>
-<link rel="stylesheet" href="admit-card.css?v=20260906g">
+<title>Sample e-Admission Certificate - Development</title>
+<link rel="stylesheet" href="admit-card.css?v=20260907a">
 </head>
 <body>
 <div class="no-print backbar"><button onclick="history.back()">← Back</button></div>
 <main class="paper" id="card">
-  <div class="sideMark left"></div><div class="sideMark right"></div>
-  <div class="sampleTop">SAMPLE / DEVELOPMENT VERSION • NOT AN OFFICIAL GOVERNMENT DOCUMENT</div>
-  <header class="head">
-    <div class="headTop">SAMPLE CANDIDATE PORTAL</div>
-    <h1>STAFF SELECTION COMMISSION</h1>
-    <h2>ADMISSION CERTIFICATE / ADMIT CARD</h2>
-    <p>Sample Development Version</p>
-  </header>
-  <div class="title">EXAMINATION DETAILS</div>
-  <div class="grid">
-    <div class="details">
-      <div class="row"><b>Registration No.</b><span id="reg">—</span></div>
-      <div class="row"><b>Candidate Name</b><span id="name">—</span></div>
-      <div class="row"><b>Roll No.</b><span id="roll">—</span></div>
-      <div class="row"><b>Examination</b><span id="exam">—</span></div>
-      <div class="row"><b>Date of Birth</b><span id="dob">—</span></div>
-      <div class="row"><b>Exam Date</b><span id="date">—</span></div>
-      <div class="row"><b>Reporting Time</b><span id="report">—</span></div>
-      <div class="row"><b>Exam Time</b><span id="time">—</span></div>
-      <div class="row"><b>Shift</b><span id="shift">—</span></div>
-      <div class="row"><b>Centre</b><span id="centre">—</span></div>
-      <div class="row"><b>Centre Code</b><span id="code">—</span></div>
-    </div>
-    <div class="photo"><img id="photo" alt="Candidate Photo"><span id="photoText">CANDIDATE<br>PHOTO</span></div>
-  </div>
-  <div class="section"><h3>SUBJECTS / MARKS</h3><table class="tbl"><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody id="marks"></tbody></table></div>
-  <div class="section instructions"><h3>IMPORTANT INSTRUCTIONS</h3><div class="notice"><ol><li>Carry this admission certificate and a valid photo identity document to the examination centre.</li><li>Reach the examination centre before the reporting time.</li><li>Follow all instructions issued for the examination.</li><li>Do not carry prohibited electronic devices or unauthorized material.</li></ol></div></div>
-  <div class="footer">NOT FOR OFFICE USE</div>
-  <div class="sample">This sample/development template is not an official government document and is for website testing/demo use only.</div>
+  <div class="sample-banner">SAMPLE / DEVELOPMENT VERSION — NOT AN OFFICIAL GOVERNMENT DOCUMENT</div>
+  <section class="outer">
+    <header class="masthead">
+      <div class="mast-side left">
+        <b>SAMPLE CANDIDATE PORTAL</b><br>Website: Sample Portal<br>Helpdesk: Sample Support<br>Email: support@example.invalid
+      </div>
+      <div class="mast-center"><div class="sample-emblem">SAMPLE</div></div>
+      <div class="mast-side right">
+        <b>STAFF SELECTION COMMISSION</b><br>Development Portal<br>Helpdesk: Sample Support<br>Email: support@example.invalid
+      </div>
+    </header>
+    <div class="doc-title">e-ADMISSION CERTIFICATE / ADMIT CARD</div>
+    <div class="doc-subtitle">COMBINED GRADUATE LEVEL EXAMINATION — SAMPLE DEVELOPMENT VERSION</div>
+
+    <section class="identity-block">
+      <div class="id-left">
+        <div class="barcode"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="id-row"><label>Registration No. / User ID</label><strong id="reg">—</strong></div>
+        <div class="id-row"><label>Roll No.</label><strong id="roll">—</strong></div>
+        <div class="id-row"><label>Password for Examination</label><strong class="small-value">Not displayed</strong></div>
+        <div class="id-row"><label>Identification Mark</label><strong id="mark">—</strong></div>
+      </div>
+      <div class="id-right">
+        <div class="id-row"><label>Candidate Registration No.</label><strong id="candidateReg">—</strong></div>
+        <div class="id-row"><label>Opted for Scribe</label><strong>No</strong></div>
+        <div class="id-row"><label>Language chosen by the candidate</label><strong>—</strong></div>
+        <div class="id-row"><label>Eligible for Compensatory Time</label><strong>No</strong></div>
+      </div>
+    </section>
+
+    <section class="date-table">
+      <div><b>Exam Date</b><strong id="date">—</strong></div>
+      <div><b>Reporting Time</b><strong id="report">—</strong></div>
+      <div><b>Entry Closing Time</b><strong id="entry">—</strong></div>
+    </section>
+
+    <section class="candidate-area">
+      <div class="candidate-details">
+        <div class="triple headrow"><b>Candidate's Name</b><b>Candidate's New / Changed Name</b><b>Gender</b></div>
+        <div class="triple values"><span id="name">—</span><span></span><span id="gender">—</span></div>
+        <div class="triple headrow"><b>Date of Birth</b><b>Examination</b><b>Category</b></div>
+        <div class="triple values"><span id="dob">—</span><span id="exam">—</span><span id="category">—</span></div>
+        <div class="address-head">Candidate's Address</div>
+        <div class="address" id="address">—</div>
+      </div>
+      <div class="photo-sign">
+        <div class="photo"><img id="photo" alt="Candidate Photo"><span id="photoText">CANDIDATE<br>PHOTO</span></div>
+        <div class="sign"><span id="signText">CANDIDATE SIGNATURE</span><img id="sign" alt="Candidate Signature"></div>
+      </div>
+    </section>
+
+    <section class="venue-table">
+      <div class="venue-date"><b>Date &amp; Time of Examination</b><strong><span id="date2">—</span><br><span id="time">—</span></strong></div>
+      <div class="venue"><b>Examination Venue</b><span id="centre">—</span><small id="centreCode">Centre Code: —</small></div>
+    </section>
+
+    <section class="subjects">
+      <div class="section-heading">TIER-I / SUBJECT AND MARKS</div>
+      <table><thead><tr><th>Type</th><th>Code</th><th>Subject</th><th>No. of Questions</th><th>Max. Marks</th></tr></thead><tbody id="marks"></tbody></table>
+    </section>
+
+    <section class="instructions">
+      <div class="section-heading">GENERAL INSTRUCTIONS FOR THE CANDIDATES</div>
+      <ol>
+        <li>Carry this sample admission certificate and a valid photo identity document to the examination centre.</li>
+        <li>Reach the examination centre as per the reporting time shown above. Entry after the closing time may not be permitted.</li>
+        <li>Bring an original photo-bearing identity proof. If the identity document does not contain the required date of birth, carry an additional original document supporting it.</li>
+        <li>Keep the admission certificate safely for your records.</li>
+        <li>Follow all instructions displayed at the examination venue and do not carry prohibited electronic devices or unauthorized material.</li>
+      </ol>
+    </section>
+
+    <div class="office-note">NOT FOR OFFICE USE</div>
+    <div class="disclaimer">This is a sample/development template for website testing and demonstration only. It is not an official government document.</div>
+  </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=20260906g"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=20260907a"></script>
 <script>
-(async()=>{const cfg=window.SSC_CONFIG||{};const $=id=>document.getElementById(id);const val=(o,ks)=>{for(const k of ks)if(o&&o[k]!=null&&String(o[k]).trim())return o[k];return '—'};const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));const set=(id,v)=>$(id).textContent=v||'—';const fmt=v=>{if(!v||v==='—')return '—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};try{if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw Error('Sample configuration is not available.');const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const ss=await db.auth.getSession();const u=ss.data?.session?.user;if(!u)throw Error('Please login to the candidate portal first.');const cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();if(cr.error)throw cr.error;if(!cr.data)throw Error('Candidate details not found.');const c=cr.data;const ar=await db.from('ssc_admit_cards').select('*').eq('candidate_id',u.id).eq('published',true).order('exam_date',{ascending:false}).limit(1);if(ar.error)throw ar.error;const a=ar.data?.[0];if(!a)throw Error('No published admit card found.');const f=a.form_data||{};set('reg',val(a,['registration_no'])!=='—'?val(a,['registration_no']):c.registration_no);set('name',c.full_name);set('roll',val(a,['roll_no'])!=='—'?val(a,['roll_no']):c.roll_no);set('exam',val(a,['exam_name']));set('dob',fmt(c.dob));set('date',fmt(val(a,['exam_date'])!=='—'?val(a,['exam_date']):val(f,['exam_date','examDate','date_of_exam','date'])));set('report',val(a,['reporting_time'])!=='—'?val(a,['reporting_time']):val(f,['reporting_time','reportingTime','report_time']));set('time',val(a,['exam_time'])!=='—'?val(a,['exam_time']):val(f,['exam_time','examTime','time']));set('shift',val(a,['shift','examination_shift'])!=='—'?val(a,['shift','examination_shift']):val(f,['shift','examination_shift']));set('centre',val(a,['venue'])!=='—'?val(a,['venue']):val(f,['centre','exam_centre','exam_venue','examVenue']));set('code',val(a,['centre_code','center_code'])!=='—'?val(a,['centre_code','center_code']):val(f,['centre_code','centreCode','exam_centre_code']));const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);$('marks').innerHTML=subjects.map(x=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—');const m=Array.isArray(x)?x[1]:(x.marks??x.maximum_marks??'—');return '<tr><td>'+esc(n)+'</td><td>'+esc(m)+'</td></tr>'}).join('');const dr=await db.from('ssc_candidate_documents').select('file_path,created_at').eq('candidate_id',u.id).eq('document_type','PHOTO').order('created_at',{ascending:false}).limit(1);const p=dr.data?.[0]?.file_path;if(p){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(p,600);if(sr.data?.signedUrl){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}}}catch(e){$('card').innerHTML='<div style="padding:30px;text-align:center;font-family:Arial"><b>SAMPLE / DEVELOPMENT</b><br><br>'+esc(e.message||e)+'<br><br><b>NOT AN OFFICIAL GOVERNMENT DOCUMENT</b></div>'}})();
-</script></body></html>
+(async()=>{const cfg=window.SSC_CONFIG||{};const $=id=>document.getElementById(id);const val=(o,ks)=>{for(const k of ks)if(o&&o[k]!=null&&String(o[k]).trim())return o[k];return '—'};const set=(id,v)=>{if($(id))$(id).textContent=v||'—'};const fmt=v=>{if(!v||v==='—')return '—';const d=new Date(String(v).length===10?v+'T00:00:00':v);return Number.isNaN(d.getTime())?v:d.toLocaleDateString('en-GB')};try{if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY)throw Error('Sample configuration is not available.');const db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const ss=await db.auth.getSession();const u=ss.data?.session?.user;if(!u)throw Error('Please login to the candidate portal first.');const cr=await db.from('ssc_candidates').select('*').eq('user_id',u.id).maybeSingle();if(cr.error)throw cr.error;if(!cr.data)throw Error('Candidate details not found.');const c=cr.data;const ar=await db.from('ssc_admit_cards').select('*').eq('candidate_id',u.id).eq('published',true).order('exam_date',{ascending:false}).limit(1);if(ar.error)throw ar.error;const a=ar.data?.[0];if(!a)throw Error('No published admit card found.');const f=a.form_data||{};const reg=val(a,['registration_no'])!=='—'?val(a,['registration_no']):val(c,['registration_no']);const roll=val(a,['roll_no'])!=='—'?val(a,['roll_no']):val(c,['roll_no']);const examDate=val(a,['exam_date'])!=='—'?val(a,['exam_date']):val(f,['exam_date','examDate','date_of_exam','date']);set('reg',reg);set('candidateReg',reg);set('name',c.full_name);set('roll',roll);set('exam',val(a,['exam_name'])!=='—'?val(a,['exam_name']):val(f,['exam_name','exam']));set('dob',fmt(c.dob));set('date',fmt(examDate));set('date2',fmt(examDate));set('report',val(a,['reporting_time'])!=='—'?val(a,['reporting_time']):val(f,['reporting_time','reportingTime','report_time']));set('entry',val(a,['entry_closing_time'])!=='—'?val(a,['entry_closing_time']):val(f,['entry_closing_time','entryClosingTime','entry_time']));set('time',val(a,['exam_time'])!=='—'?val(a,['exam_time']):val(f,['exam_time','examTime','time']));set('gender',val(c,['gender']));set('category',val(c,['category','caste_category']));set('address',val(c,['address','full_address']));const venue=val(a,['venue'])!=='—'?val(a,['venue']):val(f,['centre','exam_centre','exam_venue','examVenue']);set('centre',venue);set('centreCode', 'Centre Code: '+(val(a,['centre_code','center_code'])!=='—'?val(a,['centre_code','center_code']):val(f,['centre_code','centreCode','exam_centre_code'])));const subjects=Array.isArray(a.subjects_marks)?a.subjects_marks:(Array.isArray(f.subjects_marks)?f.subjects_marks:[['General Intelligence and Reasoning',50],['General Awareness',50],['Quantitative Aptitude',50],['English Comprehension',50]]);$('marks').innerHTML=subjects.map((x,i)=>{const n=Array.isArray(x)?x[0]:(x.subject||x.name||'—');const m=Array.isArray(x)?x[1]:(x.marks??x.maximum_marks??'—');const q=Array.isArray(x)?Math.round(Number(m)/2):((x.questions??x.no_of_questions??'—'));return '<tr><td>Objective Type</td><td>'+String.fromCharCode(65+i)+'</td><td>'+n+'</td><td>'+q+'</td><td>'+m+'</td></tr>'}).join('');const dr=await db.from('ssc_candidate_documents').select('file_path,document_type,created_at').eq('candidate_id',u.id).in('document_type',['PHOTO','SIGNATURE']).order('created_at',{ascending:false});for(const d of (dr.data||[])){const sr=await db.storage.from('ssc-candidate-files').createSignedUrl(d.file_path,600);if(!sr.data?.signedUrl)continue;if(d.document_type==='PHOTO'){$('photo').src=sr.data.signedUrl;$('photo').style.display='block';$('photoText').style.display='none';}if(d.document_type==='SIGNATURE'){$('sign').src=sr.data.signedUrl;$('sign').style.display='block';$('signText').style.display='none';}}}catch(e){$('card').innerHTML='<div class="error"><b>SAMPLE / DEVELOPMENT VERSION</b><br><br>'+String(e.message||e)+'<br><br><b>NOT AN OFFICIAL GOVERNMENT DOCUMENT</b></div>'}})();
+</script>
+</body>
+</html>
