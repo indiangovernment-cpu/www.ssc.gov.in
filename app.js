@@ -9,7 +9,7 @@ const state = {
   notices: [],
   results: [],
   page: 1,
-  month: 7,
+  month: 8,
   year: 2026,
   examPage: 0,
   promoPage: 0,
@@ -60,14 +60,10 @@ const FALLBACK_NOTICES = [
 ];
 
 const CALENDAR = [
- ['2026-08-14','Indian Navy Entrance Test (INET) - [Agniveer (MR as SSR) and SSR (Medical)]'],
- ['2026-08-16','JSA / LDC Grade Limited Departmental Competitive Examination, 2025 (for DoPT only)'],
- ['2026-08-16','ASO Grade Limited Departmental Competitive Examination, 2025'],
- ['2026-08-16','SSA / UDC Grade Limited Departmental Competitive Examination, 2025 (for DoPT only)'],
- ['2026-08-30','Combined Higher Secondary Level (10+2) Examination, 2026'],
- ['2026-08-30','Stenographer Grade C and D Examination, 2026'],
- ['2026-08-30','Combined Hindi Translators Examination, 2026'],
- ['2026-09-30','Multi Tasking (Non-Technical) Staff Examination, 2026']
+ ['2024-02-01','Selection Post Examination, Phase-XII, 2024'],
+ ['2024-02-15','Sub-Inspector in Delhi Police and Central Armed Police Forces Examination, 2024'],
+ ['2024-02-29','Junior Engineer (Civil, Mechanical & Electrical) Examination, 2024'],
+ ['2024-04-02','Combined Higher Secondary Level (10+2) Examination, 2024']
 ];
 
 const PROMOS = [
@@ -157,6 +153,7 @@ function home(){
  <section class="quicksec"><div class="wrap"><h2>${tr('quick')}</h2><div class="quickgrid">
   <button data-route="apply-online"><span class="quickicon applyicon">${icon('apply')}</span>${tr('apply')}</button><button data-route="admit-card"><span class="quickicon admiticon">${icon('admit')}</span>${tr('admit')}</button>
   <button data-route="answer-key"><span class="quickicon answericon">${icon('answer')}</span>${tr('answer')}</button><button data-route="result"><span class="quickicon resulticon">${icon('result')}</span>${tr('result')}</button>
+  <button class="quickwide" data-route="selection-post-marks"><span class="quickicon resulticon">${icon('result')}</span>Selection Post Marks</button>
  </div></div></section>
  <section class="section"><div class="wrap"><div class="calendar card"><div class="sectionhead"><h2>${tr('calendar')}</h2><div class="monthnav"><button id="prevMonth">‹</button><b id="monthLabel"></b><button id="nextMonth">›</button></div></div><div id="calendarList"></div><button class="viewall" data-route="calendar">${tr('view')}</button></div></div></section>
  <section class="examBand"><div class="wrap examwrap"><div class="examintro"><h2>${tr('browse')}</h2><p>Explore exam-related details and relevant resources</p><button class="pill light" data-route="browse">${tr('view')}</button></div><div class="examarea"><div id="examGrid" class="examgrid"></div><div id="examDots" class="dots"></div></div></div></section>
@@ -197,8 +194,7 @@ async function loadNotices(){
 }
 
 function renderCalendar(){
- const m=state.month;
- const items=CALENDAR.filter(x=>new Date(x[0]).getMonth()===m);
+ const items=CALENDAR;
  document.getElementById('monthLabel').textContent=new Date(state.year,m,1).toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short',year:'numeric'});
  document.getElementById('calendarList').innerHTML=(items.length?items:CALENDAR.slice(0,4)).map(x=>{
    const d=dateParts(x[0]);return `<div class="calrow"><div class="caldate"><b>${d.day}</b><small>${d.mon}</small></div><div>${esc(x[1])}</div></div>`;
@@ -304,6 +300,28 @@ function admitModal(){
  modal(`<div class="modal small"><div class="modalhead"><h3>▣ Admit Card</h3><button class="close">×</button></div><div class="modalbody">${['Download E-Admit Card of Stenographer Grade C and D Examination, 2024','Download E-Admit Card of Combined Hindi Translators Examination','Download E-Admit Card of Combined Higher Secondary Level Examination'].map(x=>`<div class="resultrow"><span>${x}</span></div>`).join('')}<div class="center"><button class="pill" data-route="login">Login</button></div></div></div>`);
  bindModalRoutes();
 }
+function selectionPostMarksPage(){
+ return genericPage('Selection Posts Examination Marks',`<div class="servicecard marksCard">
+  <h3>Selection Posts Examination Marks</h3>
+  <label>Examination Name</label>
+  <select id="marksExam"><option value="">Select Exam Type</option><option>Selection Post Examination, Phase-XII, 2024</option><option>Selection Post Examination, Phase-XI, 2023</option></select>
+  <label>Registration Number</label>
+  <input id="marksRegistration" placeholder="ENTER REGISTRATION NUMBER">
+  <label>Roll Number</label>
+  <input id="marksRoll" placeholder="ENTER ROLL NUMBER">
+  <label>Date of Birth</label>
+  <input id="marksDob" type="date">
+  <label>Mother's Name</label>
+  <input id="marksMother" placeholder="ENTER MOTHER'S NAME">
+  <div class="formactions"><button class="pill" id="marksSubmit">Submit</button><button class="plain" id="marksReset" type="button">Reset</button></div>
+ </div>`);
+ document.getElementById('marksSubmit')?.addEventListener('click',()=>{
+   const required=['marksExam','marksRegistration','marksRoll','marksDob','marksMother'];
+   if(required.some(id=>!(document.getElementById(id)?.value||'').trim())){toast('Please fill all details.');return}
+   toast('Details submitted.');
+ });
+ document.getElementById('marksReset')?.addEventListener('click',()=>document.querySelector('.marksCard')?.querySelectorAll('input,select').forEach(x=>x.value=''));
+}
 function answerModal(){
  modal(`<div class="modal"><div class="modalhead"><h3>▤ Answer Key</h3><button class="close">×</button></div><div class="modalbody">${['Grade C Stenographers Limited Departmental Competitive Examination, 2025: Uploading of Tentative Answer Keys along with Candidates Response Sheets.','Constable (Executive) Male and Female in Delhi Police Examination, 2025: Uploading of Final Answer Keys.','Head Constable (Ministerial) in Delhi Police Examination, 2025: Uploading of Final Answer Keys along with Question Papers cum Response Sheet.'].map(x=>`<div class="resultrow"><span>${x}</span><span>191.93 KB <i class="pdf">PDF</i> ◉</span></div>`).join('')}<div class="center"><button class="pill">View All</button></div></div></div>`);
 }
@@ -347,6 +365,7 @@ function route(r){
  if(r==='result'){resultModal();return}
  if(r==='admit-card'){admitModal();return}
  if(r==='answer-key'){answerModal();return}
+ if(r==='selection-post-marks'){selectionPostMarksPage();return}
  if(r==='apply-online'){document.getElementById('app').innerHTML=applyPage();bindCommon();return}
  if(r==='chair'){document.getElementById('app').innerHTML=chairmanPage();bindCommon();return}
  if(r==='tender'||r==='current-tenders'||r==='tender-archive'||r==='corrigenda'){document.getElementById('app').innerHTML=tenderPage();bindCommon();return}
