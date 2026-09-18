@@ -319,21 +319,42 @@ function selectionPostMarksPage(){
   <label>Examination Name</label>
   <select id="marksExam"><option value="">Select Exam Type</option><option>Selection Post Examination, Phase-XII, 2024</option><option>Selection Post Examination, Phase-XI, 2023</option></select>
   <label>Registration Number</label>
-  <input id="marksRegistration" placeholder="ENTER REGISTRATION NUMBER">
+  <input id="marksRegistration" inputmode="numeric" autocomplete="off" placeholder="ENTER REGISTRATION NUMBER">
+  <small id="marksRegistrationError" class="formerror"></small>
   <label>Roll Number</label>
-  <input id="marksRoll" placeholder="ENTER ROLL NUMBER">
+  <input id="marksRoll" inputmode="numeric" autocomplete="off" placeholder="ENTER ROLL NUMBER">
   <label>Date of Birth</label>
   <input id="marksDob" type="date">
   <label>Mother's Name</label>
-  <input id="marksMother" placeholder="ENTER MOTHER'S NAME">
-  <div class="formactions"><button class="pill" id="marksSubmit">Submit</button><button class="plain" id="marksReset" type="button">Reset</button></div>
+  <input id="marksMother" autocomplete="off" placeholder="ENTER MOTHER'S NAME">
+  <div class="formactions"><button class="pill" id="marksSubmit" type="button">Submit</button><button class="plain" id="marksReset" type="button">Reset</button></div>
  </div>`);
+}
+function bindSelectionPostMarks(){
+ const exam=document.getElementById('marksExam');
+ const reg=document.getElementById('marksRegistration');
+ const roll=document.getElementById('marksRoll');
+ const dob=document.getElementById('marksDob');
+ const mother=document.getElementById('marksMother');
+ const error=document.getElementById('marksRegistrationError');
+ const validReg=()=>/^\\d{8,20}$/.test((reg?.value||'').trim());
+ reg?.addEventListener('blur',()=>{
+   if(reg.value.trim() && !validReg()) error.textContent='Please enter a valid Registration number.';
+   else error.textContent='';
+ });
  document.getElementById('marksSubmit')?.addEventListener('click',()=>{
-   const required=['marksExam','marksRegistration','marksRoll','marksDob','marksMother'];
-   if(required.some(id=>!(document.getElementById(id)?.value||'').trim())){toast('Please fill all details.');return}
+   error.textContent='';
+   if(!exam?.value){toast('Please select Examination Name.');exam?.focus();return}
+   if(!validReg()){error.textContent='Please enter a valid Registration number.';reg?.focus();return}
+   if(!/^\\d{6,20}$/.test((roll?.value||'').trim())){toast('Please enter a valid Roll Number.');roll?.focus();return}
+   if(!dob?.value){toast('Please select Date of Birth.');dob?.focus();return}
+   if(!mother?.value.trim()){toast("Please enter Mother's Name.");mother?.focus();return}
    toast('Details submitted.');
  });
- document.getElementById('marksReset')?.addEventListener('click',()=>document.querySelector('.marksCard')?.querySelectorAll('input,select').forEach(x=>x.value=''));
+ document.getElementById('marksReset')?.addEventListener('click',()=>{
+   [exam,reg,roll,dob,mother].forEach(x=>{if(x)x.value='';});
+   error.textContent='';
+ });
 }
 function answerModal(){
  modal(`<div class="modal"><div class="modalhead"><h3>▤ Answer Key</h3><button class="close">×</button></div><div class="modalbody">${['Grade C Stenographers Limited Departmental Competitive Examination, 2025: Uploading of Tentative Answer Keys along with Candidates Response Sheets.','Constable (Executive) Male and Female in Delhi Police Examination, 2025: Uploading of Final Answer Keys.','Head Constable (Ministerial) in Delhi Police Examination, 2025: Uploading of Final Answer Keys along with Question Papers cum Response Sheet.'].map(x=>`<div class="resultrow"><span>${x}</span><span>191.93 KB <i class="pdf">PDF</i> ◉</span></div>`).join('')}<div class="center"><button class="pill">View All</button></div></div></div>`);
@@ -378,7 +399,7 @@ function route(r){
  if(r==='result'){resultModal();return}
  if(r==='admit-card'){admitModal();return}
  if(r==='answer-key'){answerModal();return}
- if(r==='selection-post-marks'){selectionPostMarksPage();return}
+ if(r==='selection-post-marks'){document.getElementById('app').innerHTML=selectionPostMarksPage();bindCommon();bindSelectionPostMarks();return}
  if(r==='apply-online'){document.getElementById('app').innerHTML=applyPage();bindCommon();return}
  if(r==='chair'){document.getElementById('app').innerHTML=chairmanPage();bindCommon();return}
  if(r==='tender'||r==='current-tenders'||r==='tender-archive'||r==='corrigenda'){document.getElementById('app').innerHTML=tenderPage();bindCommon();return}
