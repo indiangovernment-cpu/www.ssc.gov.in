@@ -314,46 +314,58 @@ function admitModal(){
  bindModalRoutes();
 }
 function selectionPostMarksPage(){
- return genericPage('Selection Posts Examination Marks',`<div class="servicecard marksCard">
+ return genericPage('Selection Posts Examination Marks',`<form class="servicecard marksCard" id="marksForm" novalidate>
   <h3>Selection Posts Examination Marks</h3>
-  <label>Examination Name</label>
-  <select id="marksExam"><option value="">Select Exam Type</option><option>Selection Post Examination, Phase-XII, 2024</option><option>Selection Post Examination, Phase-XI, 2023</option></select>
-  <label>Registration Number</label>
-  <input id="marksRegistration" inputmode="numeric" autocomplete="off" placeholder="ENTER REGISTRATION NUMBER">
-  <small id="marksRegistrationError" class="formerror"></small>
-  <label>Roll Number</label>
-  <input id="marksRoll" inputmode="numeric" autocomplete="off" placeholder="ENTER ROLL NUMBER">
-  <label>Date of Birth</label>
-  <input id="marksDob" type="date">
-  <label>Mother's Name</label>
-  <input id="marksMother" autocomplete="off" placeholder="ENTER MOTHER'S NAME">
-  <div class="formactions"><button class="pill" id="marksSubmit" type="button">Submit</button><button class="plain" id="marksReset" type="button">Reset</button></div>
- </div>`);
+  <label for="marksExam">Examination Name</label>
+  <select id="marksExam" name="exam" required><option value="">Select Exam Type</option><option value="Phase-XII-2024">Selection Post Examination, Phase-XII, 2024</option><option value="Phase-XI-2023">Selection Post Examination, Phase-XI, 2023</option></select>
+  <label for="marksRegistration">Registration Number</label>
+  <input id="marksRegistration" name="registration" inputmode="numeric" autocomplete="off" placeholder="ENTER REGISTRATION NUMBER" required>
+  <small id="marksRegistrationError" class="formerror" aria-live="polite"></small>
+  <label for="marksRoll">Roll Number</label>
+  <input id="marksRoll" name="roll" inputmode="numeric" autocomplete="off" placeholder="ENTER ROLL NUMBER" required>
+  <label for="marksDob">Date of Birth</label>
+  <input id="marksDob" name="dob" type="date" required>
+  <label for="marksMother">Mother's Name</label>
+  <input id="marksMother" name="mother" autocomplete="off" placeholder="ENTER MOTHER'S NAME" required>
+  <div class="formactions">
+   <button class="pill" id="marksSubmit" type="submit">Submit</button>
+   <button class="plain" id="marksReset" type="reset">Reset</button>
+  </div>
+ </form>`);
 }
 function bindSelectionPostMarks(){
+ const form=document.getElementById('marksForm');
  const exam=document.getElementById('marksExam');
  const reg=document.getElementById('marksRegistration');
  const roll=document.getElementById('marksRoll');
  const dob=document.getElementById('marksDob');
  const mother=document.getElementById('marksMother');
  const error=document.getElementById('marksRegistrationError');
+ if(!form)return;
+
  const validReg=()=>/^\\d{8,20}$/.test((reg?.value||'').trim());
- reg?.addEventListener('blur',()=>{
-   if(reg.value.trim() && !validReg()) error.textContent='Please enter a valid Registration number.';
-   else error.textContent='';
- });
- document.getElementById('marksSubmit')?.addEventListener('click',()=>{
-   error.textContent='';
-   if(!exam?.value){toast('Please select Examination Name.');exam?.focus();return}
-   if(!validReg()){error.textContent='Please enter a valid Registration number.';reg?.focus();return}
-   if(!/^\\d{6,20}$/.test((roll?.value||'').trim())){toast('Please enter a valid Roll Number.');roll?.focus();return}
-   if(!dob?.value){toast('Please select Date of Birth.');dob?.focus();return}
-   if(!mother?.value.trim()){toast("Please enter Mother's Name.");mother?.focus();return}
+ const validRoll=()=>/^\\d{6,20}$/.test((roll?.value||'').trim());
+
+ reg?.addEventListener('input',()=>{ if(error) error.textContent=''; });
+ reg?.addEventListener('blur',()=>{ if(reg.value.trim() && !validReg()) error.textContent='Please enter a valid Registration number.'; });
+
+ form.addEventListener('submit',e=>{
+   e.preventDefault();
+   e.stopPropagation();
+   if(error) error.textContent='';
+   if(!exam?.value){toast('Please select Examination Name.');exam?.focus();return;}
+   if(!validReg()){if(error) error.textContent='Please enter a valid Registration number.';reg?.focus();return;}
+   if(!validRoll()){toast('Please enter a valid Roll Number.');roll?.focus();return;}
+   if(!dob?.value){toast('Please select Date of Birth.');dob?.focus();return;}
+   if(!mother?.value.trim()){toast("Please enter Mother's Name.");mother?.focus();return;}
    toast('Details submitted.');
  });
- document.getElementById('marksReset')?.addEventListener('click',()=>{
-   [exam,reg,roll,dob,mother].forEach(x=>{if(x)x.value='';});
-   error.textContent='';
+
+ form.addEventListener('reset',()=>{
+   window.setTimeout(()=>{
+     if(error) error.textContent='';
+     reg?.focus();
+   },0);
  });
 }
 function answerModal(){
