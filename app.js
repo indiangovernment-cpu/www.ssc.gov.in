@@ -8,6 +8,7 @@ const state = {
   lang: localStorage.getItem('sscLang') || 'en',
   notices: [],
   results: [],
+  calendar: [],
   page: 1,
   month: 8,
   year: 2026,
@@ -193,9 +194,21 @@ async function loadNotices(){
  renderNotices();
 }
 
+async function loadCalendar(){
+  if(!db){ state.calendar=[]; renderCalendar(); return; }
+  try{
+    const {data,error}=await db.from('ssc_calendar').select('id,event_date,title,category').eq('active',true).order('event_date',{ascending:true});
+    state.calendar=(!error && Array.isArray(data)) ? data : [];
+  }catch(err){
+    console.error('Calendar load failed:',err);
+    state.calendar=[];
+  }
+  renderCalendar();
+}
 function renderCalendar(){
- const items=CALENDAR;
- document.getElementById('monthLabel').textContent=new Date(state.year,m,1).toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short',year:'numeric'});
+ const dbItems=state.calendar.map(x=>[x.event_date,x.title]);
+ const items=dbItems.length?dbItems:CALENDAR;
+ document.getElementById('monthLabel').textContent=new Date(state.year,state.month,1).toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short',year:'numeric'});
  document.getElementById('calendarList').innerHTML=(items.length?items:CALENDAR.slice(0,4)).map(x=>{
    const d=dateParts(x[0]);return `<div class="calrow"><div class="caldate"><b>${d.day}</b><small>${d.mon}</small></div><div>${esc(x[1])}</div></div>`;
  }).join('');
@@ -373,7 +386,7 @@ function route(r){
  if(r.startsWith('exam:')){examModal(decodeURIComponent(r.slice(5)));return}
  if(r.startsWith('notice:')){openNotice(r.slice(7));return}
  if(r==='notices'){document.getElementById('app').innerHTML=genericPage('Notice Board','<div class="servicecard" id="allNotices"></div>');bindCommon();document.getElementById('allNotices').innerHTML=state.notices.map(n=>`<div class="resultrow"><span>${esc(n.title)}</span><span><a href="${n.file_path?esc(fileUrl(n.file_path)):'#'}" target="_blank">PDF</a> <button data-notice="${esc(n.id)}">◉</button></span></div>`).join('');document.querySelectorAll('[data-notice]').forEach(b=>b.onclick=()=>openNotice(b.dataset.notice));return}
- if(r==='calendar'){document.getElementById('app').innerHTML=genericPage('SSC Calendar',CALENDAR.map(x=>`<div class="resultrow"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join(''));bindCommon();return}
+ if(r==='calendar'){const items=state.calendar.length?state.calendar.map(x=>[x.event_date,x.title]):CALENDAR;document.getElementById('app').innerHTML=genericPage('SSC Calendar',items.map(x=>`<div class="resultrow"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join(''));bindCommon();return}
  if(r==='faq'){document.getElementById('app').innerHTML=genericPage('Frequently Asked Questions',FAQ.map(x=>`<div class="faqfull"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join(''));bindCommon();return}
  if(r==='rti'||r.startsWith('rti-')){document.getElementById('app').innerHTML=genericPage('RTI',`<div class="servicecard">${RTI.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`);bindCommon();return}
  if(r==='about'||ABOUT.map(slug).includes(r)){document.getElementById('app').innerHTML=genericPage('About Us',`<div class="servicecard">${ABOUT.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`);bindCommon();return}
@@ -409,7 +422,7 @@ function closeMenus(){document.querySelectorAll('.navmenu.open').forEach(x=>x.cl
 
 function renderHome(){
  document.getElementById('app').innerHTML=home();
- bindCommon(); loadNotices(); renderCalendar(); renderExams(); renderPromos(); renderInitiatives(); renderFaq();
+ bindCommon(); loadNotices(); loadCalendar(); renderExams(); renderPromos(); renderInitiatives(); renderFaq();
  clearInterval(window.sscTimer);
  window.sscTimer=setInterval(()=>{state.promoPage=(state.promoPage+1)%3;state.initiativePage=(state.initiativePage+1)%2;renderPromos();renderInitiatives()},5000);
 }
