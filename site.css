@@ -97,3 +97,12 @@ button,input{font:inherit}button{cursor:pointer}.plain{background:none;border:0;
  .dateRangeBox input{width:44%;font-size:9px}
  .calendarTableWrap{border-radius:10px}
 }
+
+/* Home SSC Calendar: show exactly four rows, scroll for remaining rows */
+#calendarList{max-height:304px;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#93464b #f2e9e7}
+#calendarList::-webkit-scrollbar{width:7px}
+#calendarList::-webkit-scrollbar-track{background:#f2e9e7;border-radius:8px}
+#calendarList::-webkit-scrollbar-thumb{background:#93464b;border-radius:8px}
+@media(max-width:800px){
+ #calendarList{max-height:260px}
+}
