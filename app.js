@@ -14,7 +14,10 @@ const state = {
   year: 2026,
   examPage: 0,
   promoPage: 0,
-  initiativePage: 0
+  initiativePage: 0,
+  calendarPage: 1,
+  calendarFrom: '',
+  calendarTo: ''
 };
 
 const EXAMS = [
@@ -197,7 +200,7 @@ async function loadNotices(){
 async function loadCalendar(){
   if(!db){ state.calendar=[]; renderCalendar(); return; }
   try{
-    const {data,error}=await db.from('ssc_calendar').select('id,event_date,title,category').eq('active',true).order('event_date',{ascending:true});
+    const {data,error}=await db.from('ssc_calendar').select('id,sr_no,event_date,title,tier_phase,advertisement_date,closing_date,exam_month,category').eq('active',true).order('event_date',{ascending:true});
     state.calendar=(!error && Array.isArray(data)) ? data : [];
   }catch(err){
     console.error('Calendar load failed:',err);
@@ -378,6 +381,39 @@ function loginPage(){
 function chairmanPage(){return genericPage("Chairman's Message",`<div class="chaircard"><div class="chairhero"><img src="${A}chairman.jpg" alt="Chairman"><div><h3>Chairman's Message</h3><p>Staff Selection Commission has evolved as one of the trusted recruiting agencies in India. The Commission uses technology and transparent processes to conduct fair recruitment.</p><p>For the full message and downloadable documents, use the links provided by the administrator.</p></div></div></div>`)}
 function tenderPage(){return genericPage('SSC Tender',`<p>Welcome to the SSC Tenders page, your gateway to tender announcements.</p><div class="servicecard">${Array.from({length:9},(_,i)=>`<div class="tenderrow"><span class="datebox"><small>APR</small><b>${8-i%7}</b><small>2026</small></span><span>Opening of Financial Bids in respect of RFP for Selection of Service Provider (SP) for SSC Examinations and Candidate Services</span><span>PDF · ${(158+i*17)}.89 KB</span><span>↓ ◉</span></div>`).join('')}</div>`)}
 function genericPage(title,body){return `${header('')}<main class="page"><div class="wrap"><div class="crumb">← Homepage &gt; ${esc(title)}</div><h2>${esc(title)}</h2>${body}</div></main>${footer()}`}
+function calendarPage(){
+ const pdfUrl='https://ssc.gov.in/api/attachment/uploads/masterData/ExamCalendar/Tentative_Calendar2026_27_08012026.pdf';
+ return `${header('home')}<main class="page calendarPage"><div class="wrap">
+  <div class="crumb">← Homepage &gt; SSC Calendar</div>
+  <h2>Staff Selection Commission Tentative Calendar of Examination for the Year 2026-2027</h2>
+  <div class="calendarTools"><div class="dateRangeBox">
+   <input id="calendarFrom" type="date" aria-label="Choose start date" value="${esc(state.calendarFrom)}"><span>to</span>
+   <input id="calendarTo" type="date" aria-label="Choose end date" value="${esc(state.calendarTo)}"><span class="calendarGlyph">▣</span>
+  </div><button class="resetCalendar" id="resetCalendar">Reset</button></div>
+  <div class="calendarDownload">To Download Examination Calendar <a href="${pdfUrl}" target="_blank" rel="noopener">Click here</a></div>
+  <div class="calendarTableWrap"><table class="calendarTable"><thead><tr><th>Sr. No.</th><th>Name of Examination</th><th>Tier/Phase</th><th>Date of Advt.</th><th>Closing Date</th><th>Month of Exam</th></tr></thead><tbody id="calendarTableBody"></tbody></table></div>
+  <div id="calendarPager" class="calendarPager"></div>
+ </div></main>${footer()}`;
+}
+function bindCalendarPage(){
+ const from=document.getElementById('calendarFrom'), to=document.getElementById('calendarTo'), reset=document.getElementById('resetCalendar');
+ const render=()=>{state.calendarFrom=from?.value||'';state.calendarTo=to?.value||'';state.calendarPage=1;renderCalendarPageRows();};
+ from?.addEventListener('change',render);to?.addEventListener('change',render);
+ reset?.addEventListener('click',()=>{if(from)from.value='';if(to)to.value='';state.calendarFrom='';state.calendarTo='';state.calendarPage=1;renderCalendarPageRows();});
+ renderCalendarPageRows();
+}
+function renderCalendarPageRows(){
+ const body=document.getElementById('calendarTableBody'),pager=document.getElementById('calendarPager');if(!body||!pager)return;
+ const from=state.calendarFrom?new Date(state.calendarFrom+'T00:00:00'):null,to=state.calendarTo?new Date(state.calendarTo+'T23:59:59'):null;
+ const rows=(state.calendar.length?state.calendar:CALENDAR.map((x,i)=>({sr_no:i+1,event_date:x[0],title:x[1],tier_phase:'Paper-I (CBE)*',advertisement_date:'',closing_date:'',exam_month:''}))).filter(x=>{const d=new Date(String(x.event_date)+'T12:00:00');return (!from||d>=from)&&(!to||d<=to);});
+ const pageSize=10,total=Math.max(1,Math.ceil(rows.length/pageSize));state.calendarPage=Math.min(state.calendarPage,total);const start=(state.calendarPage-1)*pageSize;
+ body.innerHTML=rows.slice(start,start+pageSize).map(x=>`<tr><td>${esc(x.sr_no||'')}</td><td>${esc(x.title||'')}</td><td>${esc(x.tier_phase||'')}</td><td>${esc(x.advertisement_date||'')}</td><td>${esc(x.closing_date||'')}</td><td>${esc(x.exam_month||'')}</td></tr>`).join('')||'<tr><td colspan="6" class="calendarEmpty">No examinations found for the selected date range.</td></tr>';
+ let html='<button class="pageArrow" data-calpage="'+Math.max(1,state.calendarPage-1)+'">‹</button>';
+ const nums=[...new Set([1,state.calendarPage-1,state.calendarPage,state.calendarPage+1,total].filter(n=>n>=1&&n<=total))];
+ nums.forEach((n,i)=>{if(i&&n>nums[i-1]+1)html+='<span>...</span>';html+='<button class="'+(n===state.calendarPage?'active':'')+'" data-calpage="'+n+'">'+n+'</button>';});
+ html+='<button class="pageArrow" data-calpage="'+Math.min(total,state.calendarPage+1)+'">›</button>';pager.innerHTML=html;
+ pager.querySelectorAll('[data-calpage]').forEach(b=>b.onclick=()=>{state.calendarPage=+b.dataset.calpage;renderCalendarPageRows();});
+}
 
 function openNotice(id){
  const n=state.notices.find(x=>String(x.id)===String(id)); if(!n)return;
@@ -419,7 +455,7 @@ function route(r){
  if(r.startsWith('exam:')){examModal(decodeURIComponent(r.slice(5)));return}
  if(r.startsWith('notice:')){openNotice(r.slice(7));return}
  if(r==='notices'){document.getElementById('app').innerHTML=genericPage('Notice Board','<div class="servicecard" id="allNotices"></div>');bindCommon();document.getElementById('allNotices').innerHTML=state.notices.map(n=>`<div class="resultrow"><span>${esc(n.title)}</span><span><a href="${n.file_path?esc(fileUrl(n.file_path)):'#'}" target="_blank">PDF</a> <button data-notice="${esc(n.id)}">◉</button></span></div>`).join('');document.querySelectorAll('[data-notice]').forEach(b=>b.onclick=()=>openNotice(b.dataset.notice));return}
- if(r==='calendar'){const items=state.calendar.length?state.calendar.map(x=>[x.event_date,x.title]):CALENDAR;document.getElementById('app').innerHTML=genericPage('SSC Calendar',items.map(x=>`<div class="resultrow"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join(''));bindCommon();return}
+ if(r==='calendar'){document.getElementById('app').innerHTML=calendarPage();bindCommon();bindCalendarPage();return}
  if(r==='faq'){document.getElementById('app').innerHTML=genericPage('Frequently Asked Questions',FAQ.map(x=>`<div class="faqfull"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join(''));bindCommon();return}
  if(r==='rti'||r.startsWith('rti-')){document.getElementById('app').innerHTML=genericPage('RTI',`<div class="servicecard">${RTI.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`);bindCommon();return}
  if(r==='about'||ABOUT.map(slug).includes(r)){document.getElementById('app').innerHTML=genericPage('About Us',`<div class="servicecard">${ABOUT.map(x=>`<button class="serviceitem" data-route="${slug(x)}">${esc(x)} <b>→</b></button>`).join('')}</div>`);bindCommon();return}
