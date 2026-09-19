@@ -211,8 +211,11 @@ async function loadCalendar(){
 function renderCalendar(){
  const dbItems=state.calendar.map(x=>[x.event_date,x.title]);
  const items=dbItems.length?dbItems:CALENDAR;
- document.getElementById('monthLabel').textContent=new Date(state.year,state.month,1).toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short',year:'numeric'});
- document.getElementById('calendarList').innerHTML=(items.length?items:CALENDAR.slice(0,4)).map(x=>{
+ const label=document.getElementById('monthLabel');
+ if(label) label.textContent=new Date(state.year,state.month,1).toLocaleString(state.lang==='hi'?'hi-IN':'en-IN',{month:'short',year:'numeric'});
+ const list=document.getElementById('calendarList');
+ if(!list)return;
+ list.innerHTML=(items.length?items:CALENDAR).map(x=>{
    const d=dateParts(x[0]);return `<div class="calrow"><div class="caldate"><b>${d.day}</b><small>${d.mon}</small></div><div>${esc(x[1])}</div></div>`;
  }).join('');
 }
